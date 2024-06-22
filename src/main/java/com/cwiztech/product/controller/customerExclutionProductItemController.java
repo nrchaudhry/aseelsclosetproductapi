@@ -61,7 +61,7 @@ public class customerExclutionProductItemController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<CustomerExclutionProductItem> customerexclutionproductitems = customerexclutionproductitemrepository.findActive();
-		return new ResponseEntity(getAPIResponse(customerexclutionproductitems, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(customerexclutionproductitems, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -72,7 +72,7 @@ public class customerExclutionProductItemController {
 
 		List<CustomerExclutionProductItem> customerexclutionproductitems = customerexclutionproductitemrepository.findAll();
 		
-		return new ResponseEntity(getAPIResponse(customerexclutionproductitems, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(customerexclutionproductitems, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -83,7 +83,7 @@ public class customerExclutionProductItemController {
 
 		CustomerExclutionProductItem customerexclutionproductitem = customerexclutionproductitemrepository.findOne(id);
 		
-		return new ResponseEntity(getAPIResponse(null, customerexclutionproductitem , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, customerexclutionproductitem , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 
@@ -104,7 +104,7 @@ public class customerExclutionProductItemController {
 		if (jsoncustomerexclutionproductitems.length()>0)
 			customerexclutionproductitems = customerexclutionproductitemrepository.findByIDs(customerexclutionproductitem_IDS);
 		
-		return new ResponseEntity(getAPIResponse(customerexclutionproductitems, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(customerexclutionproductitems, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -124,7 +124,7 @@ public class customerExclutionProductItemController {
 		if (jsoncustomerexclutionproductitems.length()>0)
 			customerexclutionproductitems = customerexclutionproductitemrepository.findByNotInIDs(customerexclutionproductitem_IDS);
 		
-		return new ResponseEntity(getAPIResponse(customerexclutionproductitems, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(customerexclutionproductitems, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.POST)
@@ -183,17 +183,17 @@ public class customerExclutionProductItemController {
 					customerexclutionproductitem = customerexclutionproductitemrepository.findOne(customerexclutionproductitemid);
 					
 					if (customerexclutionproductitem == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid CustomerExclutionProductItem Data!", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid CustomerExclutionProductItem Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				}
 			}
 
 				
 			if (customerexclutionproductitemid == 0) {
 				if (!jsonObj.has("customer_ID") || jsonObj.isNull("customer_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "customer_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "customer_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 				if (!jsonObj.has("productitem_ID") || jsonObj.isNull("productitem_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 			}
 			if (jsonObj.has("customer_ID") && !jsonObj.isNull("customer_ID")) 			
@@ -221,13 +221,11 @@ public class customerExclutionProductItemController {
 		
 		ResponseEntity responseentity;
 		if (jsonCustomerExclutionProductItem != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, customerexclutionproductitems.get(0) , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, customerexclutionproductitems.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(customerexclutionproductitems, null , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(customerexclutionproductitems, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		return responseentity;
 	}
-	
-
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -238,7 +236,7 @@ public class customerExclutionProductItemController {
 		CustomerExclutionProductItem customerexclutionproductitem = customerexclutionproductitemrepository.findOne(id);
 		customerexclutionproductitemrepository.delete(customerexclutionproductitem);
 		
-		return new ResponseEntity(getAPIResponse(null, customerexclutionproductitem , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, customerexclutionproductitem , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -278,9 +276,84 @@ public class customerExclutionProductItemController {
 				? customerexclutionproductitemrepository.findBySearch("%" + jsonObj.getString("search") + "%")
 				: customerexclutionproductitemrepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 		
-		return new ResponseEntity(getAPIResponse(customerexclutionproductitems, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(customerexclutionproductitems, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+	}
+	
+	@SuppressWarnings({ "rawtypes" })
+	@RequestMapping(value = "/advancedsearch", method = RequestMethod.POST)
+	public ResponseEntity getByAdvancedSearch(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException, JSONException, ParseException {
+		return ByAdvancedSearch(data, true, headToken);
 	}
 
+	@SuppressWarnings({ "rawtypes" })
+	@RequestMapping(value = "/advancedsearch/all", method = RequestMethod.POST)
+	public ResponseEntity getAllByAdvancedSearch(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException, JSONException, ParseException {
+		return ByAdvancedSearch(data, false, headToken);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken) throws JsonProcessingException, JSONException, ParseException {
+		APIRequestDataLog apiRequest = checkToken("POST", "/customerexclutionproductitem/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
+		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		
+		List<CustomerExclutionProductItem> customerexclutionproductitems = new ArrayList<CustomerExclutionProductItem>();
+		JSONObject jsonObj = new JSONObject(data);
+		
+		   JSONArray searchObject = new JSONArray();
+	        List<Integer> customer_IDS = new ArrayList<Integer>(); 
+	        List<Integer> productitem_IDS = new ArrayList<Integer>(); 
+
+	        customer_IDS.add((int) 0);
+	        productitem_IDS.add((int) 0);
+	        
+		long customer_ID = 0 , productitem_ID = 0;
+		
+        boolean isWithDetail = true;
+        if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+            isWithDetail = jsonObj.getBoolean("iswithdetail");
+        }
+        jsonObj.put("iswithdetail", false);
+		
+        if (jsonObj.has("customer_ID") && !jsonObj.isNull("customer_ID") && jsonObj.getLong("customer_ID") != 0) {
+            customer_ID = jsonObj.getLong("customer_ID");
+            customer_IDS.add((int) customer_ID);
+        } else if (jsonObj.has("customer") && !jsonObj.isNull("customer") && jsonObj.getLong("customer") != 0) {
+            if (active == true) {
+                searchObject = new JSONArray(ProductService.POST("customer/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+            } else {
+                searchObject = new JSONArray(ProductService.POST("customer/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+            }
+
+            customer_ID = searchObject.length();
+            for (int i=0; i<searchObject.length(); i++) {
+                customer_IDS.add((int) searchObject.getJSONObject(i).getLong("customer_ID"));
+            }
+        }
+		
+        if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID") && jsonObj.getLong("productitem_ID") != 0) {
+            productitem_ID = jsonObj.getLong("productitem_ID");
+            productitem_IDS.add((int) productitem_ID);
+        } else if (jsonObj.has("productitem") && !jsonObj.isNull("productitem") && jsonObj.getLong("productitem") != 0) {
+            if (active == true) {
+                searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+            } else {
+                searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+            }
+
+            productitem_ID = searchObject.length();
+            for (int i=0; i<searchObject.length(); i++) {
+                productitem_IDS.add((int) searchObject.getJSONObject(i).getLong("productitem_ID"));
+            }
+        }
+		
+		if(customer_ID != 0 || customer_ID != 0){
+		 customerexclutionproductitems = ((active == true)
+				? customerexclutionproductitemrepository.findByAdvancedSearch(customer_ID, customer_IDS, productitem_ID, productitem_IDS)
+				: customerexclutionproductitemrepository.findAllByAdvancedSearch(customer_ID, customer_IDS, productitem_ID, productitem_IDS));
+		}
+		return new ResponseEntity(getAPIResponse(customerexclutionproductitems, null, null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
+	}
+	
 	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
 		JSONObject checkTokenResponse = AccessToken.checkToken(accessToken);
 		DatabaseTables databaseTableID = databasetablesrepository.findOne(CustomerExclutionProductItem.getDatabaseTableID());
@@ -306,7 +379,7 @@ public class customerExclutionProductItemController {
 		return apiRequest;
 	}
 	
-	APIRequestDataLog getAPIResponse(List<CustomerExclutionProductItem> customerexclutionproductitems, CustomerExclutionProductItem customerexclutionproductitem , JSONArray jsonCustomerExclutionProductItems, JSONObject jsonCustomerExclutionProductItem, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<CustomerExclutionProductItem> customerexclutionproductitems, CustomerExclutionProductItem customerexclutionproductitem , JSONArray jsonCustomerExclutionProductItems, JSONObject jsonCustomerExclutionProductItem, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -316,14 +389,14 @@ public class customerExclutionProductItemController {
 			apiRequest = tableDataLogs.errorDataLog(apiRequest, "CustomerExclutionProductItem", message);
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
-			if (customerexclutionproductitem != null) {
+			if (customerexclutionproductitem != null && isWithDetail == true) {
 				JSONObject customer = new JSONObject(CustomerService.GET("customer/"+customerexclutionproductitem.getCUSTOMER_ID(), apiRequest.getREQUEST_OUTPUT()));
 				customerexclutionproductitem.setCUSTOMER_DETAIL(customer.toString());
 				JSONObject productitem = new JSONObject(ProductService.GET("productitem/"+customerexclutionproductitem.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT()));
 				customerexclutionproductitem.setPRODUCTITEM_DETAIL(productitem.toString());
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(customerexclutionproductitem));
 				customerexclutionproductitemID = customerexclutionproductitem.getCUSTOMEREXCLUSIONPRODUCTITEM_ID();
-			} else if(customerexclutionproductitems != null){
+			} else if(customerexclutionproductitems != null && isWithDetail == true){
 				if (customerexclutionproductitems.size()>0) {
 					List<Integer> customerList = new ArrayList<Integer>();
 					for (int i=0; i<customerexclutionproductitems.size(); i++) {
@@ -358,7 +431,12 @@ public class customerExclutionProductItemController {
 			
 			} else if (jsonCustomerExclutionProductItem != null){
 				apiRequest.setREQUEST_OUTPUT(jsonCustomerExclutionProductItem.toString());
-			}
+			
+		} else if (jsonCustomerExclutionProductItems != null){
+			apiRequest.setREQUEST_OUTPUT(jsonCustomerExclutionProductItems.toString());
+		} else if (jsonCustomerExclutionProductItem != null){
+			apiRequest.setREQUEST_OUTPUT(jsonCustomerExclutionProductItem.toString());
+		}
 			apiRequest.setRESPONSE_DATETIME(dateFormat1.format(date));
 			apiRequest.setREQUEST_STATUS("Success");
 			apirequestdatalogRepository.saveAndFlush(apiRequest);

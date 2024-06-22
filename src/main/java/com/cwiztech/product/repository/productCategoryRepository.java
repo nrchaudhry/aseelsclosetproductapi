@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.cwiztech.product.model.ProductCategory;
-import com.cwiztech.product.model.ProductItem;
 
 public interface productCategoryRepository extends JpaRepository<ProductCategory, Long>{
 	
@@ -23,33 +22,27 @@ public interface productCategoryRepository extends JpaRepository<ProductCategory
 	@Query(value = "select * from TBLPRODUCTCATEGORY where ISACTIVE='Y' and PRODUCTCATEGORYPARENT_ID=?1 order by PRODUCTCATEGORYORDER_NO", nativeQuery = true)
 	public List<ProductCategory> findActiveByParent(Long pid);
 
-	@Query(value = "select distinct a.* from TBLPRODUCTCATEGORY as a "
-			+ "left outer join TBLPRODUCT as b on a.PRODUCTCATEGORY_ID=b.PRODUCTCATEGORY_ID "
-			+ "left outer join TBLPRODUCTAPPLICATION as c on b.PRODUCT_ID=c.PRODUCT_ID "
-			+ "where APPLICATION_ID LIKE CASE WHEN ?1 = 0 THEN APPLICATION_ID ELSE ?1 END " 
-			+ "and (PRODUCTCATEGORY_NAME LIKE ?2 "
-			+ "OR PRODUCTCATEGORY_DESC LIKE ?2) "
-			+ "and a.ISACTIVE='Y' order by PRODUCTCATEGORYORDER_NO", nativeQuery = true)
-	public List<ProductCategory> findBySearch(Long applicationID, String search);
+	@Query(value = "select distinct * from TBLPRODUCTCATEGORY "
+			+ "where PRODUCTCATEGORY_NAME LIKE ?1 OR PRODUCTCATEGORY_DESC LIKE ?1 "
+			+ "and ISACTIVE='Y' order by PRODUCTCATEGORYORDER_NO", nativeQuery = true)
+	public List<ProductCategory> findBySearch(String search);
 
-	@Query(value = "select distinct a.* from TBLPRODUCTCATEGORY as a "
-			+ "left outer join TBLPRODUCT as b on a.PRODUCTCATEGORY_ID=b.PRODUCTCATEGORY_ID "
-			+ "left outer join TBLPRODUCTAPPLICATION as c on b.PRODUCT_ID=c.PRODUCT_ID "
-			+ "where APPLICATION_ID LIKE CASE WHEN ?1 = 0 THEN APPLICATION_ID ELSE ?1 END " 
-			+ "and (PRODUCTCATEGORY_NAME LIKE ?2 "
-			+ "OR PRODUCTCATEGORY_DESC LIKE ?2) "
+    @Query(value = "select distinct * from TBLPRODUCTCATEGORY "
+            + "where PRODUCTCATEGORY_NAME LIKE ?1 OR PRODUCTCATEGORY_DESC LIKE ?1 "
 			+ "order by PRODUCTCATEGORYORDER_NO", nativeQuery = true)
-	public List<ProductCategory> findAllBySearch(Long applicationID, String search);
+	public List<ProductCategory> findAllBySearch(String search);
 	
-	@Query(value = "select distinct a.* from TBLPRODUCTCATEGORY as a "
-				+ "where PRODUCTCATEGORYPARENT_ID LIKE CASE WHEN ?1 = 0 THEN PRODUCTCATEGORYPARENT_ID ELSE ?1 END and PRODUCTCATEGORYPARENT_ID is NOT NULL " 
-				+ "and a.ISACTIVE='Y' order by PRODUCTCATEGORYORDER_NO", nativeQuery = true)
-	List<ProductCategory> findByAdvancedSearch(Long productcategoryID);
+    @Query(value = "select * from TBLPRODUCTCATEGORY  "
+            + "where CASE WHEN :PRODUCTCATEGORYPARENT_ID = 0 THEN PRODUCTCATEGORYPARENT_ID=PRODUCTCATEGORYPARENT_ID ELSE PRODUCTCATEGORYPARENT_ID IN (:PRODUCTCATEGORYPARENT_IDS) END "
+            + "and ISACTIVE='Y' order by PRODUCTCATEGORYORDER_NO", nativeQuery = true)
+    List<ProductCategory> findByAdvancedSearch(
+    @Param("PRODUCTCATEGORYPARENT_ID") Long PRODUCTCATEGORYPARENT_ID, @Param("PRODUCTCATEGORYPARENT_IDS") List<Integer> PRODUCTCATEGORYPARENT_IDS); 
 
-	@Query(value = "select distinct a.* from TBLPRODUCTCATEGORY as a "
-			    + "where PRODUCTCATEGORYPARENT_ID LIKE CASE WHEN ?1 = 0 THEN PRODUCTCATEGORYPARENT_ID ELSE ?1 END and PRODUCTCATEGORYPARENT_ID is NOT NULL " 
-			    + "order by PRODUCTCATEGORYORDER_NO", nativeQuery = true)
-	List<ProductCategory> findAllByAdvancedSearch(Long productcategoryID);
+    @Query(value = "select distinct * from TBLPRODUCTCATEGORY "
+            + "where CASE WHEN :PRODUCTCATEGORYPARENT_ID = 0 THEN PRODUCTCATEGORYPARENT_ID=PRODUCTCATEGORYPARENT_ID ELSE PRODUCTCATEGORYPARENT_ID IN (:PRODUCTCATEGORYPARENT_IDS) END "
+            , nativeQuery = true)
+    List<ProductCategory> findAllByAdvancedSearch(
+    @Param("PRODUCTCATEGORYPARENT_ID") Long PRODUCTCATEGORYPARENT_ID, @Param("PRODUCTCATEGORYPARENT_IDS") List<Integer> PRODUCTCATEGORYPARENT_IDS); 
 	
 	@Query(value = "select * from TBLPRODUCTCATEGORY "
 			+ "where PRODUCTCATEGORY_ID in (:ids) "

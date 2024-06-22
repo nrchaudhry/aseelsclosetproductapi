@@ -24,15 +24,17 @@ public interface attributeRepository extends JpaRepository<Attribute, Long>{
 			+ "where ATTRIBUTE_NAME like ?1 or ATTRIBUTE_KEY like ?1 or ATTRIBUTE_DESCRIPTION like ?1 order by ATTRIBUTEORDER_NO", nativeQuery = true)
 	public List<Attribute> findAllBySearch(String search);
 
-	@Query(value = "select * from TBLATTRIBUTE " 
-			+ "where DATATYPE_ID like CASE WHEN ?1=0 THEN DATATYPE_ID ELSE ?1 END "
+    @Query(value = "select * from TBLATTRIBUTE "
+            + "where CASE WHEN :DATATYPE_ID = 0 THEN DATATYPE_ID=DATATYPE_ID ELSE DATATYPE_ID IN (:DATATYPE_IDS) END "
 			+ "and ISACTIVE='Y' order by ATTRIBUTEORDER_NO ", nativeQuery = true)
-	List<Attribute> findByAdvancedSearch(Long datatypeID);
+	List<Attribute> findByAdvancedSearch(
+    @Param("DATATYPE_ID") Long DATATYPE_ID, @Param("DATATYPE_IDS") List<Integer> DATATYPE_IDS); 
 
 	@Query(value = "select * from TBLATTRIBUTE "
-			+ "where DATATYPE_ID like CASE WHEN ?1=0 THEN DATATYPE_ID ELSE ?1 END order by ATTRIBUTEORDER_NO"
+			+ "where CASE WHEN :DATATYPE_ID = 0 THEN DATATYPE_ID=DATATYPE_ID ELSE DATATYPE_ID IN (:DATATYPE_IDS) END "
 			, nativeQuery = true)
-	List<Attribute> findAllByAdvancedSearch(Long datatypeID);
+	List<Attribute> findAllByAdvancedSearch(
+    @Param("DATATYPE_ID") Long DATATYPE_ID, @Param("DATATYPE_IDS") List<Integer> DATATYPE_IDS); 
 
 	@Query(value = "select * from TBLATTRIBUTE where ATTRIBUTE_ID in (:ids) ", nativeQuery = true)
 	public List<Attribute> findByIDs(@Param("ids") List<Integer> ids);

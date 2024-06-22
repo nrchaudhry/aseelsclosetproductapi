@@ -60,7 +60,7 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<ProductItemMovement> productitemmovements = productitemmovementrepository.findActive();
-		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -71,7 +71,7 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 
 		List<ProductItemMovement> productitemmovements = productitemmovementrepository.findAll();
 		
-		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -82,7 +82,7 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 
 		ProductItemMovement productitemmovement = productitemmovementrepository.findOne(id);
 		
-		return new ResponseEntity(getAPIResponse(null, productitemmovement , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productitemmovement , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -102,7 +102,7 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		if (jsonproductitemmovements.length()>0)
 			productitemmovements = productitemmovementrepository.findByIDs(productitemmovement_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -122,7 +122,7 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		if (jsonproductitemmovements.length()>0)
 			productitemmovements = productitemmovementrepository.findByNotInIDs(productitemmovement_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -181,22 +181,22 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 					productitemmovement = productitemmovementrepository.findOne(productitemmovementid);
 					
 					if (productitemmovement == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemMovement Data!", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemMovement Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				}
 			}
 			
 			if (productitemmovementid == 0) {
 				if (!jsonObj.has("product_ID") || jsonObj.isNull("product_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 				if (!jsonObj.has("productitemmovement_DATE") || jsonObj.isNull("productitemmovement_DATE"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitemmovement_DATE is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitemmovement_DATE is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 					
 				if (!jsonObj.has("productitem_QUANTITY") || jsonObj.isNull("productitem_QUANTITY"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_QUANTITY is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_QUANTITY is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 				if (!jsonObj.has("productitemmovement_QUANTITY") || jsonObj.isNull("productitemmovement_QUANTITY"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitemmovement_QUANTITY is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitemmovement_QUANTITY is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 			}
 			
 			if (jsonObj.has("productitemmovement_DATE") && !jsonObj.isNull("productitemmovement_DATE")) 
@@ -242,9 +242,9 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		
 		ResponseEntity responseentity;
 		if (jsonProductItemMovement != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productitemmovements.get(0) , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productitemmovements.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		return responseentity;
 	}
 	
@@ -257,7 +257,7 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		ProductItemMovement productitemmovement = productitemmovementrepository.findOne(id);
 		productitemmovementrepository.delete(productitemmovement);
 		
-		return new ResponseEntity(getAPIResponse(null, productitemmovement , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productitemmovement , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -296,7 +296,7 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 				? productitemmovementrepository.findBySearch("%" + jsonObj.getString("search") + "%")
 				: productitemmovementrepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 		
-		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -318,73 +318,60 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		
 		List<ProductItemMovement> productitemmovements = new ArrayList<ProductItemMovement>();
 		JSONObject jsonObj = new JSONObject(data);
-		long product_ID = 0, productitemmovementdate=0 ,employee_ID=0, assigntoemployeedatetime=0 ,productitemmovementdatetime=0,productbrand_ID=0;
-		String productitemmovement_DATE="";
-		String assigntoemployee_DATETIME="";
-		String productitemmovement_DATETIME="";
-		
-		if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID"))
-			product_ID = jsonObj.getLong("product_ID");
-		if (jsonObj.has("productcategory_ID") && !jsonObj.isNull("productcategory_ID") && product_ID == 0 ) {
-            JSONArray productcategorysObject;
-            if (active == true) {
-            	productcategorysObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
-            } else {
-            	productcategorysObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
-            }
+		   JSONArray searchObject = new JSONArray();
+	        List<Integer> employee_IDS = new ArrayList<Integer>(); 
+	        List<Integer> product_IDS = new ArrayList<Integer>(); 
 
-            for (int i=0; i<productcategorysObject.length(); i++) {
-                List<ProductItemMovement> productitemmovement = new ArrayList<ProductItemMovement>();
-                productitemmovement = ((active == true)
-                        ? productitemmovementrepository.findByAdvancedSearch(productcategorysObject.getJSONObject(i).getLong("product_ID") , (long) 0, "",  (long) 0,"", (long) 0, (long) 0,"" )
-                        : productitemmovementrepository.findAllByAdvancedSearch(productcategorysObject.getJSONObject(i).getLong("product_ID") , (long) 0,"",  (long) 0,"", (long) 0, (long) 0,"" ));
-                for (int j=0; j<productitemmovement.size(); j++) {
-                	productitemmovements.add(productitemmovement.get(j));
-                }
-            }
-        }
+	        employee_IDS.add((int) 0);
+	        product_IDS.add((int) 0);
+	        
+		long employee_ID = 0 , product_ID = 0;
 		
-		if (jsonObj.has("productitemmovement_DATE")) {
-			productitemmovementdate = 1;
-			productitemmovement_DATE = jsonObj.getString("productitemmovement_DATE");
-		}
+       boolean isWithDetail = true;
+       if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+           isWithDetail = jsonObj.getBoolean("iswithdetail");
+       }
+       jsonObj.put("iswithdetail", false);
 		
-		if (jsonObj.has("assigntoemployee_DATETIME")) {
-			assigntoemployeedatetime = 1;
-			assigntoemployee_DATETIME = jsonObj.getString("assigntoemployee_DATETIME");		
-		}
-		
-		if (jsonObj.has("employee_ID") && !jsonObj.isNull("employee_ID")) {
-			employee_ID = jsonObj.getLong("employee_ID");
-		}
-		
-		if (jsonObj.has("productitemmovement_DATETIME")) {
-			productitemmovementdatetime = 1;
-			productitemmovement_DATETIME = jsonObj.getString("productitemmovement_DATETIME");
-		}
+       if (jsonObj.has("employee_ID") && !jsonObj.isNull("employee_ID") && jsonObj.getLong("employee_ID") != 0) {
+           employee_ID = jsonObj.getLong("employee_ID");
+           employee_IDS.add((int) employee_ID);
+       } else if (jsonObj.has("employee") && !jsonObj.isNull("employee") && jsonObj.getLong("employee") != 0) {
+           if (active == true) {
+               searchObject = new JSONArray(EmployeeService.POST("employee/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+           } else {
+               searchObject = new JSONArray(EmployeeService.POST("employee/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+           }
 
-	if(product_ID != 0 || productitemmovementdatetime != 0 || employee_ID != 0 || assigntoemployeedatetime != 0 || productitemmovementdate != 0){
+           employee_ID = searchObject.length();
+           for (int i=0; i<searchObject.length(); i++) {
+               employee_IDS.add((int) searchObject.getJSONObject(i).getLong("employee_ID"));
+           }
+       }
+		
+       if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID") && jsonObj.getLong("product_ID") != 0) {
+           product_ID = jsonObj.getLong("product_ID");
+           product_IDS.add((int) product_ID);
+       } else if (jsonObj.has("product") && !jsonObj.isNull("product") && jsonObj.getLong("product") != 0) {
+           if (active == true) {
+               searchObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+           } else {
+               searchObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+           }
+
+           product_ID = searchObject.length();
+           for (int i=0; i<searchObject.length(); i++) {
+               product_IDS.add((int) searchObject.getJSONObject(i).getLong("product_ID"));
+           }
+       }
+       
+	if(product_ID != 0 || employee_ID != 0 ){
 		List<ProductItemMovement> productitemmovement = ((active == true)
-				? productitemmovementrepository.findByAdvancedSearch(product_ID,productitemmovementdate, productitemmovement_DATE, 
-						assigntoemployeedatetime, assigntoemployee_DATETIME,employee_ID,productitemmovementdatetime,productitemmovement_DATETIME)
-				: productitemmovementrepository.findAllByAdvancedSearch(product_ID,productitemmovementdate, productitemmovement_DATE, 
-						assigntoemployeedatetime, assigntoemployee_DATETIME,employee_ID,productitemmovementdatetime,productitemmovement_DATETIME));
-	for (int i=0; i<productitemmovement.size(); i++) {
-        boolean found = false;
-        
-        for (int j=0; j<productitemmovements.size(); j++) {
-            if (productitemmovement.get(i).getPRODUCTITEMMOVEMENT_ID() == productitemmovements.get(j).getPRODUCTITEMMOVEMENT_ID()) {
-                found = true;
-                break;
-            }
-        }
-        
-        if (found == false) {
-        	productitemmovements.add(productitemmovement.get(i));
-        }
-    }
+				? productitemmovementrepository.findByAdvancedSearch(product_ID,product_IDS,employee_ID,employee_IDS)
+				: productitemmovementrepository.findAllByAdvancedSearch(product_ID,product_IDS,employee_ID,employee_IDS));
+
 	}
-		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
@@ -411,7 +398,7 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		return apiRequest;
 	}
 	
-	APIRequestDataLog getAPIResponse(List<ProductItemMovement> productitemmovements, ProductItemMovement productitemmovement , JSONArray jsonProductItemMovements, JSONObject jsonProductItemMovement, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<ProductItemMovement> productitemmovements, ProductItemMovement productitemmovement , JSONArray jsonProductItemMovements, JSONObject jsonProductItemMovement, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -481,137 +468,4 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		return apiRequest;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/refresh", method = RequestMethod.POST)
-	public ResponseEntity getProductQuantity(@RequestBody String data,@RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException {
-
-		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
-		String rtn, workstation = null;
-		APIRequestDataLog apiRequest;
-
-		log.info("POST: productitemmovement/refresh");
-		log.info("Input: " + data);
-		
-		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItemMovement.getDatabaseTableID());
-
-	if (checkTokenResponse.has("error")) {
-			apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, (long) 0, "/productitemmovement/refresh", data, workstation);
-		apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-		apirequestdatalogRepository.saveAndFlush(apiRequest);
-		return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-	}
-		
-		ObjectMapper mapper = new ObjectMapper();
-		Long requestUser = checkTokenResponse.getLong("user_ID");
-		apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, requestUser, "/productitemmovement/refresh", data, workstation);
-
-		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date date = new Date();
-		
-		JSONObject jsonObj = new JSONObject(data);
-		long netsuite_ID=0, saleorder_ID = 0,product_ID=0,saleordertype_ID=0,shop_ID = 0, transportroute_ID = -1, saleorderstatus_ID=0,
-				routestatus_ID=0,saleorderdate=0,saleorderdeliverydate=0,productcategory_ID=0,productbrand_ID=0,producttype_ID=0,
-				saleorderstatus=0, saleordertype=0, routestatus=0;
-		String saleorder_DATE="", saleorderdelivery_DATE="", saleorderstatus_CODE="", saleordertype_CODE="", routestatus_CODE="";
-		
-		if (jsonObj.has("netsuite_ID"))
-			netsuite_ID = jsonObj.getLong("netsuite_ID");
-		
-		if (jsonObj.has("saleorder_ID"))
-			saleorder_ID = jsonObj.getLong("saleorder_ID");
-		
-		if (jsonObj.has("product_ID"))
-			product_ID = jsonObj.getLong("product_ID");
-		
-		if (jsonObj.has("saleordertype_ID"))
-			saleordertype_ID = jsonObj.getLong("saleordertype_ID");
-		if (jsonObj.has("saleordertype_CODE")) {
-			saleordertype = 1;
-			saleordertype_CODE = jsonObj.getString("saleordertype_CODE");
-		}
-
-		if (jsonObj.has("shop_ID"))
-			shop_ID = jsonObj.getLong("shop_ID");
-		
-		if (jsonObj.has("transportroute_ID"))
-			transportroute_ID = jsonObj.getLong("transportroute_ID");
-		
-		if (jsonObj.has("saleorderstatus_ID"))
-			saleorderstatus_ID = jsonObj.getLong("saleorderstatus_ID");
-		if (jsonObj.has("saleorderstatus_CODE")) {
-			saleorderstatus = 1;
-			saleorderstatus_CODE = jsonObj.getString("saleorderstatus_CODE");
-		}
-		
-		if (jsonObj.has("routestatus_ID"))
-			routestatus_ID = jsonObj.getLong("routestatus_ID");
-		if (jsonObj.has("routestatus_CODE")) {
-			routestatus = 1;
-			routestatus_CODE = jsonObj.getString("routestatus_CODE");
-		}
-
-		if (jsonObj.has("saleorder_DATE")) {
-			saleorderdate = 1;
-			saleorder_DATE = jsonObj.getString("saleorder_DATE");
-		}
-		
-		if (jsonObj.has("saleorderdelivery_DATE")) {
-			saleorderdeliverydate = 1;
-			saleorderdelivery_DATE = jsonObj.getString("saleorderdelivery_DATE");
-		}
-
-		if (jsonObj.has("productcategory_ID"))
-			productcategory_ID = jsonObj.getLong("productcategory_ID");
-		
-		if (jsonObj.has("productbrand_ID"))
-			productbrand_ID = jsonObj.getLong("productbrand_ID");
-		
-		if (jsonObj.has("producttype_ID"))
-			producttype_ID = jsonObj.getLong("producttype_ID");
-		
-//		List<Object[]> productquantity = orderdetailrepository.findProdutQuantityByAdvancedSearch(netsuite_ID,saleorder_ID,product_ID,saleordertype_ID, shop_ID, transportroute_ID, saleorderstatus_ID, routestatus_ID,saleorderdate, saleorder_DATE,saleorderdeliverydate,saleorderdelivery_DATE,productcategory_ID,productbrand_ID,producttype_ID, saleorderstatus, saleorderstatus_CODE, saleordertype, saleordertype_CODE, routestatus, routestatus_CODE);
-		List<Object[]> productquantity = null;
-		
-		for (int i=0; i<productquantity.size(); i++) {
-			Object[] obj = productquantity.get(i);
-			JSONObject productquantityObject = new JSONObject();
-			long productID = (int) obj[0];
-			long productQTY = (int) obj[2];
-			List<ProductItemMovement> productitemsmovement = productitemmovementrepository.findByAdvancedSearch(productID, (long) 1, (String) obj[1], 
-							(long) 0, "", (long) 0, (long) 0, "");
-			
-			if (productitemsmovement.size()>0) {
-				ProductItemMovement productitemmovement = productitemsmovement.get(0);
-				productitemmovement.setPRODUCTITEM_QUANTITY(productQTY);
-				productitemmovement.setMODIFIED_BY(requestUser);
-				productitemmovement.setMODIFIED_WORKSTATION(workstation);
-				productitemmovement.setMODIFIED_WHEN(dateFormat1.format(date));
-				productitemmovement = productitemmovementrepository.saveAndFlush(productitemmovement);
-			} else {
-				ProductItemMovement productitemmovement = new ProductItemMovement();
-				productitemmovement.setPRODUCTITEMMOVEMENT_DATE( (String) obj[1]);
-				productitemmovement.setPRODUCT_ID(productID);
-				productitemmovement.setPRODUCTITEM_QUANTITY(productQTY);
-				productitemmovement.setISACTIVE("Y");
-				productitemmovement.setMODIFIED_BY(requestUser);
-				productitemmovement.setMODIFIED_WORKSTATION(workstation);
-				productitemmovement.setMODIFIED_WHEN(dateFormat1.format(date));
-				productitemmovement = productitemmovementrepository.saveAndFlush(productitemmovement);
-			}
-		}
-
-		List<ProductItemMovement> productitemmovement = productitemmovementrepository.findByAdvancedSearch((long) 0, saleorderdeliverydate, saleorderdelivery_DATE, 
-				(long) 0, "", (long) 0, (long) 0, "");
-		rtn = mapper.writeValueAsString(productitemmovement);
-
-		apiRequest.setREQUEST_OUTPUT(rtn);
-		apiRequest.setREQUEST_STATUS("Success");
-		apirequestdatalogRepository.saveAndFlush(apiRequest);
-
-		log.info("Output: " + rtn);
-		log.info("--------------------------------------------------------");
-
-		return new ResponseEntity(rtn, HttpStatus.OK);
-
-	}
 }

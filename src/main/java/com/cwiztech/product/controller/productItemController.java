@@ -29,10 +29,6 @@ import com.cwiztech.datalogs.repository.apiRequestDataLogRepository;
 import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductItem;
-import com.cwiztech.product.model.ProductItemAttributeValue;
-import com.cwiztech.product.model.ProductItemImage;
-import com.cwiztech.product.repository.productItemAttributeValueRepository;
-import com.cwiztech.product.repository.productItemImageRepository;
 import com.cwiztech.product.repository.productItemRepository;
 import com.cwiztech.services.ProductService;
 import com.cwiztech.services.UserLoginService;
@@ -50,12 +46,6 @@ public class productItemController {
 	private productItemRepository productitemrepository;
 
 	@Autowired
-	private productItemAttributeValueRepository productitemattributevaluerepository;
-
-	@Autowired
-	private productItemImageRepository productitemimagerepository;
-
-	@Autowired
 	private apiRequestDataLogRepository apirequestdatalogRepository;
 
 	@Autowired
@@ -63,7 +53,7 @@ public class productItemController {
 
 	@Autowired
 	private databaseTablesRepository databasetablesrepository;
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException, JSONException, ParseException {
@@ -71,7 +61,7 @@ public class productItemController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<ProductItem> productitems = productitemrepository.findActive();
-		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -81,10 +71,10 @@ public class productItemController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<ProductItem> productitems = productitemrepository.findAll();
-		
-		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+
+		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity getOne(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException, JSONException, ParseException {
@@ -92,10 +82,10 @@ public class productItemController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		ProductItem productitem = productitemrepository.findOne(id);
-		
-		return new ResponseEntity(getAPIResponse(null, productitem , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+
+		return new ResponseEntity(getAPIResponse(null, productitem , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/ids", method = RequestMethod.POST)
 	public ResponseEntity getByIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken)
@@ -112,8 +102,8 @@ public class productItemController {
 		List<ProductItem> productitems = new ArrayList<ProductItem>();
 		if (jsonproductitems.length()>0)
 			productitems = productitemrepository.findByIDs(productitem_IDS);
-		
-		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+
+		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -140,13 +130,13 @@ public class productItemController {
 				applicationList.add(Integer.parseInt(productitems.get(i).getAPPLICATION_ID().toString()));
 			}
 			JSONArray logisticsObject = new JSONArray(UserLoginService.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getREQUEST_OUTPUT()));
-			
+
 			List<Integer> productList = new ArrayList<Integer>();
 			for (int i=0; i<productitems.size(); i++) {
 				productList.add(Integer.parseInt(productitems.get(i).getPRODUCT_ID().toString()));
 			}
 			JSONArray productObject = new JSONArray(ProductService.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT()));
-			
+
 			for (int i=0; i<productitems.size(); i++) {
 				for (int j=0; j<logisticsObject.length(); j++) {
 					JSONObject application = logisticsObject.getJSONObject(j);
@@ -154,7 +144,7 @@ public class productItemController {
 						productitems.get(i).setAPPLICATION_DETAIL(application.toString());
 					}
 				}
-				
+
 				for (int j=0; j<productObject.length(); j++) {
 					JSONObject product = productObject.getJSONObject(j);
 					if(productitems.get(i).getPRODUCT_ID() == product.getLong("product_ID") ) {
@@ -163,7 +153,7 @@ public class productItemController {
 				}
 			}
 		}
-		
+
 		jsonproductitems = new JSONArray();
 		JSONArray productitemattributevalues = new JSONArray(ProductService.POST("productitemattributevalue/productitem/ids", jsonObj.toString().replace("//", ""), apiRequest.getREQUEST_OUTPUT()));
 		for (int i=0; i<productitems.size(); i++) {
@@ -190,7 +180,7 @@ public class productItemController {
 			jsonproductitems.put(objProductItem);
 		}
 
-		return new ResponseEntity(getAPIResponse(null, null , jsonproductitems, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, null , jsonproductitems, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -209,8 +199,8 @@ public class productItemController {
 		List<ProductItem> productitems = new ArrayList<ProductItem>();
 		if (jsonproductitems.length()>0)
 			productitems = productitemrepository.findByNotInIDs(productitem_IDS);
-		
-		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+
+		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.POST)
@@ -218,7 +208,7 @@ public class productItemController {
 			throws JsonProcessingException, JSONException, ParseException {
 		APIRequestDataLog apiRequest = checkToken("POST", "/productitem", data, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-		
+
 		return insertupdateAll(null, new JSONObject(data), apiRequest);
 	}
 
@@ -228,27 +218,27 @@ public class productItemController {
 			throws JsonProcessingException, JSONException, ParseException {
 		APIRequestDataLog apiRequest = checkToken("PUT", "/productitem/"+id, data, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-		
+
 		JSONObject jsonObj = new JSONObject(data);
 		jsonObj.put("id", id);
-		
+
 		return insertupdateAll(null, jsonObj, apiRequest);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.PUT)
 	public ResponseEntity insertupdate(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken)
 			throws JsonProcessingException, JSONException, ParseException {
 		APIRequestDataLog apiRequest = checkToken("PUT", "/productitem", data, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-		
+
 		return insertupdateAll(new JSONArray(data), null, apiRequest);
 	}
 
-			
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity insertupdateAll(JSONArray jsonProductItems, JSONObject jsonProductItem, APIRequestDataLog apiRequest) throws JsonProcessingException, JSONException, ParseException {
-	    SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 
 		List<ProductItem> productitems = new ArrayList<ProductItem>();
@@ -257,7 +247,7 @@ public class productItemController {
 			jsonProductItems.put(jsonProductItem);
 		}
 		log.info(jsonProductItems.toString());
-		
+
 		for (int a=0; a<jsonProductItems.length(); a++) {
 			JSONObject jsonObj = jsonProductItems.getJSONObject(a);
 			ProductItem productitem = new ProductItem();
@@ -267,41 +257,41 @@ public class productItemController {
 				productitemid = jsonObj.getLong("productitem_ID");
 				if (productitemid != 0) {
 					productitem = productitemrepository.findOne(productitemid);
-					
+
 					if (productitem == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItem Data!", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItem Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				}
 			}
 
-				
+
 			if (productitemid == 0) {
 				if (!jsonObj.has("product_ID") || jsonObj.isNull("product_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-				
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+
 				if (!jsonObj.has("application_ID") || jsonObj.isNull("application_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "application_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-				
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "application_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+
 				if (!jsonObj.has("productitem_NAME") || jsonObj.isNull("productitem_NAME"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_NAME is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_NAME is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 			}
 			if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID"))
-		    	productitem.setPRODUCT_ID(jsonObj.getLong("product_ID"));
+				productitem.setPRODUCT_ID(jsonObj.getLong("product_ID"));
 
-		    if (jsonObj.has("application_ID") && !jsonObj.isNull("application_ID"))
-		    	productitem.setAPPLICATION_ID(jsonObj.getLong("application_ID"));
+			if (jsonObj.has("application_ID") && !jsonObj.isNull("application_ID"))
+				productitem.setAPPLICATION_ID(jsonObj.getLong("application_ID"));
 
-		    if (jsonObj.has("productitem_NAME") && !jsonObj.isNull("productitem_NAME"))
-		    	productitem.setPRODUCTITEM_NAME(jsonObj.getString("productitem_NAME"));
+			if (jsonObj.has("productitem_NAME") && !jsonObj.isNull("productitem_NAME"))
+				productitem.setPRODUCTITEM_NAME(jsonObj.getString("productitem_NAME"));
 
-		    if (jsonObj.has("productitem_DESC") && !jsonObj.isNull("productitem_DESC"))
-		    	productitem.setPRODUCTITEM_DESC(jsonObj.getString("productitem_DESC"));
+			if (jsonObj.has("productitem_DESC") && !jsonObj.isNull("productitem_DESC"))
+				productitem.setPRODUCTITEM_DESC(jsonObj.getString("productitem_DESC"));
 
-		    if (jsonObj.has("productitem_IMAGE") && !jsonObj.isNull("productitem_IMAGE"))
-		    	productitem.setPRODUCTITEM_IMAGE(jsonObj.getString("productitem_IMAGE"));
-			
-		    if (productitemid == 0)
+			if (jsonObj.has("productitem_IMAGE") && !jsonObj.isNull("productitem_IMAGE"))
+				productitem.setPRODUCTITEM_IMAGE(jsonObj.getString("productitem_IMAGE"));
+
+			if (productitemid == 0)
 				productitem.setISACTIVE("Y");
-		    else if (jsonObj.has("isactive"))
+			else if (jsonObj.has("isactive"))
 				productitem.setISACTIVE(jsonObj.getString("isactive"));
 
 			productitem.setMODIFIED_BY(apiRequest.getREQUEST_ID());
@@ -309,21 +299,21 @@ public class productItemController {
 			productitem.setMODIFIED_WHEN(dateFormat1.format(date));
 			productitems.add(productitem);
 		}
-		
+
 		for (int a=0; a<productitems.size(); a++) {
 			ProductItem productitem = productitems.get(a);
 			productitem = productitemrepository.saveAndFlush(productitem);
 			productitems.get(a).setPRODUCTITEM_ID(productitem.getPRODUCTITEM_ID());
 		}
-		
+
 		ResponseEntity responseentity;
 		if (jsonProductItem != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productitems.get(0) , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productitems.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		return responseentity;
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity delete(@PathVariable Long id,@RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException, JSONException, ParseException {
@@ -332,20 +322,20 @@ public class productItemController {
 
 		ProductItem productitem = productitemrepository.findOne(id);
 		productitemrepository.delete(productitem);
-		
-		return new ResponseEntity(getAPIResponse(null, productitem , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+
+		return new ResponseEntity(getAPIResponse(null, productitem , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
 	public ResponseEntity remove(@PathVariable Long id,@RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException, JSONException, ParseException {
 		APIRequestDataLog apiRequest = checkToken("GET", "/productitem/"+id, null, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-		
+
 		JSONObject productitem = new JSONObject();
 		productitem.put("id", id);
 		productitem.put("isactive", "N");
-		
+
 		return insertupdateAll(null, productitem, apiRequest);
 	}
 	@SuppressWarnings({ "rawtypes" })
@@ -369,9 +359,9 @@ public class productItemController {
 
 		List<ProductItem> productitems = ((active == true)
 				? productitemrepository.findBySearch("%" + jsonObj.getString("search") + "%")
-				: productitemrepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
-		
-		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+						: productitemrepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
+
+		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -393,62 +383,76 @@ public class productItemController {
 
 		List<ProductItem> productitems = new ArrayList<ProductItem>();
 		JSONObject jsonObj = new JSONObject(data);
-		long product_ID = 0;
-		long application_ID = 0;
+		JSONArray searchObject = new JSONArray();
+		List<Integer> application_IDS = new ArrayList<Integer>(); 
+		List<Integer> product_IDS = new ArrayList<Integer>(); 
 
-		if (jsonObj.has("product_ID") && !jsonObj.has("product_ID"))
-			product_ID = jsonObj.getLong("product_ID");
-		if (jsonObj.has("productcategory_ID") && !jsonObj.isNull("productcategory_ID") && product_ID == 0 ) {
-            JSONArray productcategorysObject;
-            if (active == true) {
-            	productcategorysObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
-            } else {
-            	productcategorysObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
-            }
+		application_IDS.add((int) 0);
+		product_IDS.add((int) 0);
 
-            for (int i=0; i<productcategorysObject.length(); i++) {
-                List<ProductItem> productitem = new ArrayList<ProductItem>();
-               productitem = ((active == true)
-                        ? productitemrepository.findByAdvancedSearch(productcategorysObject.getJSONObject(i).getLong("product_ID") , (long) 0 )
-                        : productitemrepository.findAllByAdvancedSearch( productcategorysObject.getJSONObject(i).getLong("product_ID") , (long) 0 ));
-                for (int j=0; j<productitem.size(); j++) {
-                	productitems.add(productitem.get(j));
-                }
-            }
-        }
-		
-		if (jsonObj.has("application_ID") && !jsonObj.has("application_ID"))
-			application_ID = jsonObj.getLong("application_ID");
-		
-		if(application_ID != 0 || product_ID != 0){
-			List<ProductItem> productitem = ((active == true)
-					
-				? productitemrepository.findByAdvancedSearch(product_ID, application_ID)
-				: productitemrepository.findAllByAdvancedSearch(product_ID, application_ID));
-		for (int i=0; i<productitem.size(); i++) {
-            boolean found = false;
-            
-            for (int j=0; j<productitems.size(); j++) {
-                if (productitem.get(i).getPRODUCTITEM_ID() == productitems.get(j).getPRODUCTITEM_ID()) {
-                    found = true;
-                    break;
-                }
-            }
-            
-            if (found == false) {
-            	productitems.add(productitem.get(i));
-            }
-        }
+		long application_ID = 0 , product_ID = 0;
+
+		boolean isWithDetail = true;
+		if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+			isWithDetail = jsonObj.getBoolean("iswithdetail");
 		}
-		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		jsonObj.put("iswithdetail", false);
+
+		if (jsonObj.has("application_ID") && !jsonObj.isNull("application_ID") && jsonObj.getLong("application_ID") != 0) {
+			application_ID = jsonObj.getLong("application_ID");
+			application_IDS.add((int) application_ID);
+		} else if (jsonObj.has("application") && !jsonObj.isNull("application") && jsonObj.getLong("application") != 0) {
+			if (active == true) {
+				searchObject = new JSONArray(ProductService.POST("application/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+			} else {
+				searchObject = new JSONArray(ProductService.POST("application/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+			}
+
+			application_ID = searchObject.length();
+			for (int i=0; i<searchObject.length(); i++) {
+				application_IDS.add((int) searchObject.getJSONObject(i).getLong("application_ID"));
+			}
+		}
+
+		if (application_ID == 0) {
+			application_IDS.add(0);
+		}
+
+		if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID") && jsonObj.getLong("product_ID") != 0) {
+			product_ID = jsonObj.getLong("product_ID");
+			product_IDS.add((int) product_ID);
+		} else if (jsonObj.has("product") && !jsonObj.isNull("product") && jsonObj.getLong("product") != 0) {
+			if (active == true) {
+				searchObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+			} else {
+				searchObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+			}
+
+			product_ID = searchObject.length();
+			for (int i=0; i<searchObject.length(); i++) {
+				product_IDS.add((int) searchObject.getJSONObject(i).getLong("product_ID"));
+			}
+		}
+
+		if (product_ID == 0) {
+			product_IDS.add(0);
+		}
+
+		if (application_ID != 0 || product_ID != 0) {
+			productitems = ((active == true)
+					? productitemrepository.findByAdvancedSearch(product_ID,product_IDS, application_ID, application_IDS)
+							: productitemrepository.findAllByAdvancedSearch(product_ID,product_IDS, application_ID, application_IDS));
+		}
+
+		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
-	
-	
+
+
 	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
 		JSONObject checkTokenResponse = AccessToken.checkToken(accessToken);
 		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItem.getDatabaseTableID());
 		APIRequestDataLog apiRequest;
-		
+
 		log.info(requestType + ": " + requestURI);
 		if (requestBody != null)
 			log.info("Input: " + requestBody);
@@ -459,46 +463,46 @@ public class productItemController {
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 			return apiRequest;
 		}
-		
+
 		Long requestUser = (long) 0;
 		if (accessToken != null && accessToken != "")
 			requestUser = checkTokenResponse.getLong("user_ID");
 		apiRequest = tableDataLogs.apiRequestDataLog(requestType, databaseTableID, requestUser, requestURI, requestBody, workstation);
 		apiRequest.setREQUEST_OUTPUT(accessToken);
-		
+
 		return apiRequest;
 	}
-	
-	APIRequestDataLog getAPIResponse(List<ProductItem> productitems, ProductItem productitem , JSONArray jsonProductItems, JSONObject jsonProductItem, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+
+	APIRequestDataLog getAPIResponse(List<ProductItem> productitems, ProductItem productitem , JSONArray jsonProductItems, JSONObject jsonProductItem, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 		long productitemID = 0;
-		
+
 		if (message != null) {
 			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductItem", message);
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
-			if (productitem != null) {
+			if (productitem != null && isWithDetail == true) {
 				JSONObject application = new JSONObject(UserLoginService.GET("application/"+productitem.getAPPLICATION_ID(), apiRequest.getREQUEST_OUTPUT()));
 				productitem.setAPPLICATION_DETAIL(application.toString());
 				JSONObject product = new JSONObject(ProductService.GET("product/"+productitem.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT()));
 				productitem.setPRODUCT_DETAIL(product.toString());
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitem));
 				productitemID = productitem.getPRODUCTITEM_ID();
-			} else if(productitems != null){
+			} else if(productitems != null && isWithDetail == true){
 				if (productitems.size()>0) {
 					List<Integer> applicationList = new ArrayList<Integer>();
 					List<Integer> productList = new ArrayList<Integer>();
 					for (int i=0; i<productitems.size(); i++) {
 						if(productitems.get(i).getAPPLICATION_ID() != null)
-						  applicationList.add(Integer.parseInt(productitems.get(i).getAPPLICATION_ID().toString()));
+							applicationList.add(Integer.parseInt(productitems.get(i).getAPPLICATION_ID().toString()));
 						if(productitems.get(i).getPRODUCT_ID() != null)
-						  productList.add(Integer.parseInt(productitems.get(i).getPRODUCT_ID().toString()));
+							productList.add(Integer.parseInt(productitems.get(i).getPRODUCT_ID().toString()));
 					}
 					JSONArray logisticsObject = new JSONArray(UserLoginService.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getREQUEST_OUTPUT()));
 					JSONArray productObject = new JSONArray(ProductService.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT()));
-					
+
 					for (int i=0; i<productitems.size(); i++) {
 						for (int j=0; j<logisticsObject.length(); j++) {
 							JSONObject application = logisticsObject.getJSONObject(j);
@@ -515,1301 +519,1034 @@ public class productItemController {
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitems));
-			}else if (jsonProductItems != null){
+
+			} else if (productitem != null && isWithDetail == false) {
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitem));
+
+			} else if (productitems != null && isWithDetail == false) {
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitems));
+
+			} else if (jsonProductItems != null) {
 				apiRequest.setREQUEST_OUTPUT(jsonProductItems.toString());
-			
-			} else if (jsonProductItem != null){
+
+			} else if (jsonProductItem != null) {
 				apiRequest.setREQUEST_OUTPUT(jsonProductItem.toString());
 			}
+
 			apiRequest.setRESPONSE_DATETIME(dateFormat1.format(date));
 			apiRequest.setREQUEST_STATUS("Success");
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		}
-		
+
 		if (isTableLog)
 			tbldatalogrepository.saveAndFlush(tableDataLogs.TableSaveDataLog(productitemID, apiRequest.getDATABASETABLE_ID(), apiRequest.getREQUEST_ID(), apiRequest.getREQUEST_OUTPUT()));
-		
+
 		if (apiRequest.getREQUEST_OUTPUT().contains("bearer"))
 			apiRequest.setREQUEST_OUTPUT(null);
-		
+
 		log.info("Output: " + apiRequest.getREQUEST_OUTPUT());
 		log.info("--------------------------------------------------------");
 
 		return apiRequest;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/all/detail", method = RequestMethod.GET)
-	public ResponseEntity getAllDetail(@RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productitem/all/detail", null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
-		String rtn = null;
-        List<ProductItem> productitem = productitemrepository.findAll();
-		
-        ObjectMapper mapper = new ObjectMapper();
-		JSONArray objproductitems = new JSONArray();
-		for (int j=0; j<productitem.size(); j++) {
-			JSONObject objproductitem = new JSONObject(mapper.writeValueAsString(productitem.get(j)));
-			
-			List<ProductItemAttributeValue> productitemattributevalues = productitemattributevaluerepository.findByAdvancedSearch(productitem.get(j).getPRODUCTITEM_ID(), (long) 0); 
-			for (int i=0; i<productitemattributevalues.size(); i++) {
-				JSONObject jsonproductattribute = new JSONObject(ProductService.GET("productattribute/"+productitemattributevalues.get(i).getPRODUCTATTRIBUTE_ID(), apiRequest.getREQUEST_OUTPUT()));
-				JSONObject jsonproductattributevalue = new JSONObject(ProductService.GET("productattributevalue/"+productitemattributevalues.get(i).getPRODUCTATTRIBUTEVALUE_ID(), apiRequest.getREQUEST_OUTPUT()));
-				if (productitemattributevalues.get(i).getPRODUCTATTRIBUTEVALUE_ID()==null)
-					objproductitem.put(jsonproductattribute.getString("productattribute_KEY"), productitemattributevalues.get(i).getPRODUCTATTRIBUTEITEM_VALUE());
-				else
-					objproductitem.put(jsonproductattribute.getString("productattribute_KEY"), jsonproductattributevalue.getString("productattribute_VALUE"));
-			}
-			objproductitems.put(objproductitem);
-		}
+	//	@RequestMapping(value = "/getfromnetsuite/{id}", method = RequestMethod.GET)
+	//	public ResponseEntity getNetSuiteProducts(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken)
+	//			throws InterruptedException, IOException, JSONException, ParseException {
+	//		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
+	//		String rtn, workstation = null;
+	//		APIRequestDataLog apiRequest;
+	//		
+	//		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	//		Date date = new Date();
+	//
+	//		log.info("GET: /productitem/getfromnetsuite/"+id);
+	//
+	//		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItem.getDatabaseTableID());
+	//
+	//		if (checkTokenResponse.has("error")) {
+	//			apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, (long) 0,
+	//					"/product/getfromnetsuite/"+id, null, workstation);
+	//			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
+	//			apirequestdatalogRepository.saveAndFlush(apiRequest);
+	//			return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+	//		}
+	//
+	//		ObjectMapper mapper = new ObjectMapper();
+	//		Long requestUser = checkTokenResponse.getLong("user_ID");
+	//		apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, requestUser, 
+	//				"/product/getfromnetsuite/"+id, null, workstation);
+	//	
+	//		int start = 0, counter = 1;
+	//		List<ProductItem> products = new ArrayList<ProductItem>();
+	//		JSONArray objproductitems = new JSONArray();
+	//		
+	//		while (start == 0 || objproductitems.length() > 0) {
+	//			JSONArray params = new JSONArray();
+	//			JSONObject obj = new JSONObject();
+	//			obj.put("key", "start");
+	//			obj.put("value", "" + start);
+	//			params.put(obj);
+	//
+	//			int end = start + 100;
+	//			obj = new JSONObject();
+	//			obj.put("key", "end");
+	//			obj.put("value", "" + end);
+	//			params.put(obj);
+	//			
+	//			obj = new JSONObject();
+	//			obj.put("key", "id");
+	//			obj.put("value", "" + id);
+	//			params.put(obj);
+	//
+	//			int getDataCount = 1;
+	//			while (getDataCount <= 20) {
+	//				try {
+	//					if (id==0) {
+	//						JSONObject customersFromNetSuite = new JSONObject(NetSuiteAPI.GET(692, 1, params));
+	//						objproductitems = customersFromNetSuite.getJSONArray("msg");
+	//					} else if (id>0){
+	//						JSONObject customersFromNetSuite = new JSONObject(NetSuiteAPI.GET(685, 1, params));
+	//						JSONObject objproduct = customersFromNetSuite.getJSONObject("msg");
+	//						objproductitems.put(objproduct);
+	//						id = (long) -1;
+	//					} else {
+	//						objproductitems = new JSONArray();
+	//					}
+	//					getDataCount = 21;
+	//				} catch (Exception e) {
+	//					log.info(e.getMessage());
+	//					Thread.sleep(5000);
+	//					getDataCount = getDataCount + 1;
+	//				}
+	//			}
+	//
+	//			for (int i = 0; i < objproductitems.length(); i++) {
+	//				JSONObject objProductItem = objproductitems.getJSONObject(i);
+	//				JSONObject productFromNetSuite = objProductItem.getJSONObject("fields");
+	//
+	//				log.info(objProductItem.getString("id"));
+	//				log.info(productFromNetSuite.getString("itemid"));
+	//
+	//				List<ProductItem> productitem = productitemrepository
+	//						.findByCode(productFromNetSuite.getString("itemid"));
+	//				if (productitem.size() == 0) {
+	//					Product product = new Product();
+	//					product.setPRODUCTCATEGORY_ID(productcategoryrepository.findOne((long) 71));
+	//					product.setPRODUCT_CODE(productFromNetSuite.getString("itemid"));
+	//					product.setPRODUCT_NAME(productFromNetSuite.getString("displayname"));
+	//					product.setPRODUCT_DESC(productFromNetSuite.getString("modifiableitemid"));
+	//					product.setISACTIVE("Y");
+	//					product.setMODIFIED_BY(requestUser);
+	//					product.setMODIFIED_WORKSTATION(workstation);
+	//					product.setMODIFIED_WHEN(dateFormat1.format(date));
+	//					product = productrepository.saveAndFlush(product);
+	//
+	//					ProductItem productitemnew = new ProductItem();
+	//					productitemnew.setPRODUCT_ID(product);
+	//					productitemnew.setAPPLICATION_ID((long) 1);
+	//					productitemnew.setPRODUCTITEM_NAME(productFromNetSuite.getString("displayname"));
+	//					productitemnew.setPRODUCTITEM_DESC(productFromNetSuite.getString("modifiableitemid"));
+	//					productitemnew.setISACTIVE("Y");
+	//					productitemnew.setMODIFIED_BY(requestUser);
+	//					productitemnew.setMODIFIED_WORKSTATION(workstation);
+	//					productitemnew.setMODIFIED_WHEN(dateFormat1.format(date));
+	//					productitemnew = productitemrepository.saveAndFlush(productitemnew);
+	//
+	//					productitem.add(productitemnew);
+	//				}
+	//
+	//				Iterator<?> keys = productFromNetSuite.keys();
+	//				while (keys.hasNext()) {
+	//					String key = (String) keys.next();
+	//					String key1 = key;
+	//					key = key.replace("_", "");
+	//					
+	//					if (key.compareTo("isinactive")==0) {
+	//						if (productFromNetSuite.getString(key1).compareTo("F")==0) {
+	//							productitem.get(0).setISACTIVE("Y");
+	//						} else {
+	//							productitem.get(0).setISACTIVE("N");
+	//						}
+	//						productitemrepository.saveAndFlush(productitem.get(0));
+	//					}
+	//					
+	//					ProductAttribute productattribute = productattributerepository.findByKey(key);
+	//					if (productattribute == null) {
+	//						productattribute = new ProductAttribute();
+	//						productattribute
+	//								.setPRODUCTATTRIBUTECATEGORY_ID(productattributecategoryrepository.findOne((long) 18));
+	//						productattribute.setPRODUCTATTRIBUTEORDER_NO((long) 1);
+	//						productattribute.setPRODUCTCATEGORY_ID(productcategoryrepository.findOne((long) 0));
+	//						productattribute.setPRODUCTATTRIBUTE_NAME("Unknown");
+	//						productattribute.setPRODUCTATTRIBUTE_KEY(key);
+	//						productattribute.setDATATYPE_ID(lookuprepository.findOne((long) 1));
+	//						productattribute.setISREQUIRED("N");
+	//						productattribute.setISACTIVE("Y");
+	//						productattribute.setMODIFIED_BY(requestUser);
+	//						productattribute.setMODIFIED_WORKSTATION(workstation);
+	//						productattribute.setMODIFIED_WHEN(dateFormat1.format(date));
+	//						productattribute = productattributerepository.saveAndFlush(productattribute);
+	//					}
+	//
+	//					List<ProductItemAttributeValue> productitemattributevalues = productitemattributevaluerepository
+	//							.findByAdvancedSearch(productitem.get(0).getPRODUCTITEM_ID(), (long) 0, (long) 0, (long) 0,
+	//									productattribute.getPRODUCTATTRIBUTE_ID(), (long) 0, "", (long) 0, (long) 0, "", (long) 0, "");
+	//					if (productitemattributevalues.size() > 0) {
+	//						productitemattributevalues.get(0)
+	//								.setPRODUCTATTRIBUTEITEM_VALUE(productFromNetSuite.getString(key1));
+	//						productitemattributevalues.get(0).setISACTIVE("Y");
+	//						productitemattributevalues.get(0).setMODIFIED_BY(requestUser);
+	//						productitemattributevalues.get(0).setMODIFIED_WORKSTATION(workstation);
+	//						productitemattributevalues.get(0).setMODIFIED_WHEN(dateFormat1.format(date));
+	//						productitemattributevaluerepository.saveAndFlush(productitemattributevalues.get(0));
+	//					} else {
+	//						ProductItemAttributeValue productitemattributevalue = new ProductItemAttributeValue();
+	//						productitemattributevalue.setPRODUCTITEM_ID(productitem.get(0));
+	//						productitemattributevalue.setPRODUCTATTRIBUTE_ID(productattribute);
+	//						productitemattributevalue.setPRODUCTATTRIBUTEITEM_VALUE(productFromNetSuite.getString(key1));
+	//						productitemattributevalue.setISACTIVE("Y");
+	//						productitemattributevalue.setMODIFIED_BY(requestUser);
+	//						productitemattributevalue.setMODIFIED_WORKSTATION(workstation);
+	//						productitemattributevalue.setMODIFIED_WHEN(dateFormat1.format(date));
+	//						productitemattributevalue = productitemattributevaluerepository
+	//								.saveAndFlush(productitemattributevalue);
+	//					}
+	//				}
+	//
+	//				JSONObject productitemsublist = objProductItem.getJSONObject("sublists");
+	//
+	//				JSONObject productitemprices = productitemsublist.getJSONObject("price1");
+	//				int lineNo = 1;
+	//				while (productitemprices.has("line " + lineNo)) {
+	//					JSONObject productitemprice = productitemprices.getJSONObject("line " + lineNo);
+	//					log.info("Line : " + lineNo + ", Price level: " + productitemprice.getString("pricelevelname"));
+	//					lineNo = lineNo + 1;
+	//
+	//					if (!productitemprice.isNull("price[1]")) {
+	//						log.info("Price: " + productitemprice.get("price[1]"));
+	//						List<ProductItemPriceLevel> productitempricelevels = productitempricelevelrepository
+	//								.findByAdvancedSearch((long) 0, productitem.get(0).getPRODUCTITEM_ID(), (long) 0,
+	//										(long) 0, (long) 0, (long) 0, "", (long) 1,
+	//										productitemprice.getString("pricelevel"), (long) 0, (long) 0);
+	//
+	//						ProductItemPriceLevel productitempricelevel = new ProductItemPriceLevel();
+	//						if (productitempricelevels.size() > 0)
+	//							productitempricelevel = productitempricelevels.get(0);
+	//						
+	//						Lookup currency = lookuprepository.findByCode("CURRENCY",
+	//								productitemprice.getString("currency"));
+	//						if (currency == null) {
+	//							currency = new Lookup();
+	//							currency.setENTITYNAME("CURRENCY");
+	//							currency.setCODE(productitemprice.getString("currency"));
+	//							currency.setDESCRIPTION(productitemprice.getString("currency"));
+	//							currency.setISACTIVE("Y");
+	//							currency.setMODIFIED_BY(requestUser);
+	//							currency.setMODIFIED_WORKSTATION(workstation);
+	//							currency.setMODIFIED_WHEN(dateFormat1.format(date));
+	//							currency = lookuprepository.saveAndFlush(currency);
+	//						}
+	//						productitempricelevel.setCURRENCY_ID(currency);
+	//						productitempricelevel.setPRODUCTITEM_ID(productitem.get(0));
+	//						Lookup pricelevel = lookuprepository.findByCode("PRICELEVEL",
+	//								productitemprice.getString("pricelevel"));
+	//						if (pricelevel == null) {
+	//							pricelevel = new Lookup();
+	//							pricelevel.setENTITYNAME("PRICELEVEL");
+	//							pricelevel.setCODE(productitemprice.getString("pricelevel"));
+	//							pricelevel.setDESCRIPTION(productitemprice.getString("pricelevelname"));
+	//							pricelevel.setISACTIVE("Y");
+	//							pricelevel.setMODIFIED_BY(requestUser);
+	//							pricelevel.setMODIFIED_WORKSTATION(workstation);
+	//							pricelevel.setMODIFIED_WHEN(dateFormat1.format(date));
+	//							pricelevel = lookuprepository.saveAndFlush(currency);
+	//						}
+	//						productitempricelevel.setPRICELEVEL_ID(pricelevel);
+	//						productitempricelevel.setPRODUCTITEM_QUANTITY((long) 1);
+	//						productitempricelevel.setPRODUCTITEM_UNITPRICE(
+	//								Double.parseDouble(productitemprice.getString("price[1]")));
+	//						productitempricelevel.setISACTIVE("Y");
+	//						productitempricelevel.setMODIFIED_BY(requestUser);
+	//						productitempricelevel.setMODIFIED_WORKSTATION(workstation);
+	//						productitempricelevel.setMODIFIED_WHEN(dateFormat1.format(date));
+	//						productitempricelevel = productitempricelevelrepository.saveAndFlush(productitempricelevel);
+	//					}
+	//				}
+	//
+	//				JSONObject objproductiteminventories = productitemsublist.getJSONObject("locations");
+	//				lineNo = 1;
+	//				while (objproductiteminventories.has("line " + lineNo)) {
+	//					JSONObject objproductiteminventory = objproductiteminventories.getJSONObject("line " + lineNo);
+	//					lineNo = lineNo + 1;
+	//
+	//					if (objproductiteminventory.getString("location").compareTo("2") == 0) {
+	//						List<ProductItemInventory> productiteminventories = productiteminventoryrepository
+	//								.findByAdvancedSearch((long) 0, (long) 0, (long) 0, "", (long) 0, "",
+	//										productitem.get(0).getPRODUCTITEM_ID(), (long) 0, (long) 0, "");
+	//
+	//						if (productiteminventories.size() > 0) {
+	//
+	//							productiteminventories.get(0).setPRODUCTITEM_ID(productitem.get(0));
+	//
+	//							if (objproductiteminventory.has("locationid")
+	//									&& !objproductiteminventory.isNull("locationid"))
+	//								productiteminventories.get(0).setLOCATION_ID(
+	//										Long.parseLong(objproductiteminventory.getString("locationid")));
+	//
+	//							if (objproductiteminventory.has("quantityonhand")
+	//									&& !objproductiteminventory.isNull("quantityonhand"))
+	//								productiteminventories.get(0).setQUANTITY_ONHAND(
+	//										Double.parseDouble(objproductiteminventory.getString("quantityonhand")));
+	//
+	//							if (objproductiteminventory.has("quantityonorder")
+	//									&& !objproductiteminventory.isNull("quantityonorder"))
+	//								productiteminventories.get(0).setQUANTITY_ONORDER(
+	//										Long.parseLong(objproductiteminventory.getString("quantityonorder")));
+	//
+	//							if (objproductiteminventory.has("quantitycommitted")
+	//									&& !objproductiteminventory.isNull("quantitycommitted"))
+	//								productiteminventories.get(0).setQUANTITY_COMMITTED(
+	//										Long.parseLong(objproductiteminventory.getString("quantitycommitted")));
+	//
+	//							if (objproductiteminventory.has("quantityavailable")
+	//									&& !objproductiteminventory.isNull("quantityavailable"))
+	//								productiteminventories.get(0).setQUANTITY_AVAILABLE(
+	//										Double.parseDouble(objproductiteminventory.getString("quantityavailable")));
+	//
+	//							if (objproductiteminventory.has("quantitybackordered")
+	//									&& !objproductiteminventory.isNull("quantitybackordered"))
+	//								productiteminventories.get(0).setQUANTITY_BACKORDERED(
+	//										Long.parseLong(objproductiteminventory.getString("quantitybackordered")));
+	//
+	//							if (objproductiteminventory.has("quantityintransit")
+	//									&& !objproductiteminventory.isNull("quantityintransit"))
+	//								productiteminventories.get(0).setQUANTITY_INTRANSIT(
+	//										Long.parseLong(objproductiteminventory.getString("quantityintransit")));
+	//
+	//							if (objproductiteminventory.has("qtyintransitexternal")
+	//									&& !objproductiteminventory.isNull("qtyintransitexternal"))
+	//								productiteminventories.get(0).setQUANTITYEXTERNAL_INTRANSIT(
+	//										Long.parseLong(objproductiteminventory.getString("qtyintransitexternal")));
+	//
+	//							if (objproductiteminventory.has("quantityonhandbase")
+	//									&& !objproductiteminventory.isNull("quantityonhandbase"))
+	//								productiteminventories.get(0).setQUANTITYBASEUNIT_ONHAND(
+	//										Double.parseDouble(objproductiteminventory.getString("quantityonhandbase")));
+	//
+	//							if (objproductiteminventory.has("quantityavailablebase")
+	//									&& !objproductiteminventory.isNull("quantityavailablebase"))
+	//								productiteminventories.get(0).setQUANTITYBASEUNIT_AVAILABLE(
+	//										Double.parseDouble(objproductiteminventory.getString("quantityavailablebase")));
+	//
+	//							if (objproductiteminventory.has("onhandvaluemli")
+	//									&& !objproductiteminventory.isNull("onhandvaluemli"))
+	//								productiteminventories.get(0).setVALUE(
+	//										Double.parseDouble(objproductiteminventory.getString("onhandvaluemli")));
+	//
+	//							if (objproductiteminventory.has("averagecostmli")
+	//									&& !objproductiteminventory.isNull("averagecostmli"))
+	//								productiteminventories.get(0).setAVERAGE_COST(
+	//										Double.parseDouble(objproductiteminventory.getString("averagecostmli")));
+	//
+	//							if (objproductiteminventory.has("lastpurchasepricemli")
+	//									&& !objproductiteminventory.isNull("lastpurchasepricemli"))
+	//								productiteminventories.get(0).setLASTPURCHASE_PRICE(
+	//										Double.parseDouble(objproductiteminventory.getString("lastpurchasepricemli")));
+	//
+	//							if (objproductiteminventory.has("reorderpoint")
+	//									&& !objproductiteminventory.isNull("reorderpoint"))
+	//								productiteminventories.get(0).setREORDER_POINT(
+	//										Long.parseLong(objproductiteminventory.getString("reorderpoint")));
+	//
+	//							if (objproductiteminventory.has("isautolocassignmentallowed")
+	//									&& !objproductiteminventory.isNull("onhandvaluemli"))
+	//								productiteminventories.get(0).setAUTOLOCATIONASSIGNMENT_ALLOWED(
+	//										objproductiteminventory.getString("isautolocassignmentallowed"));
+	//
+	//							if (objproductiteminventory.has("isautolocassignmentsuspended")
+	//									&& !objproductiteminventory.isNull("onhandvaluemli"))
+	//								productiteminventories.get(0).setAUTOLOCATIONASSIGNMENT_SUSPENDED(
+	//										objproductiteminventory.getString("isautolocassignmentsuspended"));
+	//
+	//							if (objproductiteminventory.has("preferredstocklevel")
+	//									&& !objproductiteminventory.isNull("preferredstocklevel"))
+	//								productiteminventories.get(0).setPREFEREDSTOCK_LEVEL(
+	//										Long.parseLong(objproductiteminventory.getString("preferredstocklevel")));
+	//
+	//							if (objproductiteminventory.has("leadtime") && !objproductiteminventory.isNull("leadtime"))
+	//								productiteminventories.get(0).setPURCHASELEAD_TIME(
+	//										Long.parseLong(objproductiteminventory.getString("leadtime")));
+	//
+	//							if (objproductiteminventory.has("safetystocklevel")
+	//									&& !objproductiteminventory.isNull("safetystocklevel"))
+	//								productiteminventories.get(0).setSTAFTYSTOCK_LEVEL(
+	//										Long.parseLong(objproductiteminventory.getString("safetystocklevel")));
+	//
+	//							if (objproductiteminventory.has("atpleadtime")
+	//									&& !objproductiteminventory.isNull("atpleadtime"))
+	//								productiteminventories.get(0).setATPLEAD_TIME(
+	//										Long.parseLong(objproductiteminventory.getString("atpleadtime")));
+	//
+	//							if (objproductiteminventory.has("defaultreturncost")
+	//									&& !objproductiteminventory.isNull("defaultreturncost"))
+	//								productiteminventories.get(0).setDEFAULTRETURN_COST(
+	//										Double.parseDouble(objproductiteminventory.getString("defaultreturncost")));
+	//
+	//							if (objproductiteminventory.has("lastinvtcountdate")
+	//									&& !objproductiteminventory.isNull("lastinvtcountdate"))
+	//								productiteminventories.get(0)
+	//										.setLASTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
+	//												.parse(objproductiteminventory.getString("lastinvtcountdate"))));
+	//
+	//							if (objproductiteminventory.has("nextinvtcountdate")
+	//									&& !objproductiteminventory.isNull("nextinvtcountdate"))
+	//								productiteminventories.get(0)
+	//										.setNECTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
+	//												.parse(objproductiteminventory.getString("nextinvtcountdate"))));
+	//
+	//							if (objproductiteminventory.has("invtcountinterval")
+	//									&& !objproductiteminventory.isNull("invtcountinterval"))
+	//								productiteminventories.get(0).setCOUNT_INTERVAL(
+	//										Long.parseLong(objproductiteminventory.getString("invtcountinterval")));
+	//
+	//							if (objproductiteminventory.has("invtclassification")
+	//									&& !objproductiteminventory.isNull("invtclassification"))
+	//								productiteminventories.get(0).setINVENTORYCLASSIFICTION_ID(
+	//										Long.parseLong(objproductiteminventory.getString("invtclassification")));
+	//
+	//							productiteminventories.get(0).setISACTIVE("Y");
+	//							productiteminventories.get(0).setMODIFIED_BY(requestUser);
+	//							productiteminventories.get(0).setMODIFIED_WORKSTATION(workstation);
+	//							productiteminventories.get(0).setMODIFIED_WHEN(dateFormat1.format(date));
+	//							productiteminventoryrepository.saveAndFlush(productiteminventories.get(0));
+	//
+	//						} else {
+	//
+	//							ProductItemInventory productiteminventory = new ProductItemInventory();
+	//
+	//							productiteminventory.setPRODUCTITEM_ID(productitem.get(0));
+	//
+	//							if (objproductiteminventory.has("locationid")
+	//									&& !objproductiteminventory.isNull("locationid"))
+	//								productiteminventory.setLOCATION_ID(
+	//										Long.parseLong(objproductiteminventory.getString("locationid")));
+	//
+	//							if (objproductiteminventory.has("quantityonhand")
+	//									&& !objproductiteminventory.isNull("quantityonhand"))
+	//								productiteminventory.setQUANTITY_ONHAND(
+	//										Double.parseDouble(objproductiteminventory.getString("quantityonhand")));
+	//
+	//							if (objproductiteminventory.has("quantityonorder")
+	//									&& !objproductiteminventory.isNull("quantityonorder"))
+	//								productiteminventory.setQUANTITY_ONORDER(
+	//										Long.parseLong(objproductiteminventory.getString("quantityonorder")));
+	//
+	//							if (objproductiteminventory.has("quantitycommitted")
+	//									&& !objproductiteminventory.isNull("quantitycommitted"))
+	//								productiteminventory.setQUANTITY_COMMITTED(
+	//										Long.parseLong(objproductiteminventory.getString("quantitycommitted")));
+	//
+	//							if (objproductiteminventory.has("quantityavailable")
+	//									&& !objproductiteminventory.isNull("quantityavailable"))
+	//								productiteminventory.setQUANTITY_AVAILABLE(
+	//										Double.parseDouble(objproductiteminventory.getString("quantityavailable")));
+	//
+	//							if (objproductiteminventory.has("quantitybackordered")
+	//									&& !objproductiteminventory.isNull("quantitybackordered"))
+	//								productiteminventory.setQUANTITY_BACKORDERED(
+	//										Long.parseLong(objproductiteminventory.getString("quantitybackordered")));
+	//
+	//							if (objproductiteminventory.has("quantityintransit")
+	//									&& !objproductiteminventory.isNull("quantityintransit"))
+	//								productiteminventory.setQUANTITY_INTRANSIT(
+	//										Long.parseLong(objproductiteminventory.getString("quantityintransit")));
+	//
+	//							if (objproductiteminventory.has("qtyintransitexternal")
+	//									&& !objproductiteminventory.isNull("qtyintransitexternal"))
+	//								productiteminventory.setQUANTITYEXTERNAL_INTRANSIT(
+	//										Long.parseLong(objproductiteminventory.getString("qtyintransitexternal")));
+	//
+	//							if (objproductiteminventory.has("quantityonhandbase")
+	//									&& !objproductiteminventory.isNull("quantityonhandbase"))
+	//								productiteminventory.setQUANTITYBASEUNIT_ONHAND(
+	//										Double.parseDouble(objproductiteminventory.getString("quantityonhandbase")));
+	//
+	//							if (objproductiteminventory.has("quantityavailablebase")
+	//									&& !objproductiteminventory.isNull("quantityavailablebase"))
+	//								productiteminventory.setQUANTITYBASEUNIT_AVAILABLE(
+	//										Double.parseDouble(objproductiteminventory.getString("quantityavailablebase")));
+	//
+	//							if (objproductiteminventory.has("onhandvaluemli")
+	//									&& !objproductiteminventory.isNull("onhandvaluemli"))
+	//								productiteminventory.setVALUE(
+	//										Double.parseDouble(objproductiteminventory.getString("onhandvaluemli")));
+	//
+	//							if (objproductiteminventory.has("averagecostmli")
+	//									&& !objproductiteminventory.isNull("averagecostmli"))
+	//								productiteminventory.setAVERAGE_COST(
+	//										Double.parseDouble(objproductiteminventory.getString("averagecostmli")));
+	//
+	//							if (objproductiteminventory.has("lastpurchasepricemli")
+	//									&& !objproductiteminventory.isNull("lastpurchasepricemli"))
+	//								productiteminventory.setLASTPURCHASE_PRICE(
+	//										Double.parseDouble(objproductiteminventory.getString("lastpurchasepricemli")));
+	//
+	//							if (objproductiteminventory.has("reorderpoint")
+	//									&& !objproductiteminventory.isNull("reorderpoint"))
+	//								productiteminventory.setREORDER_POINT(
+	//										Long.parseLong(objproductiteminventory.getString("reorderpoint")));
+	//
+	//							if (objproductiteminventory.has("isautolocassignmentallowed")
+	//									&& !objproductiteminventory.isNull("isautolocassignmentallowed"))
+	//								productiteminventory.setAUTOLOCATIONASSIGNMENT_ALLOWED(
+	//										objproductiteminventory.getString("isautolocassignmentallowed"));
+	//
+	//							if (objproductiteminventory.has("isautolocassignmentsuspended")
+	//									&& !objproductiteminventory.isNull("isautolocassignmentsuspended"))
+	//								productiteminventory.setAUTOLOCATIONASSIGNMENT_SUSPENDED(
+	//										objproductiteminventory.getString("isautolocassignmentsuspended"));
+	//
+	//							if (objproductiteminventory.has("preferredstocklevel")
+	//									&& !objproductiteminventory.isNull("preferredstocklevel"))
+	//								productiteminventory.setPREFEREDSTOCK_LEVEL(
+	//										Long.parseLong(objproductiteminventory.getString("preferredstocklevel")));
+	//
+	//							if (objproductiteminventory.has("leadtime") && !objproductiteminventory.isNull("leadtime"))
+	//								productiteminventory.setPURCHASELEAD_TIME(
+	//										Long.parseLong(objproductiteminventory.getString("leadtime")));
+	//
+	//							if (objproductiteminventory.has("safetystocklevel")
+	//									&& !objproductiteminventory.isNull("safetystocklevel"))
+	//								productiteminventory.setSTAFTYSTOCK_LEVEL(
+	//										Long.parseLong(objproductiteminventory.getString("safetystocklevel")));
+	//
+	//							if (objproductiteminventory.has("atpleadtime")
+	//									&& !objproductiteminventory.isNull("atpleadtime"))
+	//								productiteminventory.setATPLEAD_TIME(
+	//										Long.parseLong(objproductiteminventory.getString("atpleadtime")));
+	//
+	//							if (objproductiteminventory.has("defaultreturncost")
+	//									&& !objproductiteminventory.isNull("defaultreturncost"))
+	//								productiteminventory.setDEFAULTRETURN_COST(
+	//										Double.parseDouble(objproductiteminventory.getString("defaultreturncost")));
+	//
+	//							if (objproductiteminventory.has("lastinvtcountdate")
+	//									&& !objproductiteminventory.isNull("lastinvtcountdate"))
+	//								productiteminventory
+	//										.setLASTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
+	//												.parse(objproductiteminventory.getString("lastinvtcountdate"))));
+	//
+	//							if (objproductiteminventory.has("nextinvtcountdate")
+	//									&& !objproductiteminventory.isNull("nextinvtcountdate"))
+	//								productiteminventory
+	//										.setNECTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
+	//												.parse(objproductiteminventory.getString("nextinvtcountdate"))));
+	//
+	//							if (objproductiteminventory.has("invtcountinterval")
+	//									&& !objproductiteminventory.isNull("invtcountinterval"))
+	//								productiteminventory.setCOUNT_INTERVAL(
+	//										Long.parseLong(objproductiteminventory.getString("invtcountinterval")));
+	//
+	//							if (objproductiteminventory.has("invtclassification")
+	//									&& !objproductiteminventory.isNull("invtclassification"))
+	//								productiteminventory.setINVENTORYCLASSIFICTION_ID(
+	//										Long.parseLong(objproductiteminventory.getString("invtclassification")));
+	//
+	//							productiteminventory.setISACTIVE("Y");
+	//							productiteminventory.setMODIFIED_BY(requestUser);
+	//							productiteminventory.setMODIFIED_WORKSTATION(workstation);
+	//							productiteminventory.setMODIFIED_WHEN(dateFormat1.format(date));
+	//							productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
+	//						}
+	//					}
+	//				}
+	//
+	//				counter = counter + 1;
+	//			}
+	//
+	//			start = start + 100;
+	//		}
+	//
+	//		rtn = mapper.writeValueAsString(products);
+	//
+	//		apiRequest.setREQUEST_OUTPUT(rtn);
+	//		apiRequest.setREQUEST_STATUS("Success");
+	//		apirequestdatalogRepository.saveAndFlush(apiRequest);
+	//
+	//		log.info("Output: " + rtn);
+	//		log.info("--------------------------------------------------------");
+	//
+	//		return new ResponseEntity(rtn, HttpStatus.OK);
+	//	}
 
-		rtn = objproductitems.toString();
-
-
-		apiRequest.setREQUEST_OUTPUT(rtn);
-		apiRequest.setREQUEST_STATUS("Success");
-		apirequestdatalogRepository.saveAndFlush(apiRequest);
-
-		log.info("Output: " + rtn);
-		log.info("--------------------------------------------------------");
-
-		return new ResponseEntity(rtn, HttpStatus.OK);
-		
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "bynetsuiteid/{id}", method = RequestMethod.GET)
-	public ResponseEntity getOneByNetSuiteID(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken)
-			throws JsonProcessingException, JSONException, ParseException {
-		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
-		String rtn, workstation = null;
-		APIRequestDataLog apiRequest;
-		
-		log.info("GET: /productitem/bynetsuiteid/" + id);
-
-		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItem.getDatabaseTableID());
-
-		if (checkTokenResponse.has("error")) {
-			apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, (long) 0,
-					"/productitem/bynetsuiteid/" + id, null, workstation);
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
-			return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-		}
-
-		ObjectMapper mapper = new ObjectMapper();
-		Long requestUser = checkTokenResponse.getLong("user_ID");
-		apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, requestUser, 
-				"/productitem/bynetsuiteid/" + id, null, workstation);
-		
-		List<ProductItem> productitem = productitemrepository.findByNetSuiteID(id);
-		JSONObject objproductitem = new JSONObject(mapper.writeValueAsString(productitem.get(0)));
-		
-		List<ProductItemAttributeValue> productitemattributevalues = productitemattributevaluerepository.findByAdvancedSearch(productitem.get(0).getPRODUCTITEM_ID(), (long) 0); 
-		for (int i=0; i<productitemattributevalues.size(); i++) {
-			JSONObject jsonproductattribute = new JSONObject(ProductService.GET("productattribute/"+productitemattributevalues.get(i).getPRODUCTATTRIBUTE_ID(), apiRequest.getREQUEST_OUTPUT()));
-			JSONObject jsonproductattributevalue = new JSONObject(ProductService.GET("productattributevalue/"+productitemattributevalues.get(i).getPRODUCTATTRIBUTEVALUE_ID(), apiRequest.getREQUEST_OUTPUT()));
-			if (productitemattributevalues.get(i).getPRODUCTATTRIBUTEVALUE_ID()==null)
-				objproductitem.put(jsonproductattribute.getString("productattribute_KEY"), productitemattributevalues.get(i).getPRODUCTATTRIBUTEITEM_VALUE());
-			else
-				objproductitem.put(jsonproductattribute.getString("productattribute_KEY"), jsonproductattributevalue.getString("productattribute_VALUE"));
-		}
-		
-		rtn = objproductitem.toString();
-
-		apiRequest.setREQUEST_OUTPUT(rtn);
-		apiRequest.setREQUEST_STATUS("Success");
-		apirequestdatalogRepository.saveAndFlush(apiRequest);
-
-		log.info("Output: " + rtn);
-		log.info("--------------------------------------------------------");
-
-		return new ResponseEntity(rtn, HttpStatus.OK);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "bynetsuite/ids", method = RequestMethod.POST)
-	public ResponseEntity getByNetSuiteIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken)
-			throws JsonProcessingException {
-		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
-		String rtn, workstation = null;
-		APIRequestDataLog apiRequest;
-		
-		log.info("POST: /productitem/bynetsuite/ids");
-		log.info("Input: " + data);
-
-		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItem.getDatabaseTableID());
-
-		if (checkTokenResponse.has("error")) {
-			apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, (long) 0,
-					"/productitem/bynetsuite/ids", data, workstation);
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
-			return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-		}
-
-		ObjectMapper mapper = new ObjectMapper();
-		List<Integer> productitem_IDS = new ArrayList<Integer>(); 
-		Long requestUser = checkTokenResponse.getLong("user_ID");
-		apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, requestUser, 
-				"/productitem/bynetsuite/ids", data, workstation);
-		
-		JSONObject jsonObj = new JSONObject(data);
-		JSONArray productitems = jsonObj.getJSONArray("items");
-		for (int i=0; i<productitems.length(); i++) {
-			productitem_IDS.add((Integer) productitems.get(i));
-		}
-		List<ProductItem> productitem = new ArrayList<ProductItem>();
-		if (productitems.length()>0)
-			productitem = productitemrepository.findByNetSuiteIDs(productitem_IDS);
-		
-		rtn = mapper.writeValueAsString(productitem);
-
-		apiRequest.setREQUEST_OUTPUT(rtn);
-		apiRequest.setREQUEST_STATUS("Success");
-		apirequestdatalogRepository.saveAndFlush(apiRequest);
-
-		log.info("Output: " + rtn);
-		log.info("--------------------------------------------------------");
-
-		return new ResponseEntity(rtn, HttpStatus.OK);
-	}
-
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/codes", method = RequestMethod.POST)
-	public ResponseEntity getByCodes(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken)
-			throws JsonProcessingException {
-		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
-		String rtn, workstation = null;
-		APIRequestDataLog apiRequest;
-		
-		log.info("POST: /productitem/codes");
-		log.info("Input: " + data);
-
-		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItem.getDatabaseTableID());
-
-		if (checkTokenResponse.has("error")) {
-			apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, (long) 0,
-					"/productitem/codes", data, workstation);
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
-			return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-		}
-
-		ObjectMapper mapper = new ObjectMapper();
-		List<String> productitem_CODES = new ArrayList<String>(); 
-		Long requestUser = checkTokenResponse.getLong("user_ID");
-		apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, requestUser, 
-				"/productitem/codes", data, workstation);
-		
-		JSONObject jsonObj = new JSONObject(data);
-		JSONArray productitems = jsonObj.getJSONArray("items");
-		for (int i=0; i<productitems.length(); i++) {
-			productitem_CODES.add((String) productitems.get(i));
-		}
-		if (productitems.length()==0)
-			productitem_CODES.add("");
-		List<ProductItem> productitem = productitemrepository.findByCodes(productitem_CODES);
-		
-		rtn = mapper.writeValueAsString(productitem);
-
-		apiRequest.setREQUEST_OUTPUT(rtn);
-		apiRequest.setREQUEST_STATUS("Success");
-		apirequestdatalogRepository.saveAndFlush(apiRequest);
-
-		log.info("Output: " + rtn);
-		log.info("--------------------------------------------------------");
-
-		return new ResponseEntity(rtn, HttpStatus.OK);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/newcodes", method = RequestMethod.POST)
-	public ResponseEntity getByNewCodes(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken)
-			throws JsonProcessingException {
-		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
-		String rtn, workstation = null;
-		APIRequestDataLog apiRequest;
-		
-		log.info("POST: /productitem/newcodes");
-		log.info("Input: " + data);
-
-		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItem.getDatabaseTableID());
-
-		if (checkTokenResponse.has("error")) {
-			apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, (long) 0,
-					"/productitem/newcodes", data, workstation);
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
-			return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-		}
-
-		ObjectMapper mapper = new ObjectMapper();
-		List<String> productitem_CODES = new ArrayList<String>(); 
-		Long requestUser = checkTokenResponse.getLong("user_ID");
-		apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, requestUser, 
-				"/productitem/newcodes", data, workstation);
-		
-		JSONObject jsonObj = new JSONObject(data);
-		JSONArray productitems = jsonObj.getJSONArray("items");
-		for (int i=0; i<productitems.length(); i++) {
-			productitem_CODES.add((String) productitems.get(i));
-		}
-		if (productitems.length()==0)
-			productitem_CODES.add("");
-		List<ProductItem> productitem = productitemrepository.findByNewCodes(productitem_CODES);
-		
-		rtn = mapper.writeValueAsString(productitem);
-
-		apiRequest.setREQUEST_OUTPUT(rtn);
-		apiRequest.setREQUEST_STATUS("Success");
-		apirequestdatalogRepository.saveAndFlush(apiRequest);
-
-		log.info("Output: " + rtn);
-		log.info("--------------------------------------------------------");
-
-		return new ResponseEntity(rtn, HttpStatus.OK);
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-	public ResponseEntity getOneDetail(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken)
-			throws JsonProcessingException {
-		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
-		String rtn, workstation = null;
-		APIRequestDataLog apiRequest;
-		
-		log.info("GET: /productitem/detail/" + id);
-
-		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItem.getDatabaseTableID());
-
-		if (checkTokenResponse.has("error")) {
-			apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, (long) 0,
-					"/productitem/" + id, null, workstation);			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
-			return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-		}
-
-		ObjectMapper mapper = new ObjectMapper();
-		Long requestUser = checkTokenResponse.getLong("user_ID");
-		apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, requestUser, 
-				"/productitem/" + id, null, workstation);		
-		ProductItem productitem = productitemrepository.findOne(id);
-		JSONObject productitemdetail = new JSONObject(mapper.writeValueAsString(productitem));
-		List<ProductItemImage> productitemimage = productitemimagerepository.findByAdvancedSearch(id);
-
-		productitemdetail.put("productitemimage", productitemimage);
-
-		rtn = mapper.writeValueAsString(productitem);
-
-		apiRequest.setREQUEST_OUTPUT(rtn);
-		apiRequest.setREQUEST_STATUS("Success");
-		apirequestdatalogRepository.saveAndFlush(apiRequest);
-
-		log.info("Output: " + rtn);
-		log.info("--------------------------------------------------------");
-
-		return new ResponseEntity(rtn, HttpStatus.OK);
-	}
-
-//	@RequestMapping(value = "/getfromnetsuite/{id}", method = RequestMethod.GET)
-//	public ResponseEntity getNetSuiteProducts(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken)
-//			throws InterruptedException, IOException, JSONException, ParseException {
-//		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
-//		String rtn, workstation = null;
-//		APIRequestDataLog apiRequest;
-//		
-//		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//		Date date = new Date();
-//
-//		log.info("GET: /productitem/getfromnetsuite/"+id);
-//
-//		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItem.getDatabaseTableID());
-//
-//		if (checkTokenResponse.has("error")) {
-//			apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, (long) 0,
-//					"/product/getfromnetsuite/"+id, null, workstation);
-//			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-//			apirequestdatalogRepository.saveAndFlush(apiRequest);
-//			return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-//		}
-//
-//		ObjectMapper mapper = new ObjectMapper();
-//		Long requestUser = checkTokenResponse.getLong("user_ID");
-//		apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, requestUser, 
-//				"/product/getfromnetsuite/"+id, null, workstation);
-//	
-//		int start = 0, counter = 1;
-//		List<ProductItem> products = new ArrayList<ProductItem>();
-//		JSONArray objproductitems = new JSONArray();
-//		
-//		while (start == 0 || objproductitems.length() > 0) {
-//			JSONArray params = new JSONArray();
-//			JSONObject obj = new JSONObject();
-//			obj.put("key", "start");
-//			obj.put("value", "" + start);
-//			params.put(obj);
-//
-//			int end = start + 100;
-//			obj = new JSONObject();
-//			obj.put("key", "end");
-//			obj.put("value", "" + end);
-//			params.put(obj);
-//			
-//			obj = new JSONObject();
-//			obj.put("key", "id");
-//			obj.put("value", "" + id);
-//			params.put(obj);
-//
-//			int getDataCount = 1;
-//			while (getDataCount <= 20) {
-//				try {
-//					if (id==0) {
-//						JSONObject customersFromNetSuite = new JSONObject(NetSuiteAPI.GET(692, 1, params));
-//						objproductitems = customersFromNetSuite.getJSONArray("msg");
-//					} else if (id>0){
-//						JSONObject customersFromNetSuite = new JSONObject(NetSuiteAPI.GET(685, 1, params));
-//						JSONObject objproduct = customersFromNetSuite.getJSONObject("msg");
-//						objproductitems.put(objproduct);
-//						id = (long) -1;
-//					} else {
-//						objproductitems = new JSONArray();
-//					}
-//					getDataCount = 21;
-//				} catch (Exception e) {
-//					log.info(e.getMessage());
-//					Thread.sleep(5000);
-//					getDataCount = getDataCount + 1;
-//				}
-//			}
-//
-//			for (int i = 0; i < objproductitems.length(); i++) {
-//				JSONObject objProductItem = objproductitems.getJSONObject(i);
-//				JSONObject productFromNetSuite = objProductItem.getJSONObject("fields");
-//
-//				log.info(objProductItem.getString("id"));
-//				log.info(productFromNetSuite.getString("itemid"));
-//
-//				List<ProductItem> productitem = productitemrepository
-//						.findByCode(productFromNetSuite.getString("itemid"));
-//				if (productitem.size() == 0) {
-//					Product product = new Product();
-//					product.setPRODUCTCATEGORY_ID(productcategoryrepository.findOne((long) 71));
-//					product.setPRODUCT_CODE(productFromNetSuite.getString("itemid"));
-//					product.setPRODUCT_NAME(productFromNetSuite.getString("displayname"));
-//					product.setPRODUCT_DESC(productFromNetSuite.getString("modifiableitemid"));
-//					product.setISACTIVE("Y");
-//					product.setMODIFIED_BY(requestUser);
-//					product.setMODIFIED_WORKSTATION(workstation);
-//					product.setMODIFIED_WHEN(dateFormat1.format(date));
-//					product = productrepository.saveAndFlush(product);
-//
-//					ProductItem productitemnew = new ProductItem();
-//					productitemnew.setPRODUCT_ID(product);
-//					productitemnew.setAPPLICATION_ID((long) 1);
-//					productitemnew.setPRODUCTITEM_NAME(productFromNetSuite.getString("displayname"));
-//					productitemnew.setPRODUCTITEM_DESC(productFromNetSuite.getString("modifiableitemid"));
-//					productitemnew.setISACTIVE("Y");
-//					productitemnew.setMODIFIED_BY(requestUser);
-//					productitemnew.setMODIFIED_WORKSTATION(workstation);
-//					productitemnew.setMODIFIED_WHEN(dateFormat1.format(date));
-//					productitemnew = productitemrepository.saveAndFlush(productitemnew);
-//
-//					productitem.add(productitemnew);
-//				}
-//
-//				Iterator<?> keys = productFromNetSuite.keys();
-//				while (keys.hasNext()) {
-//					String key = (String) keys.next();
-//					String key1 = key;
-//					key = key.replace("_", "");
-//					
-//					if (key.compareTo("isinactive")==0) {
-//						if (productFromNetSuite.getString(key1).compareTo("F")==0) {
-//							productitem.get(0).setISACTIVE("Y");
-//						} else {
-//							productitem.get(0).setISACTIVE("N");
-//						}
-//						productitemrepository.saveAndFlush(productitem.get(0));
-//					}
-//					
-//					ProductAttribute productattribute = productattributerepository.findByKey(key);
-//					if (productattribute == null) {
-//						productattribute = new ProductAttribute();
-//						productattribute
-//								.setPRODUCTATTRIBUTECATEGORY_ID(productattributecategoryrepository.findOne((long) 18));
-//						productattribute.setPRODUCTATTRIBUTEORDER_NO((long) 1);
-//						productattribute.setPRODUCTCATEGORY_ID(productcategoryrepository.findOne((long) 0));
-//						productattribute.setPRODUCTATTRIBUTE_NAME("Unknown");
-//						productattribute.setPRODUCTATTRIBUTE_KEY(key);
-//						productattribute.setDATATYPE_ID(lookuprepository.findOne((long) 1));
-//						productattribute.setISREQUIRED("N");
-//						productattribute.setISACTIVE("Y");
-//						productattribute.setMODIFIED_BY(requestUser);
-//						productattribute.setMODIFIED_WORKSTATION(workstation);
-//						productattribute.setMODIFIED_WHEN(dateFormat1.format(date));
-//						productattribute = productattributerepository.saveAndFlush(productattribute);
-//					}
-//
-//					List<ProductItemAttributeValue> productitemattributevalues = productitemattributevaluerepository
-//							.findByAdvancedSearch(productitem.get(0).getPRODUCTITEM_ID(), (long) 0, (long) 0, (long) 0,
-//									productattribute.getPRODUCTATTRIBUTE_ID(), (long) 0, "", (long) 0, (long) 0, "", (long) 0, "");
-//					if (productitemattributevalues.size() > 0) {
-//						productitemattributevalues.get(0)
-//								.setPRODUCTATTRIBUTEITEM_VALUE(productFromNetSuite.getString(key1));
-//						productitemattributevalues.get(0).setISACTIVE("Y");
-//						productitemattributevalues.get(0).setMODIFIED_BY(requestUser);
-//						productitemattributevalues.get(0).setMODIFIED_WORKSTATION(workstation);
-//						productitemattributevalues.get(0).setMODIFIED_WHEN(dateFormat1.format(date));
-//						productitemattributevaluerepository.saveAndFlush(productitemattributevalues.get(0));
-//					} else {
-//						ProductItemAttributeValue productitemattributevalue = new ProductItemAttributeValue();
-//						productitemattributevalue.setPRODUCTITEM_ID(productitem.get(0));
-//						productitemattributevalue.setPRODUCTATTRIBUTE_ID(productattribute);
-//						productitemattributevalue.setPRODUCTATTRIBUTEITEM_VALUE(productFromNetSuite.getString(key1));
-//						productitemattributevalue.setISACTIVE("Y");
-//						productitemattributevalue.setMODIFIED_BY(requestUser);
-//						productitemattributevalue.setMODIFIED_WORKSTATION(workstation);
-//						productitemattributevalue.setMODIFIED_WHEN(dateFormat1.format(date));
-//						productitemattributevalue = productitemattributevaluerepository
-//								.saveAndFlush(productitemattributevalue);
-//					}
-//				}
-//
-//				JSONObject productitemsublist = objProductItem.getJSONObject("sublists");
-//
-//				JSONObject productitemprices = productitemsublist.getJSONObject("price1");
-//				int lineNo = 1;
-//				while (productitemprices.has("line " + lineNo)) {
-//					JSONObject productitemprice = productitemprices.getJSONObject("line " + lineNo);
-//					log.info("Line : " + lineNo + ", Price level: " + productitemprice.getString("pricelevelname"));
-//					lineNo = lineNo + 1;
-//
-//					if (!productitemprice.isNull("price[1]")) {
-//						log.info("Price: " + productitemprice.get("price[1]"));
-//						List<ProductItemPriceLevel> productitempricelevels = productitempricelevelrepository
-//								.findByAdvancedSearch((long) 0, productitem.get(0).getPRODUCTITEM_ID(), (long) 0,
-//										(long) 0, (long) 0, (long) 0, "", (long) 1,
-//										productitemprice.getString("pricelevel"), (long) 0, (long) 0);
-//
-//						ProductItemPriceLevel productitempricelevel = new ProductItemPriceLevel();
-//						if (productitempricelevels.size() > 0)
-//							productitempricelevel = productitempricelevels.get(0);
-//						
-//						Lookup currency = lookuprepository.findByCode("CURRENCY",
-//								productitemprice.getString("currency"));
-//						if (currency == null) {
-//							currency = new Lookup();
-//							currency.setENTITYNAME("CURRENCY");
-//							currency.setCODE(productitemprice.getString("currency"));
-//							currency.setDESCRIPTION(productitemprice.getString("currency"));
-//							currency.setISACTIVE("Y");
-//							currency.setMODIFIED_BY(requestUser);
-//							currency.setMODIFIED_WORKSTATION(workstation);
-//							currency.setMODIFIED_WHEN(dateFormat1.format(date));
-//							currency = lookuprepository.saveAndFlush(currency);
-//						}
-//						productitempricelevel.setCURRENCY_ID(currency);
-//						productitempricelevel.setPRODUCTITEM_ID(productitem.get(0));
-//						Lookup pricelevel = lookuprepository.findByCode("PRICELEVEL",
-//								productitemprice.getString("pricelevel"));
-//						if (pricelevel == null) {
-//							pricelevel = new Lookup();
-//							pricelevel.setENTITYNAME("PRICELEVEL");
-//							pricelevel.setCODE(productitemprice.getString("pricelevel"));
-//							pricelevel.setDESCRIPTION(productitemprice.getString("pricelevelname"));
-//							pricelevel.setISACTIVE("Y");
-//							pricelevel.setMODIFIED_BY(requestUser);
-//							pricelevel.setMODIFIED_WORKSTATION(workstation);
-//							pricelevel.setMODIFIED_WHEN(dateFormat1.format(date));
-//							pricelevel = lookuprepository.saveAndFlush(currency);
-//						}
-//						productitempricelevel.setPRICELEVEL_ID(pricelevel);
-//						productitempricelevel.setPRODUCTITEM_QUANTITY((long) 1);
-//						productitempricelevel.setPRODUCTITEM_UNITPRICE(
-//								Double.parseDouble(productitemprice.getString("price[1]")));
-//						productitempricelevel.setISACTIVE("Y");
-//						productitempricelevel.setMODIFIED_BY(requestUser);
-//						productitempricelevel.setMODIFIED_WORKSTATION(workstation);
-//						productitempricelevel.setMODIFIED_WHEN(dateFormat1.format(date));
-//						productitempricelevel = productitempricelevelrepository.saveAndFlush(productitempricelevel);
-//					}
-//				}
-//
-//				JSONObject objproductiteminventories = productitemsublist.getJSONObject("locations");
-//				lineNo = 1;
-//				while (objproductiteminventories.has("line " + lineNo)) {
-//					JSONObject objproductiteminventory = objproductiteminventories.getJSONObject("line " + lineNo);
-//					lineNo = lineNo + 1;
-//
-//					if (objproductiteminventory.getString("location").compareTo("2") == 0) {
-//						List<ProductItemInventory> productiteminventories = productiteminventoryrepository
-//								.findByAdvancedSearch((long) 0, (long) 0, (long) 0, "", (long) 0, "",
-//										productitem.get(0).getPRODUCTITEM_ID(), (long) 0, (long) 0, "");
-//
-//						if (productiteminventories.size() > 0) {
-//
-//							productiteminventories.get(0).setPRODUCTITEM_ID(productitem.get(0));
-//
-//							if (objproductiteminventory.has("locationid")
-//									&& !objproductiteminventory.isNull("locationid"))
-//								productiteminventories.get(0).setLOCATION_ID(
-//										Long.parseLong(objproductiteminventory.getString("locationid")));
-//
-//							if (objproductiteminventory.has("quantityonhand")
-//									&& !objproductiteminventory.isNull("quantityonhand"))
-//								productiteminventories.get(0).setQUANTITY_ONHAND(
-//										Double.parseDouble(objproductiteminventory.getString("quantityonhand")));
-//
-//							if (objproductiteminventory.has("quantityonorder")
-//									&& !objproductiteminventory.isNull("quantityonorder"))
-//								productiteminventories.get(0).setQUANTITY_ONORDER(
-//										Long.parseLong(objproductiteminventory.getString("quantityonorder")));
-//
-//							if (objproductiteminventory.has("quantitycommitted")
-//									&& !objproductiteminventory.isNull("quantitycommitted"))
-//								productiteminventories.get(0).setQUANTITY_COMMITTED(
-//										Long.parseLong(objproductiteminventory.getString("quantitycommitted")));
-//
-//							if (objproductiteminventory.has("quantityavailable")
-//									&& !objproductiteminventory.isNull("quantityavailable"))
-//								productiteminventories.get(0).setQUANTITY_AVAILABLE(
-//										Double.parseDouble(objproductiteminventory.getString("quantityavailable")));
-//
-//							if (objproductiteminventory.has("quantitybackordered")
-//									&& !objproductiteminventory.isNull("quantitybackordered"))
-//								productiteminventories.get(0).setQUANTITY_BACKORDERED(
-//										Long.parseLong(objproductiteminventory.getString("quantitybackordered")));
-//
-//							if (objproductiteminventory.has("quantityintransit")
-//									&& !objproductiteminventory.isNull("quantityintransit"))
-//								productiteminventories.get(0).setQUANTITY_INTRANSIT(
-//										Long.parseLong(objproductiteminventory.getString("quantityintransit")));
-//
-//							if (objproductiteminventory.has("qtyintransitexternal")
-//									&& !objproductiteminventory.isNull("qtyintransitexternal"))
-//								productiteminventories.get(0).setQUANTITYEXTERNAL_INTRANSIT(
-//										Long.parseLong(objproductiteminventory.getString("qtyintransitexternal")));
-//
-//							if (objproductiteminventory.has("quantityonhandbase")
-//									&& !objproductiteminventory.isNull("quantityonhandbase"))
-//								productiteminventories.get(0).setQUANTITYBASEUNIT_ONHAND(
-//										Double.parseDouble(objproductiteminventory.getString("quantityonhandbase")));
-//
-//							if (objproductiteminventory.has("quantityavailablebase")
-//									&& !objproductiteminventory.isNull("quantityavailablebase"))
-//								productiteminventories.get(0).setQUANTITYBASEUNIT_AVAILABLE(
-//										Double.parseDouble(objproductiteminventory.getString("quantityavailablebase")));
-//
-//							if (objproductiteminventory.has("onhandvaluemli")
-//									&& !objproductiteminventory.isNull("onhandvaluemli"))
-//								productiteminventories.get(0).setVALUE(
-//										Double.parseDouble(objproductiteminventory.getString("onhandvaluemli")));
-//
-//							if (objproductiteminventory.has("averagecostmli")
-//									&& !objproductiteminventory.isNull("averagecostmli"))
-//								productiteminventories.get(0).setAVERAGE_COST(
-//										Double.parseDouble(objproductiteminventory.getString("averagecostmli")));
-//
-//							if (objproductiteminventory.has("lastpurchasepricemli")
-//									&& !objproductiteminventory.isNull("lastpurchasepricemli"))
-//								productiteminventories.get(0).setLASTPURCHASE_PRICE(
-//										Double.parseDouble(objproductiteminventory.getString("lastpurchasepricemli")));
-//
-//							if (objproductiteminventory.has("reorderpoint")
-//									&& !objproductiteminventory.isNull("reorderpoint"))
-//								productiteminventories.get(0).setREORDER_POINT(
-//										Long.parseLong(objproductiteminventory.getString("reorderpoint")));
-//
-//							if (objproductiteminventory.has("isautolocassignmentallowed")
-//									&& !objproductiteminventory.isNull("onhandvaluemli"))
-//								productiteminventories.get(0).setAUTOLOCATIONASSIGNMENT_ALLOWED(
-//										objproductiteminventory.getString("isautolocassignmentallowed"));
-//
-//							if (objproductiteminventory.has("isautolocassignmentsuspended")
-//									&& !objproductiteminventory.isNull("onhandvaluemli"))
-//								productiteminventories.get(0).setAUTOLOCATIONASSIGNMENT_SUSPENDED(
-//										objproductiteminventory.getString("isautolocassignmentsuspended"));
-//
-//							if (objproductiteminventory.has("preferredstocklevel")
-//									&& !objproductiteminventory.isNull("preferredstocklevel"))
-//								productiteminventories.get(0).setPREFEREDSTOCK_LEVEL(
-//										Long.parseLong(objproductiteminventory.getString("preferredstocklevel")));
-//
-//							if (objproductiteminventory.has("leadtime") && !objproductiteminventory.isNull("leadtime"))
-//								productiteminventories.get(0).setPURCHASELEAD_TIME(
-//										Long.parseLong(objproductiteminventory.getString("leadtime")));
-//
-//							if (objproductiteminventory.has("safetystocklevel")
-//									&& !objproductiteminventory.isNull("safetystocklevel"))
-//								productiteminventories.get(0).setSTAFTYSTOCK_LEVEL(
-//										Long.parseLong(objproductiteminventory.getString("safetystocklevel")));
-//
-//							if (objproductiteminventory.has("atpleadtime")
-//									&& !objproductiteminventory.isNull("atpleadtime"))
-//								productiteminventories.get(0).setATPLEAD_TIME(
-//										Long.parseLong(objproductiteminventory.getString("atpleadtime")));
-//
-//							if (objproductiteminventory.has("defaultreturncost")
-//									&& !objproductiteminventory.isNull("defaultreturncost"))
-//								productiteminventories.get(0).setDEFAULTRETURN_COST(
-//										Double.parseDouble(objproductiteminventory.getString("defaultreturncost")));
-//
-//							if (objproductiteminventory.has("lastinvtcountdate")
-//									&& !objproductiteminventory.isNull("lastinvtcountdate"))
-//								productiteminventories.get(0)
-//										.setLASTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
-//												.parse(objproductiteminventory.getString("lastinvtcountdate"))));
-//
-//							if (objproductiteminventory.has("nextinvtcountdate")
-//									&& !objproductiteminventory.isNull("nextinvtcountdate"))
-//								productiteminventories.get(0)
-//										.setNECTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
-//												.parse(objproductiteminventory.getString("nextinvtcountdate"))));
-//
-//							if (objproductiteminventory.has("invtcountinterval")
-//									&& !objproductiteminventory.isNull("invtcountinterval"))
-//								productiteminventories.get(0).setCOUNT_INTERVAL(
-//										Long.parseLong(objproductiteminventory.getString("invtcountinterval")));
-//
-//							if (objproductiteminventory.has("invtclassification")
-//									&& !objproductiteminventory.isNull("invtclassification"))
-//								productiteminventories.get(0).setINVENTORYCLASSIFICTION_ID(
-//										Long.parseLong(objproductiteminventory.getString("invtclassification")));
-//
-//							productiteminventories.get(0).setISACTIVE("Y");
-//							productiteminventories.get(0).setMODIFIED_BY(requestUser);
-//							productiteminventories.get(0).setMODIFIED_WORKSTATION(workstation);
-//							productiteminventories.get(0).setMODIFIED_WHEN(dateFormat1.format(date));
-//							productiteminventoryrepository.saveAndFlush(productiteminventories.get(0));
-//
-//						} else {
-//
-//							ProductItemInventory productiteminventory = new ProductItemInventory();
-//
-//							productiteminventory.setPRODUCTITEM_ID(productitem.get(0));
-//
-//							if (objproductiteminventory.has("locationid")
-//									&& !objproductiteminventory.isNull("locationid"))
-//								productiteminventory.setLOCATION_ID(
-//										Long.parseLong(objproductiteminventory.getString("locationid")));
-//
-//							if (objproductiteminventory.has("quantityonhand")
-//									&& !objproductiteminventory.isNull("quantityonhand"))
-//								productiteminventory.setQUANTITY_ONHAND(
-//										Double.parseDouble(objproductiteminventory.getString("quantityonhand")));
-//
-//							if (objproductiteminventory.has("quantityonorder")
-//									&& !objproductiteminventory.isNull("quantityonorder"))
-//								productiteminventory.setQUANTITY_ONORDER(
-//										Long.parseLong(objproductiteminventory.getString("quantityonorder")));
-//
-//							if (objproductiteminventory.has("quantitycommitted")
-//									&& !objproductiteminventory.isNull("quantitycommitted"))
-//								productiteminventory.setQUANTITY_COMMITTED(
-//										Long.parseLong(objproductiteminventory.getString("quantitycommitted")));
-//
-//							if (objproductiteminventory.has("quantityavailable")
-//									&& !objproductiteminventory.isNull("quantityavailable"))
-//								productiteminventory.setQUANTITY_AVAILABLE(
-//										Double.parseDouble(objproductiteminventory.getString("quantityavailable")));
-//
-//							if (objproductiteminventory.has("quantitybackordered")
-//									&& !objproductiteminventory.isNull("quantitybackordered"))
-//								productiteminventory.setQUANTITY_BACKORDERED(
-//										Long.parseLong(objproductiteminventory.getString("quantitybackordered")));
-//
-//							if (objproductiteminventory.has("quantityintransit")
-//									&& !objproductiteminventory.isNull("quantityintransit"))
-//								productiteminventory.setQUANTITY_INTRANSIT(
-//										Long.parseLong(objproductiteminventory.getString("quantityintransit")));
-//
-//							if (objproductiteminventory.has("qtyintransitexternal")
-//									&& !objproductiteminventory.isNull("qtyintransitexternal"))
-//								productiteminventory.setQUANTITYEXTERNAL_INTRANSIT(
-//										Long.parseLong(objproductiteminventory.getString("qtyintransitexternal")));
-//
-//							if (objproductiteminventory.has("quantityonhandbase")
-//									&& !objproductiteminventory.isNull("quantityonhandbase"))
-//								productiteminventory.setQUANTITYBASEUNIT_ONHAND(
-//										Double.parseDouble(objproductiteminventory.getString("quantityonhandbase")));
-//
-//							if (objproductiteminventory.has("quantityavailablebase")
-//									&& !objproductiteminventory.isNull("quantityavailablebase"))
-//								productiteminventory.setQUANTITYBASEUNIT_AVAILABLE(
-//										Double.parseDouble(objproductiteminventory.getString("quantityavailablebase")));
-//
-//							if (objproductiteminventory.has("onhandvaluemli")
-//									&& !objproductiteminventory.isNull("onhandvaluemli"))
-//								productiteminventory.setVALUE(
-//										Double.parseDouble(objproductiteminventory.getString("onhandvaluemli")));
-//
-//							if (objproductiteminventory.has("averagecostmli")
-//									&& !objproductiteminventory.isNull("averagecostmli"))
-//								productiteminventory.setAVERAGE_COST(
-//										Double.parseDouble(objproductiteminventory.getString("averagecostmli")));
-//
-//							if (objproductiteminventory.has("lastpurchasepricemli")
-//									&& !objproductiteminventory.isNull("lastpurchasepricemli"))
-//								productiteminventory.setLASTPURCHASE_PRICE(
-//										Double.parseDouble(objproductiteminventory.getString("lastpurchasepricemli")));
-//
-//							if (objproductiteminventory.has("reorderpoint")
-//									&& !objproductiteminventory.isNull("reorderpoint"))
-//								productiteminventory.setREORDER_POINT(
-//										Long.parseLong(objproductiteminventory.getString("reorderpoint")));
-//
-//							if (objproductiteminventory.has("isautolocassignmentallowed")
-//									&& !objproductiteminventory.isNull("isautolocassignmentallowed"))
-//								productiteminventory.setAUTOLOCATIONASSIGNMENT_ALLOWED(
-//										objproductiteminventory.getString("isautolocassignmentallowed"));
-//
-//							if (objproductiteminventory.has("isautolocassignmentsuspended")
-//									&& !objproductiteminventory.isNull("isautolocassignmentsuspended"))
-//								productiteminventory.setAUTOLOCATIONASSIGNMENT_SUSPENDED(
-//										objproductiteminventory.getString("isautolocassignmentsuspended"));
-//
-//							if (objproductiteminventory.has("preferredstocklevel")
-//									&& !objproductiteminventory.isNull("preferredstocklevel"))
-//								productiteminventory.setPREFEREDSTOCK_LEVEL(
-//										Long.parseLong(objproductiteminventory.getString("preferredstocklevel")));
-//
-//							if (objproductiteminventory.has("leadtime") && !objproductiteminventory.isNull("leadtime"))
-//								productiteminventory.setPURCHASELEAD_TIME(
-//										Long.parseLong(objproductiteminventory.getString("leadtime")));
-//
-//							if (objproductiteminventory.has("safetystocklevel")
-//									&& !objproductiteminventory.isNull("safetystocklevel"))
-//								productiteminventory.setSTAFTYSTOCK_LEVEL(
-//										Long.parseLong(objproductiteminventory.getString("safetystocklevel")));
-//
-//							if (objproductiteminventory.has("atpleadtime")
-//									&& !objproductiteminventory.isNull("atpleadtime"))
-//								productiteminventory.setATPLEAD_TIME(
-//										Long.parseLong(objproductiteminventory.getString("atpleadtime")));
-//
-//							if (objproductiteminventory.has("defaultreturncost")
-//									&& !objproductiteminventory.isNull("defaultreturncost"))
-//								productiteminventory.setDEFAULTRETURN_COST(
-//										Double.parseDouble(objproductiteminventory.getString("defaultreturncost")));
-//
-//							if (objproductiteminventory.has("lastinvtcountdate")
-//									&& !objproductiteminventory.isNull("lastinvtcountdate"))
-//								productiteminventory
-//										.setLASTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
-//												.parse(objproductiteminventory.getString("lastinvtcountdate"))));
-//
-//							if (objproductiteminventory.has("nextinvtcountdate")
-//									&& !objproductiteminventory.isNull("nextinvtcountdate"))
-//								productiteminventory
-//										.setNECTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
-//												.parse(objproductiteminventory.getString("nextinvtcountdate"))));
-//
-//							if (objproductiteminventory.has("invtcountinterval")
-//									&& !objproductiteminventory.isNull("invtcountinterval"))
-//								productiteminventory.setCOUNT_INTERVAL(
-//										Long.parseLong(objproductiteminventory.getString("invtcountinterval")));
-//
-//							if (objproductiteminventory.has("invtclassification")
-//									&& !objproductiteminventory.isNull("invtclassification"))
-//								productiteminventory.setINVENTORYCLASSIFICTION_ID(
-//										Long.parseLong(objproductiteminventory.getString("invtclassification")));
-//
-//							productiteminventory.setISACTIVE("Y");
-//							productiteminventory.setMODIFIED_BY(requestUser);
-//							productiteminventory.setMODIFIED_WORKSTATION(workstation);
-//							productiteminventory.setMODIFIED_WHEN(dateFormat1.format(date));
-//							productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
-//						}
-//					}
-//				}
-//
-//				counter = counter + 1;
-//			}
-//
-//			start = start + 100;
-//		}
-//
-//		rtn = mapper.writeValueAsString(products);
-//
-//		apiRequest.setREQUEST_OUTPUT(rtn);
-//		apiRequest.setREQUEST_STATUS("Success");
-//		apirequestdatalogRepository.saveAndFlush(apiRequest);
-//
-//		log.info("Output: " + rtn);
-//		log.info("--------------------------------------------------------");
-//
-//		return new ResponseEntity(rtn, HttpStatus.OK);
-//	}
-
-//	@RequestMapping(value = "/getfromnetsuite/{id}", method = RequestMethod.GET)
-//	public ResponseEntity getNetSuiteProductByID(@PathVariable Long id,
-//			@RequestHeader(value = "Authorization") String headToken)
-//			throws InterruptedException, IOException, JSONException, ParseException {
-//		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
-//		String rtn, workstation = null;
-//		APIRequestDataLog apiRequest;
-//		
-//		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//		Date date = new Date();
-//
-//		log.info("GET: /productitem/getfromnetsuite/" + id);
-//
-//		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItem.getDatabaseTableID());
-//
-//		if (checkTokenResponse.has("error")) {
-//			apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, (long) 0,
-//					"/product/getfromnetsuite/" + id, null, workstation);
-//			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-//			apirequestdatalogRepository.saveAndFlush(apiRequest);
-//			return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-//		}
-//
-//		ObjectMapper mapper = new ObjectMapper();
-//		Long requestUser = checkTokenResponse.getLong("user_ID");
-//		apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, requestUser, 
-//				"/product/getfromnetsuite/" + id, null, workstation);
-//	
-//		int start = 0, counter = 1;
-//		List<ProductItem> products = new ArrayList<ProductItem>();
-//		JSONObject objproductitems = new JSONObject();
-//	
-//		JSONArray params = new JSONArray();
-//		JSONObject obj = new JSONObject();
-//		obj.put("key", "id");
-//		obj.put("value", "" + id);
-//		params.put(obj);
-//
-//		int getDataCount = 1;
-//		while (getDataCount <= 20) {
-//			try {
-//				JSONObject productsFromNetSuite = new JSONObject(NetSuiteAPI.GET(685, 1, params));
-//				objproductitems = productsFromNetSuite.getJSONObject("msg");
-//				getDataCount = 21;
-//			} catch (Exception e) {
-//				log.info(e.getMessage());
-//				Thread.sleep(5000);
-//				getDataCount = getDataCount + 1;
-//			}
-//		}
-//
-//		if (objproductitems.has("fields")) {
-//			JSONObject productFromNetSuite = objproductitems.getJSONObject("fields");
-//
-//			log.info(objproductitems.getString("id"));
-//			log.info(productFromNetSuite.getString("itemid"));
-//
-//			List<ProductItem> productitem = productitemrepository.findByCode(productFromNetSuite.getString("itemid"));
-//			if (productitem.size() == 0) {
-//
-//			} else {
-//				Iterator<?> keys = productFromNetSuite.keys();
-//				while (keys.hasNext()) {
-//					String key = (String) keys.next();
-//					String key1 = key;
-//					key = key.replace("_", "");
-//					ProductAttribute productattribute = productattributerepository.findByKey(key);
-//					if (productattribute == null) {
-//						productattribute = new ProductAttribute();
-//						productattribute
-//								.setPRODUCTATTRIBUTECATEGORY_ID(productattributecategoryrepository.findOne((long) 18));
-//						productattribute.setPRODUCTATTRIBUTEORDER_NO((long) 1);
-//						productattribute.setPRODUCTCATEGORY_ID(productcategoryrepository.findOne((long) 0));
-//						productattribute.setPRODUCTATTRIBUTE_NAME("Unknown");
-//						productattribute.setPRODUCTATTRIBUTE_KEY(key);
-//						productattribute.setDATATYPE_ID(lookuprepository.findOne((long) 1));
-//						productattribute.setISREQUIRED("N");
-//						productattribute.setISACTIVE("Y");
-//						productattribute.setMODIFIED_BY(requestUser);
-//						productattribute.setMODIFIED_WORKSTATION(workstation);
-//						productattribute.setMODIFIED_WHEN(dateFormat1.format(date));
-//						productattribute = productattributerepository.saveAndFlush(productattribute);
-//					}
-//
-//					List<ProductItemAttributeValue> productitemattributevalues = productitemattributevaluerepository
-//							.findByAdvancedSearch(productitem.get(0).getPRODUCTITEM_ID(), (long) 0, (long) 0, (long) 0,
-//									productattribute.getPRODUCTATTRIBUTE_ID(), (long) 0, "", (long) 0, (long) 0, "", (long) 0, "");
-//					if (productitemattributevalues.size() > 0) {
-//						productitemattributevalues.get(0)
-//								.setPRODUCTATTRIBUTEITEM_VALUE(productFromNetSuite.getString(key1));
-//						productitemattributevalues.get(0).setISACTIVE("Y");
-//						productitemattributevalues.get(0).setMODIFIED_BY(requestUser);
-//						productitemattributevalues.get(0).setMODIFIED_WORKSTATION(workstation);
-//						productitemattributevalues.get(0).setMODIFIED_WHEN(dateFormat1.format(date));
-//						productitemattributevaluerepository.saveAndFlush(productitemattributevalues.get(0));
-//					} else {
-//						ProductItemAttributeValue productitemattributevalue = new ProductItemAttributeValue();
-//						productitemattributevalue.setPRODUCTITEM_ID(productitem.get(0));
-//						productitemattributevalue.setPRODUCTATTRIBUTE_ID(productattribute);
-//						productitemattributevalue.setPRODUCTATTRIBUTEITEM_VALUE(productFromNetSuite.getString(key1));
-//						productitemattributevalue.setISACTIVE("Y");
-//						productitemattributevalue.setMODIFIED_BY(requestUser);
-//						productitemattributevalue.setMODIFIED_WORKSTATION(workstation);
-//						productitemattributevalue.setMODIFIED_WHEN(dateFormat1.format(date));
-//						productitemattributevalue = productitemattributevaluerepository
-//								.saveAndFlush(productitemattributevalue);
-//					}
-//				}
-//			}
-//
-//			JSONObject productitemsublist = objproductitems.getJSONObject("sublists");
-//
-//			JSONObject productitemprices = productitemsublist.getJSONObject("price1");
-//			int lineNo = 1;
-//			while (productitemprices.has("line " + lineNo)) {
-//				JSONObject productitemprice = productitemprices.getJSONObject("line " + lineNo);
-//				log.info("Line : " + lineNo + ", Price level: " + productitemprice.getString("pricelevelname"));
-//				lineNo = lineNo + 1;
-//
-//				if (!productitemprice.isNull("price[1]")) {
-//					log.info("Price: " + productitemprice.get("price[1]"));
-//					List<ProductItemPriceLevel> productitempricelevels = productitempricelevelrepository
-//							.findByAdvancedSearch((long) 0, productitem.get(0).getPRODUCTITEM_ID(), (long) 0, (long) 0,
-//									(long) 0, (long) 0, "", (long) 1, productitemprice.getString("pricelevel"),
-//									(long) 0, (long) 0);
-//
-//					if (productitempricelevels.size() > 0) {
-//
-//					} else {
-//
-//						ProductItemPriceLevel productitempricelevel = new ProductItemPriceLevel();
-//						Lookup currency = lookuprepository.findByCode("CURRENCY",
-//								productitemprice.getString("currency"));
-//						if (currency == null) {
-//							currency = new Lookup();
-//							currency.setENTITYNAME("CURRENCY");
-//							currency.setCODE(productitemprice.getString("currency"));
-//							currency.setDESCRIPTION(productitemprice.getString("currency"));
-//							currency.setISACTIVE("Y");
-//							currency.setMODIFIED_BY(requestUser);
-//							currency.setMODIFIED_WORKSTATION(workstation);
-//							currency.setMODIFIED_WHEN(dateFormat1.format(date));
-//							currency = lookuprepository.saveAndFlush(currency);
-//						}
-//						productitempricelevel.setCURRENCY_ID(currency);
-//						productitempricelevel.setPRODUCTITEM_ID(productitem.get(0));
-//						Lookup pricelevel = lookuprepository.findByCode("PRICELEVEL",
-//								productitemprice.getString("pricelevel"));
-//						if (pricelevel == null) {
-//							pricelevel = new Lookup();
-//							pricelevel.setENTITYNAME("PRICELEVEL");
-//							pricelevel.setCODE(productitemprice.getString("pricelevel"));
-//							pricelevel.setDESCRIPTION(productitemprice.getString("pricelevelname"));
-//							pricelevel.setISACTIVE("Y");
-//							pricelevel.setMODIFIED_BY(requestUser);
-//							pricelevel.setMODIFIED_WORKSTATION(workstation);
-//							pricelevel.setMODIFIED_WHEN(dateFormat1.format(date));
-//							pricelevel = lookuprepository.saveAndFlush(currency);
-//						}
-//						productitempricelevel.setPRICELEVEL_ID(pricelevel);
-//						productitempricelevel.setPRODUCTITEM_QUANTITY((long) 1);
-//						productitempricelevel
-//								.setPRODUCTITEM_UNITPRICE(Double.parseDouble(productitemprice.getString("price[1]")));
-//						productitempricelevel.setISACTIVE("Y");
-//						productitempricelevel.setMODIFIED_BY(requestUser);
-//						productitempricelevel.setMODIFIED_WORKSTATION(workstation);
-//						productitempricelevel.setMODIFIED_WHEN(dateFormat1.format(date));
-//						productitempricelevel = productitempricelevelrepository.saveAndFlush(productitempricelevel);
-//					}
-//				}
-//			}
-//
-//			JSONObject objproductiteminventories = productitemsublist.getJSONObject("locations");
-//			lineNo = 1;
-//			while (objproductiteminventories.has("line " + lineNo)) {
-//				JSONObject objproductiteminventory = objproductiteminventories.getJSONObject("line " + lineNo);
-//				lineNo = lineNo + 1;
-//
-//				if (objproductiteminventory.getString("location").compareTo("2") == 0) {
-//					List<ProductItemInventory> productiteminventories = productiteminventoryrepository
-//							.findByAdvancedSearch((long) 0, (long) 0, (long) 0, "", (long) 0, "",
-//									productitem.get(0).getPRODUCTITEM_ID());
-//
-//					if (productiteminventories.size() > 0) {
-//
-//						productiteminventories.get(0).setPRODUCTITEM_ID(productitem.get(0));
-//
-//						if (objproductiteminventory.has("locationid") && !objproductiteminventory.isNull("locationid"))
-//							productiteminventories.get(0)
-//									.setLOCATION_ID(Long.parseLong(objproductiteminventory.getString("locationid")));
-//
-//						if (objproductiteminventory.has("quantityonhand")
-//								&& !objproductiteminventory.isNull("quantityonhand"))
-//							productiteminventories.get(0).setQUANTITY_ONHAND(
-//									Double.parseDouble(objproductiteminventory.getString("quantityonhand")));
-//
-//						if (objproductiteminventory.has("quantityonorder")
-//								&& !objproductiteminventory.isNull("quantityonorder"))
-//							productiteminventories.get(0).setQUANTITY_ONORDER(
-//									Long.parseLong(objproductiteminventory.getString("quantityonorder")));
-//
-//						if (objproductiteminventory.has("quantitycommitted")
-//								&& !objproductiteminventory.isNull("quantitycommitted"))
-//							productiteminventories.get(0).setQUANTITY_COMMITTED(
-//									Long.parseLong(objproductiteminventory.getString("quantitycommitted")));
-//
-//						if (objproductiteminventory.has("quantityavailable")
-//								&& !objproductiteminventory.isNull("quantityavailable"))
-//							productiteminventories.get(0).setQUANTITY_AVAILABLE(
-//									Double.parseDouble(objproductiteminventory.getString("quantityavailable")));
-//
-//						if (objproductiteminventory.has("quantitybackordered")
-//								&& !objproductiteminventory.isNull("quantitybackordered"))
-//							productiteminventories.get(0).setQUANTITY_BACKORDERED(
-//									Long.parseLong(objproductiteminventory.getString("quantitybackordered")));
-//
-//						if (objproductiteminventory.has("quantityintransit")
-//								&& !objproductiteminventory.isNull("quantityintransit"))
-//							productiteminventories.get(0).setQUANTITY_INTRANSIT(
-//									Long.parseLong(objproductiteminventory.getString("quantityintransit")));
-//
-//						if (objproductiteminventory.has("qtyintransitexternal")
-//								&& !objproductiteminventory.isNull("qtyintransitexternal"))
-//							productiteminventories.get(0).setQUANTITYEXTERNAL_INTRANSIT(
-//									Long.parseLong(objproductiteminventory.getString("qtyintransitexternal")));
-//
-//						if (objproductiteminventory.has("quantityonhandbase")
-//								&& !objproductiteminventory.isNull("quantityonhandbase"))
-//							productiteminventories.get(0).setQUANTITYBASEUNIT_ONHAND(
-//									Double.parseDouble(objproductiteminventory.getString("quantityonhandbase")));
-//
-//						if (objproductiteminventory.has("quantityavailablebase")
-//								&& !objproductiteminventory.isNull("quantityavailablebase"))
-//							productiteminventories.get(0).setQUANTITYBASEUNIT_AVAILABLE(
-//									Double.parseDouble(objproductiteminventory.getString("quantityavailablebase")));
-//
-//						if (objproductiteminventory.has("onhandvaluemli")
-//								&& !objproductiteminventory.isNull("onhandvaluemli"))
-//							productiteminventories.get(0)
-//									.setVALUE(Double.parseDouble(objproductiteminventory.getString("onhandvaluemli")));
-//
-//						if (objproductiteminventory.has("averagecostmli")
-//								&& !objproductiteminventory.isNull("averagecostmli"))
-//							productiteminventories.get(0).setAVERAGE_COST(
-//									Double.parseDouble(objproductiteminventory.getString("averagecostmli")));
-//
-//						if (objproductiteminventory.has("lastpurchasepricemli")
-//								&& !objproductiteminventory.isNull("lastpurchasepricemli"))
-//							productiteminventories.get(0).setLASTPURCHASE_PRICE(
-//									Double.parseDouble(objproductiteminventory.getString("lastpurchasepricemli")));
-//
-//						if (objproductiteminventory.has("reorderpoint")
-//								&& !objproductiteminventory.isNull("reorderpoint"))
-//							productiteminventories.get(0).setREORDER_POINT(
-//									Long.parseLong(objproductiteminventory.getString("reorderpoint")));
-//
-//						if (objproductiteminventory.has("isautolocassignmentallowed")
-//								&& !objproductiteminventory.isNull("onhandvaluemli"))
-//							productiteminventories.get(0).setAUTOLOCATIONASSIGNMENT_ALLOWED(
-//									objproductiteminventory.getString("isautolocassignmentallowed"));
-//
-//						if (objproductiteminventory.has("isautolocassignmentsuspended")
-//								&& !objproductiteminventory.isNull("onhandvaluemli"))
-//							productiteminventories.get(0).setAUTOLOCATIONASSIGNMENT_SUSPENDED(
-//									objproductiteminventory.getString("isautolocassignmentsuspended"));
-//
-//						if (objproductiteminventory.has("preferredstocklevel")
-//								&& !objproductiteminventory.isNull("preferredstocklevel"))
-//							productiteminventories.get(0).setPREFEREDSTOCK_LEVEL(
-//									Long.parseLong(objproductiteminventory.getString("preferredstocklevel")));
-//
-//						if (objproductiteminventory.has("leadtime") && !objproductiteminventory.isNull("leadtime"))
-//							productiteminventories.get(0).setPURCHASELEAD_TIME(
-//									Long.parseLong(objproductiteminventory.getString("leadtime")));
-//
-//						if (objproductiteminventory.has("safetystocklevel")
-//								&& !objproductiteminventory.isNull("safetystocklevel"))
-//							productiteminventories.get(0).setSTAFTYSTOCK_LEVEL(
-//									Long.parseLong(objproductiteminventory.getString("safetystocklevel")));
-//
-//						if (objproductiteminventory.has("atpleadtime")
-//								&& !objproductiteminventory.isNull("atpleadtime"))
-//							productiteminventories.get(0)
-//									.setATPLEAD_TIME(Long.parseLong(objproductiteminventory.getString("atpleadtime")));
-//
-//						if (objproductiteminventory.has("defaultreturncost")
-//								&& !objproductiteminventory.isNull("defaultreturncost"))
-//							productiteminventories.get(0).setDEFAULTRETURN_COST(
-//									Double.parseDouble(objproductiteminventory.getString("defaultreturncost")));
-//
-//						if (objproductiteminventory.has("lastinvtcountdate")
-//								&& !objproductiteminventory.isNull("lastinvtcountdate"))
-//							productiteminventories.get(0)
-//									.setLASTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
-//											.parse(objproductiteminventory.getString("lastinvtcountdate"))));
-//
-//						if (objproductiteminventory.has("nextinvtcountdate")
-//								&& !objproductiteminventory.isNull("nextinvtcountdate"))
-//							productiteminventories.get(0)
-//									.setNECTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
-//											.parse(objproductiteminventory.getString("nextinvtcountdate"))));
-//
-//						if (objproductiteminventory.has("invtcountinterval")
-//								&& !objproductiteminventory.isNull("invtcountinterval"))
-//							productiteminventories.get(0).setCOUNT_INTERVAL(
-//									Long.parseLong(objproductiteminventory.getString("invtcountinterval")));
-//
-//						if (objproductiteminventory.has("invtclassification")
-//								&& !objproductiteminventory.isNull("invtclassification"))
-//							productiteminventories.get(0).setINVENTORYCLASSIFICTION_ID(
-//									Long.parseLong(objproductiteminventory.getString("invtclassification")));
-//
-//						productiteminventories.get(0).setISACTIVE("Y");
-//						productiteminventories.get(0).setMODIFIED_BY(requestUser);
-//						productiteminventories.get(0).setMODIFIED_WORKSTATION(workstation);
-//						productiteminventories.get(0).setMODIFIED_WHEN(dateFormat1.format(date));
-//						productiteminventoryrepository.saveAndFlush(productiteminventories.get(0));
-//
-//					} else {
-//
-//						ProductItemInventory productiteminventory = new ProductItemInventory();
-//
-//						productiteminventory.setPRODUCTITEM_ID(productitem.get(0));
-//
-//						if (objproductiteminventory.has("locationid") && !objproductiteminventory.isNull("locationid"))
-//							productiteminventory
-//									.setLOCATION_ID(Long.parseLong(objproductiteminventory.getString("locationid")));
-//
-//						if (objproductiteminventory.has("quantityonhand")
-//								&& !objproductiteminventory.isNull("quantityonhand"))
-//							productiteminventory.setQUANTITY_ONHAND(
-//									Double.parseDouble(objproductiteminventory.getString("quantityonhand")));
-//
-//						if (objproductiteminventory.has("quantityonorder")
-//								&& !objproductiteminventory.isNull("quantityonorder"))
-//							productiteminventory.setQUANTITY_ONORDER(
-//									Long.parseLong(objproductiteminventory.getString("quantityonorder")));
-//
-//						if (objproductiteminventory.has("quantitycommitted")
-//								&& !objproductiteminventory.isNull("quantitycommitted"))
-//							productiteminventory.setQUANTITY_COMMITTED(
-//									Long.parseLong(objproductiteminventory.getString("quantitycommitted")));
-//
-//						if (objproductiteminventory.has("quantityavailable")
-//								&& !objproductiteminventory.isNull("quantityavailable"))
-//							productiteminventory.setQUANTITY_AVAILABLE(
-//									Double.parseDouble(objproductiteminventory.getString("quantityavailable")));
-//
-//						if (objproductiteminventory.has("quantitybackordered")
-//								&& !objproductiteminventory.isNull("quantitybackordered"))
-//							productiteminventory.setQUANTITY_BACKORDERED(
-//									Long.parseLong(objproductiteminventory.getString("quantitybackordered")));
-//
-//						if (objproductiteminventory.has("quantityintransit")
-//								&& !objproductiteminventory.isNull("quantityintransit"))
-//							productiteminventory.setQUANTITY_INTRANSIT(
-//									Long.parseLong(objproductiteminventory.getString("quantityintransit")));
-//
-//						if (objproductiteminventory.has("qtyintransitexternal")
-//								&& !objproductiteminventory.isNull("qtyintransitexternal"))
-//							productiteminventory.setQUANTITYEXTERNAL_INTRANSIT(
-//									Long.parseLong(objproductiteminventory.getString("qtyintransitexternal")));
-//
-//						if (objproductiteminventory.has("quantityonhandbase")
-//								&& !objproductiteminventory.isNull("quantityonhandbase"))
-//							productiteminventory.setQUANTITYBASEUNIT_ONHAND(
-//									Double.parseDouble(objproductiteminventory.getString("quantityonhandbase")));
-//
-//						if (objproductiteminventory.has("quantityavailablebase")
-//								&& !objproductiteminventory.isNull("quantityavailablebase"))
-//							productiteminventory.setQUANTITYBASEUNIT_AVAILABLE(
-//									Double.parseDouble(objproductiteminventory.getString("quantityavailablebase")));
-//
-//						if (objproductiteminventory.has("onhandvaluemli")
-//								&& !objproductiteminventory.isNull("onhandvaluemli"))
-//							productiteminventory
-//									.setVALUE(Double.parseDouble(objproductiteminventory.getString("onhandvaluemli")));
-//
-//						if (objproductiteminventory.has("averagecostmli")
-//								&& !objproductiteminventory.isNull("averagecostmli"))
-//							productiteminventory.setAVERAGE_COST(
-//									Double.parseDouble(objproductiteminventory.getString("averagecostmli")));
-//
-//						if (objproductiteminventory.has("lastpurchasepricemli")
-//								&& !objproductiteminventory.isNull("lastpurchasepricemli"))
-//							productiteminventory.setLASTPURCHASE_PRICE(
-//									Double.parseDouble(objproductiteminventory.getString("lastpurchasepricemli")));
-//
-//						if (objproductiteminventory.has("reorderpoint")
-//								&& !objproductiteminventory.isNull("reorderpoint"))
-//							productiteminventory.setREORDER_POINT(
-//									Long.parseLong(objproductiteminventory.getString("reorderpoint")));
-//
-//						if (objproductiteminventory.has("isautolocassignmentallowed")
-//								&& !objproductiteminventory.isNull("isautolocassignmentallowed"))
-//							productiteminventory.setAUTOLOCATIONASSIGNMENT_ALLOWED(
-//									objproductiteminventory.getString("isautolocassignmentallowed"));
-//
-//						if (objproductiteminventory.has("isautolocassignmentsuspended")
-//								&& !objproductiteminventory.isNull("isautolocassignmentsuspended"))
-//							productiteminventory.setAUTOLOCATIONASSIGNMENT_SUSPENDED(
-//									objproductiteminventory.getString("isautolocassignmentsuspended"));
-//
-//						if (objproductiteminventory.has("preferredstocklevel")
-//								&& !objproductiteminventory.isNull("preferredstocklevel"))
-//							productiteminventory.setPREFEREDSTOCK_LEVEL(
-//									Long.parseLong(objproductiteminventory.getString("preferredstocklevel")));
-//
-//						if (objproductiteminventory.has("leadtime") && !objproductiteminventory.isNull("leadtime"))
-//							productiteminventory.setPURCHASELEAD_TIME(
-//									Long.parseLong(objproductiteminventory.getString("leadtime")));
-//
-//						if (objproductiteminventory.has("safetystocklevel")
-//								&& !objproductiteminventory.isNull("safetystocklevel"))
-//							productiteminventory.setSTAFTYSTOCK_LEVEL(
-//									Long.parseLong(objproductiteminventory.getString("safetystocklevel")));
-//
-//						if (objproductiteminventory.has("atpleadtime")
-//								&& !objproductiteminventory.isNull("atpleadtime"))
-//							productiteminventory
-//									.setATPLEAD_TIME(Long.parseLong(objproductiteminventory.getString("atpleadtime")));
-//
-//						if (objproductiteminventory.has("defaultreturncost")
-//								&& !objproductiteminventory.isNull("defaultreturncost"))
-//							productiteminventory.setDEFAULTRETURN_COST(
-//									Double.parseDouble(objproductiteminventory.getString("defaultreturncost")));
-//
-//						if (objproductiteminventory.has("lastinvtcountdate")
-//								&& !objproductiteminventory.isNull("lastinvtcountdate"))
-//							productiteminventory.setLASTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
-//									.parse(objproductiteminventory.getString("lastinvtcountdate"))));
-//
-//						if (objproductiteminventory.has("nextinvtcountdate")
-//								&& !objproductiteminventory.isNull("nextinvtcountdate"))
-//							productiteminventory.setNECTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
-//									.parse(objproductiteminventory.getString("nextinvtcountdate"))));
-//
-//						if (objproductiteminventory.has("invtcountinterval")
-//								&& !objproductiteminventory.isNull("invtcountinterval"))
-//							productiteminventory.setCOUNT_INTERVAL(
-//									Long.parseLong(objproductiteminventory.getString("invtcountinterval")));
-//
-//						if (objproductiteminventory.has("invtclassification")
-//								&& !objproductiteminventory.isNull("invtclassification"))
-//							productiteminventory.setINVENTORYCLASSIFICTION_ID(
-//									Long.parseLong(objproductiteminventory.getString("invtclassification")));
-//
-//						productiteminventory.setISACTIVE("Y");
-//						productiteminventory.setMODIFIED_BY(requestUser);
-//						productiteminventory.setMODIFIED_WORKSTATION(workstation);
-//						productiteminventory.setMODIFIED_WHEN(dateFormat1.format(date));
-//						productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
-//					}
-//				}
-//			}
-//		}
-//		rtn = mapper.writeValueAsString(products);
-//
-//		apiRequest.setREQUEST_OUTPUT(rtn);
-//		apiRequest.setREQUEST_STATUS("Success");
-//		apirequestdatalogRepository.saveAndFlush(apiRequest);
-//
-//		log.info("Output: " + rtn);
-//		log.info("--------------------------------------------------------");
-//
-//		return new ResponseEntity(rtn, HttpStatus.OK);
-//	}
-//
+	//	@RequestMapping(value = "/getfromnetsuite/{id}", method = RequestMethod.GET)
+	//	public ResponseEntity getNetSuiteProductByID(@PathVariable Long id,
+	//			@RequestHeader(value = "Authorization") String headToken)
+	//			throws InterruptedException, IOException, JSONException, ParseException {
+	//		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
+	//		String rtn, workstation = null;
+	//		APIRequestDataLog apiRequest;
+	//		
+	//		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	//		Date date = new Date();
+	//
+	//		log.info("GET: /productitem/getfromnetsuite/" + id);
+	//
+	//		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItem.getDatabaseTableID());
+	//
+	//		if (checkTokenResponse.has("error")) {
+	//			apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, (long) 0,
+	//					"/product/getfromnetsuite/" + id, null, workstation);
+	//			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
+	//			apirequestdatalogRepository.saveAndFlush(apiRequest);
+	//			return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+	//		}
+	//
+	//		ObjectMapper mapper = new ObjectMapper();
+	//		Long requestUser = checkTokenResponse.getLong("user_ID");
+	//		apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, requestUser, 
+	//				"/product/getfromnetsuite/" + id, null, workstation);
+	//	
+	//		int start = 0, counter = 1;
+	//		List<ProductItem> products = new ArrayList<ProductItem>();
+	//		JSONObject objproductitems = new JSONObject();
+	//	
+	//		JSONArray params = new JSONArray();
+	//		JSONObject obj = new JSONObject();
+	//		obj.put("key", "id");
+	//		obj.put("value", "" + id);
+	//		params.put(obj);
+	//
+	//		int getDataCount = 1;
+	//		while (getDataCount <= 20) {
+	//			try {
+	//				JSONObject productsFromNetSuite = new JSONObject(NetSuiteAPI.GET(685, 1, params));
+	//				objproductitems = productsFromNetSuite.getJSONObject("msg");
+	//				getDataCount = 21;
+	//			} catch (Exception e) {
+	//				log.info(e.getMessage());
+	//				Thread.sleep(5000);
+	//				getDataCount = getDataCount + 1;
+	//			}
+	//		}
+	//
+	//		if (objproductitems.has("fields")) {
+	//			JSONObject productFromNetSuite = objproductitems.getJSONObject("fields");
+	//
+	//			log.info(objproductitems.getString("id"));
+	//			log.info(productFromNetSuite.getString("itemid"));
+	//
+	//			List<ProductItem> productitem = productitemrepository.findByCode(productFromNetSuite.getString("itemid"));
+	//			if (productitem.size() == 0) {
+	//
+	//			} else {
+	//				Iterator<?> keys = productFromNetSuite.keys();
+	//				while (keys.hasNext()) {
+	//					String key = (String) keys.next();
+	//					String key1 = key;
+	//					key = key.replace("_", "");
+	//					ProductAttribute productattribute = productattributerepository.findByKey(key);
+	//					if (productattribute == null) {
+	//						productattribute = new ProductAttribute();
+	//						productattribute
+	//								.setPRODUCTATTRIBUTECATEGORY_ID(productattributecategoryrepository.findOne((long) 18));
+	//						productattribute.setPRODUCTATTRIBUTEORDER_NO((long) 1);
+	//						productattribute.setPRODUCTCATEGORY_ID(productcategoryrepository.findOne((long) 0));
+	//						productattribute.setPRODUCTATTRIBUTE_NAME("Unknown");
+	//						productattribute.setPRODUCTATTRIBUTE_KEY(key);
+	//						productattribute.setDATATYPE_ID(lookuprepository.findOne((long) 1));
+	//						productattribute.setISREQUIRED("N");
+	//						productattribute.setISACTIVE("Y");
+	//						productattribute.setMODIFIED_BY(requestUser);
+	//						productattribute.setMODIFIED_WORKSTATION(workstation);
+	//						productattribute.setMODIFIED_WHEN(dateFormat1.format(date));
+	//						productattribute = productattributerepository.saveAndFlush(productattribute);
+	//					}
+	//
+	//					List<ProductItemAttributeValue> productitemattributevalues = productitemattributevaluerepository
+	//							.findByAdvancedSearch(productitem.get(0).getPRODUCTITEM_ID(), (long) 0, (long) 0, (long) 0,
+	//									productattribute.getPRODUCTATTRIBUTE_ID(), (long) 0, "", (long) 0, (long) 0, "", (long) 0, "");
+	//					if (productitemattributevalues.size() > 0) {
+	//						productitemattributevalues.get(0)
+	//								.setPRODUCTATTRIBUTEITEM_VALUE(productFromNetSuite.getString(key1));
+	//						productitemattributevalues.get(0).setISACTIVE("Y");
+	//						productitemattributevalues.get(0).setMODIFIED_BY(requestUser);
+	//						productitemattributevalues.get(0).setMODIFIED_WORKSTATION(workstation);
+	//						productitemattributevalues.get(0).setMODIFIED_WHEN(dateFormat1.format(date));
+	//						productitemattributevaluerepository.saveAndFlush(productitemattributevalues.get(0));
+	//					} else {
+	//						ProductItemAttributeValue productitemattributevalue = new ProductItemAttributeValue();
+	//						productitemattributevalue.setPRODUCTITEM_ID(productitem.get(0));
+	//						productitemattributevalue.setPRODUCTATTRIBUTE_ID(productattribute);
+	//						productitemattributevalue.setPRODUCTATTRIBUTEITEM_VALUE(productFromNetSuite.getString(key1));
+	//						productitemattributevalue.setISACTIVE("Y");
+	//						productitemattributevalue.setMODIFIED_BY(requestUser);
+	//						productitemattributevalue.setMODIFIED_WORKSTATION(workstation);
+	//						productitemattributevalue.setMODIFIED_WHEN(dateFormat1.format(date));
+	//						productitemattributevalue = productitemattributevaluerepository
+	//								.saveAndFlush(productitemattributevalue);
+	//					}
+	//				}
+	//			}
+	//
+	//			JSONObject productitemsublist = objproductitems.getJSONObject("sublists");
+	//
+	//			JSONObject productitemprices = productitemsublist.getJSONObject("price1");
+	//			int lineNo = 1;
+	//			while (productitemprices.has("line " + lineNo)) {
+	//				JSONObject productitemprice = productitemprices.getJSONObject("line " + lineNo);
+	//				log.info("Line : " + lineNo + ", Price level: " + productitemprice.getString("pricelevelname"));
+	//				lineNo = lineNo + 1;
+	//
+	//				if (!productitemprice.isNull("price[1]")) {
+	//					log.info("Price: " + productitemprice.get("price[1]"));
+	//					List<ProductItemPriceLevel> productitempricelevels = productitempricelevelrepository
+	//							.findByAdvancedSearch((long) 0, productitem.get(0).getPRODUCTITEM_ID(), (long) 0, (long) 0,
+	//									(long) 0, (long) 0, "", (long) 1, productitemprice.getString("pricelevel"),
+	//									(long) 0, (long) 0);
+	//
+	//					if (productitempricelevels.size() > 0) {
+	//
+	//					} else {
+	//
+	//						ProductItemPriceLevel productitempricelevel = new ProductItemPriceLevel();
+	//						Lookup currency = lookuprepository.findByCode("CURRENCY",
+	//								productitemprice.getString("currency"));
+	//						if (currency == null) {
+	//							currency = new Lookup();
+	//							currency.setENTITYNAME("CURRENCY");
+	//							currency.setCODE(productitemprice.getString("currency"));
+	//							currency.setDESCRIPTION(productitemprice.getString("currency"));
+	//							currency.setISACTIVE("Y");
+	//							currency.setMODIFIED_BY(requestUser);
+	//							currency.setMODIFIED_WORKSTATION(workstation);
+	//							currency.setMODIFIED_WHEN(dateFormat1.format(date));
+	//							currency = lookuprepository.saveAndFlush(currency);
+	//						}
+	//						productitempricelevel.setCURRENCY_ID(currency);
+	//						productitempricelevel.setPRODUCTITEM_ID(productitem.get(0));
+	//						Lookup pricelevel = lookuprepository.findByCode("PRICELEVEL",
+	//								productitemprice.getString("pricelevel"));
+	//						if (pricelevel == null) {
+	//							pricelevel = new Lookup();
+	//							pricelevel.setENTITYNAME("PRICELEVEL");
+	//							pricelevel.setCODE(productitemprice.getString("pricelevel"));
+	//							pricelevel.setDESCRIPTION(productitemprice.getString("pricelevelname"));
+	//							pricelevel.setISACTIVE("Y");
+	//							pricelevel.setMODIFIED_BY(requestUser);
+	//							pricelevel.setMODIFIED_WORKSTATION(workstation);
+	//							pricelevel.setMODIFIED_WHEN(dateFormat1.format(date));
+	//							pricelevel = lookuprepository.saveAndFlush(currency);
+	//						}
+	//						productitempricelevel.setPRICELEVEL_ID(pricelevel);
+	//						productitempricelevel.setPRODUCTITEM_QUANTITY((long) 1);
+	//						productitempricelevel
+	//								.setPRODUCTITEM_UNITPRICE(Double.parseDouble(productitemprice.getString("price[1]")));
+	//						productitempricelevel.setISACTIVE("Y");
+	//						productitempricelevel.setMODIFIED_BY(requestUser);
+	//						productitempricelevel.setMODIFIED_WORKSTATION(workstation);
+	//						productitempricelevel.setMODIFIED_WHEN(dateFormat1.format(date));
+	//						productitempricelevel = productitempricelevelrepository.saveAndFlush(productitempricelevel);
+	//					}
+	//				}
+	//			}
+	//
+	//			JSONObject objproductiteminventories = productitemsublist.getJSONObject("locations");
+	//			lineNo = 1;
+	//			while (objproductiteminventories.has("line " + lineNo)) {
+	//				JSONObject objproductiteminventory = objproductiteminventories.getJSONObject("line " + lineNo);
+	//				lineNo = lineNo + 1;
+	//
+	//				if (objproductiteminventory.getString("location").compareTo("2") == 0) {
+	//					List<ProductItemInventory> productiteminventories = productiteminventoryrepository
+	//							.findByAdvancedSearch((long) 0, (long) 0, (long) 0, "", (long) 0, "",
+	//									productitem.get(0).getPRODUCTITEM_ID());
+	//
+	//					if (productiteminventories.size() > 0) {
+	//
+	//						productiteminventories.get(0).setPRODUCTITEM_ID(productitem.get(0));
+	//
+	//						if (objproductiteminventory.has("locationid") && !objproductiteminventory.isNull("locationid"))
+	//							productiteminventories.get(0)
+	//									.setLOCATION_ID(Long.parseLong(objproductiteminventory.getString("locationid")));
+	//
+	//						if (objproductiteminventory.has("quantityonhand")
+	//								&& !objproductiteminventory.isNull("quantityonhand"))
+	//							productiteminventories.get(0).setQUANTITY_ONHAND(
+	//									Double.parseDouble(objproductiteminventory.getString("quantityonhand")));
+	//
+	//						if (objproductiteminventory.has("quantityonorder")
+	//								&& !objproductiteminventory.isNull("quantityonorder"))
+	//							productiteminventories.get(0).setQUANTITY_ONORDER(
+	//									Long.parseLong(objproductiteminventory.getString("quantityonorder")));
+	//
+	//						if (objproductiteminventory.has("quantitycommitted")
+	//								&& !objproductiteminventory.isNull("quantitycommitted"))
+	//							productiteminventories.get(0).setQUANTITY_COMMITTED(
+	//									Long.parseLong(objproductiteminventory.getString("quantitycommitted")));
+	//
+	//						if (objproductiteminventory.has("quantityavailable")
+	//								&& !objproductiteminventory.isNull("quantityavailable"))
+	//							productiteminventories.get(0).setQUANTITY_AVAILABLE(
+	//									Double.parseDouble(objproductiteminventory.getString("quantityavailable")));
+	//
+	//						if (objproductiteminventory.has("quantitybackordered")
+	//								&& !objproductiteminventory.isNull("quantitybackordered"))
+	//							productiteminventories.get(0).setQUANTITY_BACKORDERED(
+	//									Long.parseLong(objproductiteminventory.getString("quantitybackordered")));
+	//
+	//						if (objproductiteminventory.has("quantityintransit")
+	//								&& !objproductiteminventory.isNull("quantityintransit"))
+	//							productiteminventories.get(0).setQUANTITY_INTRANSIT(
+	//									Long.parseLong(objproductiteminventory.getString("quantityintransit")));
+	//
+	//						if (objproductiteminventory.has("qtyintransitexternal")
+	//								&& !objproductiteminventory.isNull("qtyintransitexternal"))
+	//							productiteminventories.get(0).setQUANTITYEXTERNAL_INTRANSIT(
+	//									Long.parseLong(objproductiteminventory.getString("qtyintransitexternal")));
+	//
+	//						if (objproductiteminventory.has("quantityonhandbase")
+	//								&& !objproductiteminventory.isNull("quantityonhandbase"))
+	//							productiteminventories.get(0).setQUANTITYBASEUNIT_ONHAND(
+	//									Double.parseDouble(objproductiteminventory.getString("quantityonhandbase")));
+	//
+	//						if (objproductiteminventory.has("quantityavailablebase")
+	//								&& !objproductiteminventory.isNull("quantityavailablebase"))
+	//							productiteminventories.get(0).setQUANTITYBASEUNIT_AVAILABLE(
+	//									Double.parseDouble(objproductiteminventory.getString("quantityavailablebase")));
+	//
+	//						if (objproductiteminventory.has("onhandvaluemli")
+	//								&& !objproductiteminventory.isNull("onhandvaluemli"))
+	//							productiteminventories.get(0)
+	//									.setVALUE(Double.parseDouble(objproductiteminventory.getString("onhandvaluemli")));
+	//
+	//						if (objproductiteminventory.has("averagecostmli")
+	//								&& !objproductiteminventory.isNull("averagecostmli"))
+	//							productiteminventories.get(0).setAVERAGE_COST(
+	//									Double.parseDouble(objproductiteminventory.getString("averagecostmli")));
+	//
+	//						if (objproductiteminventory.has("lastpurchasepricemli")
+	//								&& !objproductiteminventory.isNull("lastpurchasepricemli"))
+	//							productiteminventories.get(0).setLASTPURCHASE_PRICE(
+	//									Double.parseDouble(objproductiteminventory.getString("lastpurchasepricemli")));
+	//
+	//						if (objproductiteminventory.has("reorderpoint")
+	//								&& !objproductiteminventory.isNull("reorderpoint"))
+	//							productiteminventories.get(0).setREORDER_POINT(
+	//									Long.parseLong(objproductiteminventory.getString("reorderpoint")));
+	//
+	//						if (objproductiteminventory.has("isautolocassignmentallowed")
+	//								&& !objproductiteminventory.isNull("onhandvaluemli"))
+	//							productiteminventories.get(0).setAUTOLOCATIONASSIGNMENT_ALLOWED(
+	//									objproductiteminventory.getString("isautolocassignmentallowed"));
+	//
+	//						if (objproductiteminventory.has("isautolocassignmentsuspended")
+	//								&& !objproductiteminventory.isNull("onhandvaluemli"))
+	//							productiteminventories.get(0).setAUTOLOCATIONASSIGNMENT_SUSPENDED(
+	//									objproductiteminventory.getString("isautolocassignmentsuspended"));
+	//
+	//						if (objproductiteminventory.has("preferredstocklevel")
+	//								&& !objproductiteminventory.isNull("preferredstocklevel"))
+	//							productiteminventories.get(0).setPREFEREDSTOCK_LEVEL(
+	//									Long.parseLong(objproductiteminventory.getString("preferredstocklevel")));
+	//
+	//						if (objproductiteminventory.has("leadtime") && !objproductiteminventory.isNull("leadtime"))
+	//							productiteminventories.get(0).setPURCHASELEAD_TIME(
+	//									Long.parseLong(objproductiteminventory.getString("leadtime")));
+	//
+	//						if (objproductiteminventory.has("safetystocklevel")
+	//								&& !objproductiteminventory.isNull("safetystocklevel"))
+	//							productiteminventories.get(0).setSTAFTYSTOCK_LEVEL(
+	//									Long.parseLong(objproductiteminventory.getString("safetystocklevel")));
+	//
+	//						if (objproductiteminventory.has("atpleadtime")
+	//								&& !objproductiteminventory.isNull("atpleadtime"))
+	//							productiteminventories.get(0)
+	//									.setATPLEAD_TIME(Long.parseLong(objproductiteminventory.getString("atpleadtime")));
+	//
+	//						if (objproductiteminventory.has("defaultreturncost")
+	//								&& !objproductiteminventory.isNull("defaultreturncost"))
+	//							productiteminventories.get(0).setDEFAULTRETURN_COST(
+	//									Double.parseDouble(objproductiteminventory.getString("defaultreturncost")));
+	//
+	//						if (objproductiteminventory.has("lastinvtcountdate")
+	//								&& !objproductiteminventory.isNull("lastinvtcountdate"))
+	//							productiteminventories.get(0)
+	//									.setLASTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
+	//											.parse(objproductiteminventory.getString("lastinvtcountdate"))));
+	//
+	//						if (objproductiteminventory.has("nextinvtcountdate")
+	//								&& !objproductiteminventory.isNull("nextinvtcountdate"))
+	//							productiteminventories.get(0)
+	//									.setNECTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
+	//											.parse(objproductiteminventory.getString("nextinvtcountdate"))));
+	//
+	//						if (objproductiteminventory.has("invtcountinterval")
+	//								&& !objproductiteminventory.isNull("invtcountinterval"))
+	//							productiteminventories.get(0).setCOUNT_INTERVAL(
+	//									Long.parseLong(objproductiteminventory.getString("invtcountinterval")));
+	//
+	//						if (objproductiteminventory.has("invtclassification")
+	//								&& !objproductiteminventory.isNull("invtclassification"))
+	//							productiteminventories.get(0).setINVENTORYCLASSIFICTION_ID(
+	//									Long.parseLong(objproductiteminventory.getString("invtclassification")));
+	//
+	//						productiteminventories.get(0).setISACTIVE("Y");
+	//						productiteminventories.get(0).setMODIFIED_BY(requestUser);
+	//						productiteminventories.get(0).setMODIFIED_WORKSTATION(workstation);
+	//						productiteminventories.get(0).setMODIFIED_WHEN(dateFormat1.format(date));
+	//						productiteminventoryrepository.saveAndFlush(productiteminventories.get(0));
+	//
+	//					} else {
+	//
+	//						ProductItemInventory productiteminventory = new ProductItemInventory();
+	//
+	//						productiteminventory.setPRODUCTITEM_ID(productitem.get(0));
+	//
+	//						if (objproductiteminventory.has("locationid") && !objproductiteminventory.isNull("locationid"))
+	//							productiteminventory
+	//									.setLOCATION_ID(Long.parseLong(objproductiteminventory.getString("locationid")));
+	//
+	//						if (objproductiteminventory.has("quantityonhand")
+	//								&& !objproductiteminventory.isNull("quantityonhand"))
+	//							productiteminventory.setQUANTITY_ONHAND(
+	//									Double.parseDouble(objproductiteminventory.getString("quantityonhand")));
+	//
+	//						if (objproductiteminventory.has("quantityonorder")
+	//								&& !objproductiteminventory.isNull("quantityonorder"))
+	//							productiteminventory.setQUANTITY_ONORDER(
+	//									Long.parseLong(objproductiteminventory.getString("quantityonorder")));
+	//
+	//						if (objproductiteminventory.has("quantitycommitted")
+	//								&& !objproductiteminventory.isNull("quantitycommitted"))
+	//							productiteminventory.setQUANTITY_COMMITTED(
+	//									Long.parseLong(objproductiteminventory.getString("quantitycommitted")));
+	//
+	//						if (objproductiteminventory.has("quantityavailable")
+	//								&& !objproductiteminventory.isNull("quantityavailable"))
+	//							productiteminventory.setQUANTITY_AVAILABLE(
+	//									Double.parseDouble(objproductiteminventory.getString("quantityavailable")));
+	//
+	//						if (objproductiteminventory.has("quantitybackordered")
+	//								&& !objproductiteminventory.isNull("quantitybackordered"))
+	//							productiteminventory.setQUANTITY_BACKORDERED(
+	//									Long.parseLong(objproductiteminventory.getString("quantitybackordered")));
+	//
+	//						if (objproductiteminventory.has("quantityintransit")
+	//								&& !objproductiteminventory.isNull("quantityintransit"))
+	//							productiteminventory.setQUANTITY_INTRANSIT(
+	//									Long.parseLong(objproductiteminventory.getString("quantityintransit")));
+	//
+	//						if (objproductiteminventory.has("qtyintransitexternal")
+	//								&& !objproductiteminventory.isNull("qtyintransitexternal"))
+	//							productiteminventory.setQUANTITYEXTERNAL_INTRANSIT(
+	//									Long.parseLong(objproductiteminventory.getString("qtyintransitexternal")));
+	//
+	//						if (objproductiteminventory.has("quantityonhandbase")
+	//								&& !objproductiteminventory.isNull("quantityonhandbase"))
+	//							productiteminventory.setQUANTITYBASEUNIT_ONHAND(
+	//									Double.parseDouble(objproductiteminventory.getString("quantityonhandbase")));
+	//
+	//						if (objproductiteminventory.has("quantityavailablebase")
+	//								&& !objproductiteminventory.isNull("quantityavailablebase"))
+	//							productiteminventory.setQUANTITYBASEUNIT_AVAILABLE(
+	//									Double.parseDouble(objproductiteminventory.getString("quantityavailablebase")));
+	//
+	//						if (objproductiteminventory.has("onhandvaluemli")
+	//								&& !objproductiteminventory.isNull("onhandvaluemli"))
+	//							productiteminventory
+	//									.setVALUE(Double.parseDouble(objproductiteminventory.getString("onhandvaluemli")));
+	//
+	//						if (objproductiteminventory.has("averagecostmli")
+	//								&& !objproductiteminventory.isNull("averagecostmli"))
+	//							productiteminventory.setAVERAGE_COST(
+	//									Double.parseDouble(objproductiteminventory.getString("averagecostmli")));
+	//
+	//						if (objproductiteminventory.has("lastpurchasepricemli")
+	//								&& !objproductiteminventory.isNull("lastpurchasepricemli"))
+	//							productiteminventory.setLASTPURCHASE_PRICE(
+	//									Double.parseDouble(objproductiteminventory.getString("lastpurchasepricemli")));
+	//
+	//						if (objproductiteminventory.has("reorderpoint")
+	//								&& !objproductiteminventory.isNull("reorderpoint"))
+	//							productiteminventory.setREORDER_POINT(
+	//									Long.parseLong(objproductiteminventory.getString("reorderpoint")));
+	//
+	//						if (objproductiteminventory.has("isautolocassignmentallowed")
+	//								&& !objproductiteminventory.isNull("isautolocassignmentallowed"))
+	//							productiteminventory.setAUTOLOCATIONASSIGNMENT_ALLOWED(
+	//									objproductiteminventory.getString("isautolocassignmentallowed"));
+	//
+	//						if (objproductiteminventory.has("isautolocassignmentsuspended")
+	//								&& !objproductiteminventory.isNull("isautolocassignmentsuspended"))
+	//							productiteminventory.setAUTOLOCATIONASSIGNMENT_SUSPENDED(
+	//									objproductiteminventory.getString("isautolocassignmentsuspended"));
+	//
+	//						if (objproductiteminventory.has("preferredstocklevel")
+	//								&& !objproductiteminventory.isNull("preferredstocklevel"))
+	//							productiteminventory.setPREFEREDSTOCK_LEVEL(
+	//									Long.parseLong(objproductiteminventory.getString("preferredstocklevel")));
+	//
+	//						if (objproductiteminventory.has("leadtime") && !objproductiteminventory.isNull("leadtime"))
+	//							productiteminventory.setPURCHASELEAD_TIME(
+	//									Long.parseLong(objproductiteminventory.getString("leadtime")));
+	//
+	//						if (objproductiteminventory.has("safetystocklevel")
+	//								&& !objproductiteminventory.isNull("safetystocklevel"))
+	//							productiteminventory.setSTAFTYSTOCK_LEVEL(
+	//									Long.parseLong(objproductiteminventory.getString("safetystocklevel")));
+	//
+	//						if (objproductiteminventory.has("atpleadtime")
+	//								&& !objproductiteminventory.isNull("atpleadtime"))
+	//							productiteminventory
+	//									.setATPLEAD_TIME(Long.parseLong(objproductiteminventory.getString("atpleadtime")));
+	//
+	//						if (objproductiteminventory.has("defaultreturncost")
+	//								&& !objproductiteminventory.isNull("defaultreturncost"))
+	//							productiteminventory.setDEFAULTRETURN_COST(
+	//									Double.parseDouble(objproductiteminventory.getString("defaultreturncost")));
+	//
+	//						if (objproductiteminventory.has("lastinvtcountdate")
+	//								&& !objproductiteminventory.isNull("lastinvtcountdate"))
+	//							productiteminventory.setLASTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
+	//									.parse(objproductiteminventory.getString("lastinvtcountdate"))));
+	//
+	//						if (objproductiteminventory.has("nextinvtcountdate")
+	//								&& !objproductiteminventory.isNull("nextinvtcountdate"))
+	//							productiteminventory.setNECTCOUNT_DATE(dateFormat1.format(new SimpleDateFormat("dd/MM/yyyy")
+	//									.parse(objproductiteminventory.getString("nextinvtcountdate"))));
+	//
+	//						if (objproductiteminventory.has("invtcountinterval")
+	//								&& !objproductiteminventory.isNull("invtcountinterval"))
+	//							productiteminventory.setCOUNT_INTERVAL(
+	//									Long.parseLong(objproductiteminventory.getString("invtcountinterval")));
+	//
+	//						if (objproductiteminventory.has("invtclassification")
+	//								&& !objproductiteminventory.isNull("invtclassification"))
+	//							productiteminventory.setINVENTORYCLASSIFICTION_ID(
+	//									Long.parseLong(objproductiteminventory.getString("invtclassification")));
+	//
+	//						productiteminventory.setISACTIVE("Y");
+	//						productiteminventory.setMODIFIED_BY(requestUser);
+	//						productiteminventory.setMODIFIED_WORKSTATION(workstation);
+	//						productiteminventory.setMODIFIED_WHEN(dateFormat1.format(date));
+	//						productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
+	//					}
+	//				}
+	//			}
+	//		}
+	//		rtn = mapper.writeValueAsString(products);
+	//
+	//		apiRequest.setREQUEST_OUTPUT(rtn);
+	//		apiRequest.setREQUEST_STATUS("Success");
+	//		apirequestdatalogRepository.saveAndFlush(apiRequest);
+	//
+	//		log.info("Output: " + rtn);
+	//		log.info("--------------------------------------------------------");
+	//
+	//		return new ResponseEntity(rtn, HttpStatus.OK);
+	//	}
+	//
 };

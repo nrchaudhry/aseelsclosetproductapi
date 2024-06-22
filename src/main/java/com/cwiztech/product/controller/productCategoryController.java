@@ -30,6 +30,7 @@ import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductCategory;
 import com.cwiztech.product.repository.productCategoryRepository;
+import com.cwiztech.services.ProductService;
 import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,7 +62,7 @@ public class productCategoryController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<ProductCategory> productcategories = productcategoryrepository.findActive();
-		return new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -72,7 +73,7 @@ public class productCategoryController {
 
 		List<ProductCategory> productcategories = productcategoryrepository.findAll();
 		
-		return new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -83,7 +84,7 @@ public class productCategoryController {
 
 		ProductCategory productcategory = productcategoryrepository.findOne(id);
 		
-		return new ResponseEntity(getAPIResponse(null, productcategory , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productcategory , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -103,7 +104,7 @@ public class productCategoryController {
 		if (jsonproductcategories.length()>0)
 			productcategories = productcategoryrepository.findByIDs(productcategory_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -123,7 +124,7 @@ public class productCategoryController {
 		if (jsonproductcategories.length()>0)
 			productcategories = productcategoryrepository.findByNotInIDs(productcategory_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -182,16 +183,16 @@ public class productCategoryController {
 					productcategory = productcategoryrepository.findOne(productcategoryid);
 					
 					if (productcategory == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductCategory Data!", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductCategory Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				}
 			}
 			
 			if (productcategoryid == 0) {
 				if (!jsonObj.has("productcategory_NAME") || jsonObj.isNull("productcategory_NAME"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategory_NAME is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategory_NAME is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 				if (!jsonObj.has("productcategoryorder_NO") || jsonObj.isNull("productcategoryorder_NO"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategoryorder_NO is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategoryorder_NO is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 			}
 			
 			if (jsonObj.has("productcategoryparent_ID") && !jsonObj.isNull("productcategoryparent_ID"))
@@ -240,9 +241,9 @@ public class productCategoryController {
 		
 		ResponseEntity responseentity;
 		if (jsonProductCategory != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productcategories.get(0) , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productcategories.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		return responseentity;
 	}
 	
@@ -255,7 +256,7 @@ public class productCategoryController {
 		ProductCategory productcategory = productcategoryrepository.findOne(id);
 		productcategoryrepository.delete(productcategory);
 		
-		return new ResponseEntity(getAPIResponse(null, productcategory , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productcategory , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -289,16 +290,12 @@ public class productCategoryController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		JSONObject jsonObj = new JSONObject(data);
-		long application_ID = 0;
-
-		if (jsonObj.has("application_ID"))
-			application_ID = jsonObj.getLong("application_ID");
 
 		List<ProductCategory> productcategories = ((active == true)
-				? productcategoryrepository.findBySearch(application_ID,"%" + jsonObj.getString("search") + "%")
-				: productcategoryrepository.findAllBySearch(application_ID,"%" + jsonObj.getString("search") + "%"));
+				? productcategoryrepository.findBySearch("%" + jsonObj.getString("search") + "%")
+				: productcategoryrepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 		
-		return new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -318,19 +315,45 @@ public class productCategoryController {
 		APIRequestDataLog apiRequest = checkToken("POST", "/productcategory/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 		
-		JSONObject jsonObj = new JSONObject(data);
-		long productcategoryparent_ID = 0;
-		List<ProductCategory> productcategories = new ArrayList<ProductCategory>();
+        List<ProductCategory> productcategories = new ArrayList<ProductCategory>();
+        JSONObject jsonObj = new JSONObject(data);
 
-		if (jsonObj.has("productcategoryparent_ID") && !jsonObj.isNull("productcategoryparent_ID"))
-			productcategoryparent_ID = jsonObj.getLong("productcategoryparent_ID");
-		
-		if(productcategoryparent_ID != 0){
-		 productcategories = ((active == true)
-				? productcategoryrepository.findByAdvancedSearch(productcategoryparent_ID)
-				: productcategoryrepository.findAllByAdvancedSearch(productcategoryparent_ID));
-		}
-		return new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+        JSONArray searchObject = new JSONArray();
+        List<Integer> productcategoryparent_IDS = new ArrayList<Integer>(); 
+
+        productcategoryparent_IDS.add((int) 0);
+
+        long productcategoryparent_ID = 0 ;
+
+        boolean isWithDetail = true;
+        if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+            isWithDetail = jsonObj.getBoolean("iswithdetail");
+        }
+        jsonObj.put("iswithdetail", false);
+
+        if (jsonObj.has("productcategoryparent_ID") && !jsonObj.isNull("productcategoryparent_ID") && jsonObj.getLong("productcategoryparent_ID") != 0) {
+            productcategoryparent_ID = jsonObj.getLong("productcategoryparent_ID");
+            productcategoryparent_IDS.add((int) productcategoryparent_ID);
+        } else if (jsonObj.has("productcategoryparent") && !jsonObj.isNull("productcategoryparent") && jsonObj.getLong("productcategoryparent") != 0) {
+            if (active == true) {
+                searchObject = new JSONArray(ProductService.POST("productcategoryparent/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+            } else {
+                searchObject = new JSONArray(ProductService.POST("productcategoryparent/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+            }
+
+            productcategoryparent_ID = searchObject.length();
+            for (int i=0; i<searchObject.length(); i++) {
+                productcategoryparent_IDS.add((int) searchObject.getJSONObject(i).getLong("productcategoryparent_ID"));
+            }
+        }
+
+        if(productcategoryparent_ID != 0 ){
+            productcategories = ((active == true)
+                    ? productcategoryrepository.findByAdvancedSearch(productcategoryparent_ID, productcategoryparent_IDS)
+                            : productcategoryrepository.findAllByAdvancedSearch(productcategoryparent_ID, productcategoryparent_IDS));
+
+        }
+ 		return new ResponseEntity(getAPIResponse(productcategories, null , null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
@@ -358,7 +381,7 @@ public class productCategoryController {
 		return apiRequest;
 	}
 	
-	APIRequestDataLog getAPIResponse(List<ProductCategory> productcategories, ProductCategory productcategory , JSONArray jsonProductcategories, JSONObject jsonProductCategory, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<ProductCategory> productcategories, ProductCategory productcategory , JSONArray jsonProductcategories, JSONObject jsonProductCategory, String message, APIRequestDataLog apiRequest, boolean isTableLog, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();

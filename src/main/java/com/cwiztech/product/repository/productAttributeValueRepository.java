@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.cwiztech.product.model.ProductAttributeValue;
-import com.cwiztech.product.model.ProductItem;
 
 public interface productAttributeValueRepository extends JpaRepository<ProductAttributeValue, Long>{
 	
@@ -36,12 +35,15 @@ public interface productAttributeValueRepository extends JpaRepository<ProductAt
 			+ "where PRODUCTATTRIBUTE_ID like CASE WHEN ?1=0 THEN PRODUCTATTRIBUTE_ID ELSE ?1 END "
 			+ "and (PRODUCTATTRIBUTEVALUEPARENT_ID like CASE WHEN ?2=0 THEN PRODUCTATTRIBUTEVALUEPARENT_ID ELSE ?2 END or PRODUCTATTRIBUTEVALUEPARENT_ID is NULL) "
 			+ "and ISACTIVE='Y'", nativeQuery = true)
-	List<ProductAttributeValue> findByAdvancedSearch(Long productattributeID,Long productattributevalueparentID);
-
+	List<ProductAttributeValue> findByAdvancedSearch(
+    @Param("ATTRIBUTEVALUE_ID") Long ATTRIBUTEVALUE_ID, @Param("ATTRIBUTEVALUE_IDS") List<Integer> ATTRIBUTEVALUE_IDS,
+    @Param("PRODUCTATTRIBUTE_ID") Long PRODUCTATTRIBUTE_ID, @Param("PRODUCTATTRIBUTE_IDS") List<Integer> PRODUCTATTRIBUTE_IDS); 
+    
 	@Query(value = "select a.* from TBLPRODUCTATTRIBUTEVALUE  as a "
-			+ "where PRODUCTATTRIBUTE_ID like CASE WHEN ?1=0 THEN PRODUCTATTRIBUTE_ID ELSE ?1 END "
-			+ "and (PRODUCTATTRIBUTEVALUEPARENT_ID like CASE WHEN ?2=0 THEN PRODUCTATTRIBUTEVALUEPARENT_ID ELSE ?2 END or PRODUCTATTRIBUTEVALUEPARENT_ID is NULL) "
+			+ "where CASE WHEN :PRODUCTATTRIBUTE_ID = 0 THEN PRODUCTATTRIBUTE_ID=PRODUCTATTRIBUTE_ID ELSE PRODUCTATTRIBUTE_ID IN (:PRODUCTATTRIBUTE_IDS) END "
+			+ "where CASE WHEN :ATTRIBUTEVALUE_ID = 0 THEN ATTRIBUTEVALUE_ID=ATTRIBUTEVALUE_ID ELSE ATTRIBUTEVALUE_ID IN (:ATTRIBUTEVALUE_IDS) END "
 			, nativeQuery = true)
-	List<ProductAttributeValue> findAllByAdvancedSearch(Long productattributeID,Long productattributevalueparentID);
-
+	List<ProductAttributeValue> findAllByAdvancedSearch(
+		    @Param("ATTRIBUTEVALUE_ID") Long ATTRIBUTEVALUE_ID, @Param("ATTRIBUTEVALUE_IDS") List<Integer> ATTRIBUTEVALUE_IDS,
+		    @Param("PRODUCTATTRIBUTE_ID") Long PRODUCTATTRIBUTE_ID, @Param("PRODUCTATTRIBUTE_IDS") List<Integer> PRODUCTATTRIBUTE_IDS); 
 }

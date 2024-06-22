@@ -9,13 +9,12 @@ import org.springframework.data.repository.query.Param;
 import com.cwiztech.product.model.AttributeCategory;
 
 public interface attributeCategoryRepository extends JpaRepository<AttributeCategory, Long>{
-	
 	@Query(value = "select * from TBLATTRIBUTECATEGORY where ISACTIVE='Y'", nativeQuery = true)
 	public List<AttributeCategory> findActive();
 	
 	@Query(value = "select * from TBLATTRIBUTECATEGORY "
 			+ "where ATTRIBUTECATEGORYORDER_NO like ?1 or ATTRIBUTECATEGORY_NAME like ?1 or ISTABS like ?1 "
-			+ " and ISACTIVE='Y'"
+			+ "and ISACTIVE='Y'"
 			, nativeQuery = true)
 	public List<AttributeCategory> findBySearch(String search);
 
@@ -25,15 +24,17 @@ public interface attributeCategoryRepository extends JpaRepository<AttributeCate
 	public List<AttributeCategory> findAllBySearch(String search);
 
 	@Query(value = "select * from TBLATTRIBUTECATEGORY  "
-			+ "where CATEGORY_ID LIKE CASE WHEN ?1 = 0 THEN CATEGORY_ID ELSE ?1 END "
+            + "where CASE WHEN :ATTRIBUTECATEGORYPARENT_ID = 0 THEN ATTRIBUTECATEGORYPARENT_ID=ATTRIBUTECATEGORYPARENT_ID ELSE ATTRIBUTECATEGORYPARENT_ID IN (:ATTRIBUTECATEGORYPARENT_IDS) END "
 			+ "and ISACTIVE='Y' order by ATTRIBUTECATEGORYORDER_NO", nativeQuery = true)
-	List<AttributeCategory> findByAdvancedSearch(Long categoryID);
+	List<AttributeCategory> findByAdvancedSearch(
+    @Param("ATTRIBUTECATEGORYPARENT_ID") Long ATTRIBUTECATEGORYPARENT_ID, @Param("ATTRIBUTECATEGORYPARENT_IDS") List<Integer> ATTRIBUTECATEGORYPARENT_IDS); 
 
-	@Query(value = "select distinct a.* from TBLATTRIBUTECATEGORY as a "
-			+ "where ATTRIBUTECATEGORYPARENT_ID LIKE CASE WHEN ?1 = 0 THEN ATTRIBUTECATEGORYPARENT_ID ELSE ?1 END "	
+	@Query(value = "select distinct * from TBLATTRIBUTECATEGORY "
+			+ "where CASE WHEN :ATTRIBUTECATEGORYPARENT_ID = 0 THEN ATTRIBUTECATEGORYPARENT_ID=ATTRIBUTECATEGORYPARENT_ID ELSE ATTRIBUTECATEGORYPARENT_ID IN (:ATTRIBUTECATEGORYPARENT_IDS) END "
 			, nativeQuery = true)
-	List<AttributeCategory> findAllByAdvancedSearch(Long attributecategoryparent_ID);
-	
+	List<AttributeCategory> findAllByAdvancedSearch(
+    @Param("ATTRIBUTECATEGORYPARENT_ID") Long ATTRIBUTECATEGORYPARENT_ID, @Param("ATTRIBUTECATEGORYPARENT_IDS") List<Integer> ATTRIBUTECATEGORYPARENT_IDS); 
+
 	@Query(value = "select * from TBLATTRIBUTECATEGORY "
 			+ "where ATTRIBUTECATEGORY_ID in (:ids) "
 			+ "", nativeQuery = true)

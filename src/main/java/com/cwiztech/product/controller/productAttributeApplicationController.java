@@ -32,6 +32,7 @@ import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductAttributeApplication;
 import com.cwiztech.product.repository.productAttributeApplicationRepository;
 import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ProductService;
 import com.cwiztech.services.UserLoginService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,7 +65,7 @@ public class productAttributeApplicationController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<ProductAttributeApplication> productattributeapplications = productattributeapplicationrepository.findActive();
-		return new ResponseEntity(getAPIResponse(productattributeapplications, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productattributeapplications, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -75,7 +76,7 @@ public class productAttributeApplicationController {
 
 		List<ProductAttributeApplication> productattributeapplications = productattributeapplicationrepository.findAll();
 		
-		return new ResponseEntity(getAPIResponse(productattributeapplications, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productattributeapplications, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -86,7 +87,7 @@ public class productAttributeApplicationController {
 
 		ProductAttributeApplication productattributeapplication = productattributeapplicationrepository.findOne(id);
 		
-		return new ResponseEntity(getAPIResponse(null, productattributeapplication , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productattributeapplication , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 
@@ -107,7 +108,7 @@ public class productAttributeApplicationController {
 		if (jsonproductattributeapplications.length()>0)
 			productattributeapplications = productattributeapplicationrepository.findByIDs(productattributeapplication_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productattributeapplications, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productattributeapplications, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -127,7 +128,7 @@ public class productAttributeApplicationController {
 		if (jsonproductattributeapplications.length()>0)
 			productattributeapplications = productattributeapplicationrepository.findByNotInIDs(productattributeapplication_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productattributeapplications, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productattributeapplications, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.POST)
@@ -186,17 +187,17 @@ public class productAttributeApplicationController {
 					productattributeapplication = productattributeapplicationrepository.findOne(productattributeapplicationid);
 					
 					if (productattributeapplication == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductAttributeApplication Data!", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductAttributeApplication Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				}
 			}
 
 				
 			if (productattributeapplicationid == 0) {
 				if (!jsonObj.has("application_ID") || jsonObj.isNull("application_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "application_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "application_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 				if (!jsonObj.has("productattribute_ID") || jsonObj.isNull("productattribute_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productattribute_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productattribute_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 			}
 			
@@ -225,9 +226,9 @@ public class productAttributeApplicationController {
 		
 		ResponseEntity responseentity;
 		if (jsonProductAttributeApplication != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productattributeapplications.get(0) , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productattributeapplications.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productattributeapplications, null , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productattributeapplications, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		return responseentity;
 	}
 	
@@ -242,7 +243,7 @@ public class productAttributeApplicationController {
 		ProductAttributeApplication productattributeapplication = productattributeapplicationrepository.findOne(id);
 		productattributeapplicationrepository.delete(productattributeapplication);
 		
-		return new ResponseEntity(getAPIResponse(null, productattributeapplication , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productattributeapplication , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -277,18 +278,53 @@ public class productAttributeApplicationController {
 
 		JSONArray applicationObject = new JSONArray();
 		JSONObject jsonObj = new JSONObject(data);
-		long application_ID = 0, productattribute_ID = 0;
 		
-		if (jsonObj.has("application_ID") && !jsonObj.isNull("application_ID")) {
-			application_ID = jsonObj.getLong("application_ID");
-			applicationObject.put(new JSONObject("{application_ID: "+application_ID+"}"));
-		} else {
-			if (active == true) {
-				applicationObject = new JSONArray(UserLoginService.POST("application/advancedsearch", jsonObj.toString().replace("\"", ""), apiRequest.getREQUEST_OUTPUT()));
-			} else {
-				applicationObject = new JSONArray(UserLoginService.POST("application/advancedsearch/all", jsonObj.toString().replace("\"", ""), apiRequest.getREQUEST_OUTPUT()));
-			}
-		}
+		   JSONArray searchObject = new JSONArray();
+	        List<Integer> application_IDS = new ArrayList<Integer>(); 
+	        List<Integer> productattribute_IDS = new ArrayList<Integer>(); 
+
+	        application_IDS.add((int) 0);
+	        productattribute_IDS.add((int) 0);
+	        
+		long application_ID = 0 , productattribute_ID = 0;
+		
+     boolean isWithDetail = true;
+     if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+         isWithDetail = jsonObj.getBoolean("iswithdetail");
+     }
+     jsonObj.put("iswithdetail", false);
+		
+     if (jsonObj.has("application_ID") && !jsonObj.isNull("application_ID") && jsonObj.getLong("application_ID") != 0) {
+         application_ID = jsonObj.getLong("application_ID");
+         application_IDS.add((int) application_ID);
+     } else if (jsonObj.has("application") && !jsonObj.isNull("application") && jsonObj.getLong("application") != 0) {
+         if (active == true) {
+             searchObject = new JSONArray(ProductService.POST("application/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+         } else {
+             searchObject = new JSONArray(ProductService.POST("application/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+         }
+
+         application_ID = searchObject.length();
+         for (int i=0; i<searchObject.length(); i++) {
+             application_IDS.add((int) searchObject.getJSONObject(i).getLong("application_ID"));
+         }
+     }
+		
+     if (jsonObj.has("productattribute_ID") && !jsonObj.isNull("productattribute_ID") && jsonObj.getLong("productattribute_ID") != 0) {
+         productattribute_ID = jsonObj.getLong("productattribute_ID");
+         productattribute_IDS.add((int) productattribute_ID);
+     } else if (jsonObj.has("productattribute") && !jsonObj.isNull("productattribute") && jsonObj.getLong("productattribute") != 0) {
+         if (active == true) {
+             searchObject = new JSONArray(ProductService.POST("productattribute/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+         } else {
+             searchObject = new JSONArray(ProductService.POST("productattribute/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+         }
+
+         productattribute_ID = searchObject.length();
+         for (int i=0; i<searchObject.length(); i++) {
+             productattribute_IDS.add((int) searchObject.getJSONObject(i).getLong("productattribute_ID"));
+         }
+     }
 	
 		if (jsonObj.has("productattribute_ID") && !jsonObj.isNull("productattribute_ID"))
 			productattribute_ID = jsonObj.getLong("productattribute_ID");
@@ -299,8 +335,8 @@ public class productAttributeApplicationController {
 			application_ID = objapplication.getLong("application_ID");
 			
 			List<ProductAttributeApplication> productattributeapplication = ((active == true)
-					? productattributeapplicationrepository.findByAdvancedSearch(application_ID,productattribute_ID)
-					: productattributeapplicationrepository.findAllByAdvancedSearch(application_ID,productattribute_ID));
+					? productattributeapplicationrepository.findByAdvancedSearch(application_ID,application_IDS,productattribute_ID,productattribute_IDS)
+					: productattributeapplicationrepository.findAllByAdvancedSearch(application_ID,application_IDS,productattribute_ID,productattribute_IDS));
 			for (int k=0; k<productattributeapplication.size(); k++) {
 				boolean found = false;
 				
@@ -317,7 +353,7 @@ public class productAttributeApplicationController {
 			}		
 		}
 				
-		return new ResponseEntity(getAPIResponse(productattributeapplications, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productattributeapplications, null , null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	
@@ -346,7 +382,7 @@ public class productAttributeApplicationController {
 		return apiRequest;
 	}
 	
-	APIRequestDataLog getAPIResponse(List<ProductAttributeApplication> productattributeapplications, ProductAttributeApplication productattributeapplication , JSONArray jsonProductAttributeApplications, JSONObject jsonProductAttributeApplication, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<ProductAttributeApplication> productattributeapplications, ProductAttributeApplication productattributeapplication , JSONArray jsonProductAttributeApplications, JSONObject jsonProductAttributeApplication, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -356,7 +392,7 @@ public class productAttributeApplicationController {
 			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductAttributeApplication", message);
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
-			if (productattributeapplication != null) {
+			if (productattributeapplication != null && isWithDetail == true) {
 				JSONObject application = new JSONObject(UserLoginService.GET("application/"+productattributeapplication.getAPPLICATION_ID(), apiRequest.getREQUEST_OUTPUT()));
 				productattributeapplication.setAPPLICATION_DETAIL(application.toString());
 				
@@ -365,7 +401,7 @@ public class productAttributeApplicationController {
 				
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributeapplication));
 				productattributeapplicationID = productattributeapplication.getPRODUCTATTRIBUTEAPPLICATION_ID();
-			} else if(productattributeapplications != null){
+			} else if(productattributeapplications != null && isWithDetail == true){
 				if (productattributeapplications.size()>0) {
 					List<Integer> applicationList = new ArrayList<Integer>();
 					List<Integer> productattributeList = new ArrayList<Integer>();
@@ -398,7 +434,12 @@ public class productAttributeApplicationController {
 			
 			} else if (jsonProductAttributeApplication != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductAttributeApplication.toString());
-			}
+			
+		} else if (jsonProductAttributeApplications != null){
+			apiRequest.setREQUEST_OUTPUT(jsonProductAttributeApplications.toString());
+		} else if (jsonProductAttributeApplication != null){
+			apiRequest.setREQUEST_OUTPUT(jsonProductAttributeApplication.toString());
+		}
 			apiRequest.setRESPONSE_DATETIME(dateFormat1.format(date));
 			apiRequest.setREQUEST_STATUS("Success");
 			apirequestdatalogRepository.saveAndFlush(apiRequest);

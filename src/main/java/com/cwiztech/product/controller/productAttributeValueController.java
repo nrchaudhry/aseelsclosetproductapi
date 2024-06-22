@@ -31,6 +31,7 @@ import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductAttributeValue;
 import com.cwiztech.product.repository.productAttributeValueRepository;
 import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.cwiztech.token.AccessToken;
@@ -62,7 +63,7 @@ public class productAttributeValueController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<ProductAttributeValue> productattributevalues = productattributevaluerepository.findActive();
-		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -73,7 +74,7 @@ public class productAttributeValueController {
 
 		List<ProductAttributeValue> productattributevalues = productattributevaluerepository.findAll();
 		
-		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -84,7 +85,7 @@ public class productAttributeValueController {
 
 		ProductAttributeValue productattributevalue = productattributevaluerepository.findOne(id);
 		
-		return new ResponseEntity(getAPIResponse(null, productattributevalue, null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productattributevalue, null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -104,7 +105,7 @@ public class productAttributeValueController {
 		if (jsonproductattributevalues.length()>0)
 			productattributevalues = productattributevaluerepository.findByIDs(productattributevalue_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -124,7 +125,7 @@ public class productAttributeValueController {
 		if (jsonproductattributevalues.length()>0)
 			productattributevalues = productattributevaluerepository.findByNotInIDs(productattributevalue_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -183,22 +184,26 @@ public class productAttributeValueController {
 					productattributevalue = productattributevaluerepository.findOne(productattributevalueid);
 					
 					if (productattributevalue == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductAttributeValue Data!", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductAttributeValue Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				}
 			}
 			
 			if (productattributevalueid == 0) {
+				if (!jsonObj.has("product_ID") || jsonObj.isNull("product_ID"))
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+
 				if (!jsonObj.has("productattribute_ID") || jsonObj.isNull("productattribute_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productattribute_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productattribute_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 			}
-			if (jsonObj.has("productattribute_ID") && !jsonObj.isNull("productattribute_ID"))
-			    productattributevalue.setPRODUCTATTRIBUTE_ID(jsonObj.getLong("productattribute_ID"));
+			
+			productattributevalue.setPRODUCT_ID(jsonObj.getLong("product_ID"));
+		    productattributevalue.setPRODUCTATTRIBUTE_ID(jsonObj.getLong("productattribute_ID"));
 		
 		    if (jsonObj.has("productattribute_VALUE") && !jsonObj.isNull("productattribute_VALUE"))
 			    productattributevalue.setPRODUCTATTRIBUTE_VALUE(jsonObj.getString("productattribute_VALUE"));
 		
-		    if (jsonObj.has("productattributevalueparent_ID") && !jsonObj.isNull("productattributevalueparent_ID"))
-			    productattributevalue.setPRODUCTATTRIBUTEVALUEPARENT_ID(jsonObj.getLong("productattributevalueparent_ID"));
+		    if (jsonObj.has("attributevalue_ID") && !jsonObj.isNull("attributevalue_ID"))
+			    productattributevalue.setATTRIBUTEVALUE_ID(jsonObj.getLong("attributevalue_ID"));
 			
 		    if (productattributevalueid == 0)
 				productattributevalue.setISACTIVE("Y");
@@ -219,9 +224,9 @@ public class productAttributeValueController {
 		
 		ResponseEntity responseentity;
 		if (jsonProductAttributeValue != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productattributevalues.get(0) , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productattributevalues.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		return responseentity;
 	}
 	
@@ -234,7 +239,7 @@ public class productAttributeValueController {
 		ProductAttributeValue productattributevalue = productattributevaluerepository.findOne(id);
 		productattributevaluerepository.delete(productattributevalue);
 		
-		return new ResponseEntity(getAPIResponse(null, productattributevalue , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productattributevalue , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -273,7 +278,7 @@ public class productAttributeValueController {
 				? productattributevaluerepository.findBySearch("%" + jsonObj.getString("search") + "%")
 				: productattributevaluerepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 		
-		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -295,54 +300,61 @@ public class productAttributeValueController {
 		
 		List<ProductAttributeValue> productattributevalues= new ArrayList<ProductAttributeValue>();
 		JSONObject jsonObj = new JSONObject(data);
-		long productattribute_ID = 0, productattributevalueparent_ID = 0;
+		
+		   JSONArray searchObject = new JSONArray();
+	        List<Integer> productattribute_IDS = new ArrayList<Integer>(); 
+	        List<Integer> attributevalue_IDS = new ArrayList<Integer>(); 
 
-		if (jsonObj.has("productattribute_ID") && !jsonObj.isNull("productattribute_ID"))
-			productattribute_ID = jsonObj.getLong("productattribute_ID");
-		if (jsonObj.has("productcategory_ID") && !jsonObj.isNull("productcategory_ID") && productattribute_ID == 0 || jsonObj.has("attributecategory_ID") && !jsonObj.isNull("attributecategory_ID") && productattribute_ID == 0 
-				|| jsonObj.has("attribute_ID") && !jsonObj.isNull("attribute_ID") && productattribute_ID == 0 
-				|| jsonObj.has("product_ID") && !jsonObj.isNull("product_ID") && productattribute_ID == 0) {
-            JSONArray productattributevaluesObject;
-            if (active == true) {
-            	productattributevaluesObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
-            } else {
-            	productattributevaluesObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
-            }
-            for (int i=0; i<productattributevaluesObject.length(); i++) {
-                List<ProductAttributeValue> productattributevalue = new ArrayList<ProductAttributeValue>();
-                productattributevalue = ((active == true)
-                        ? productattributevaluerepository.findByAdvancedSearch( productattributevaluesObject.getJSONObject(i).getLong("productattribute_ID"), (long) 0)
-                        : productattributevaluerepository.findAllByAdvancedSearch(productattributevaluesObject.getJSONObject(i).getLong("productattribute_ID"), (long) 0));
-                for (int j=0; j<productattributevalue.size(); j++) {
-                	productattributevalues.add(productattributevalue.get(j));
-                }
-            }
-		}
+	        productattribute_IDS.add((int) 0);
+	        attributevalue_IDS.add((int) 0);
+	        
+		long productattribute_ID = 0 , attributevalue_ID = 0;
 		
-		if (jsonObj.has("productattributevalueparent_ID") && !jsonObj.isNull("productattributevalueparent_ID"))
-			productattributevalueparent_ID = jsonObj.getLong("productattributevalueparent_ID");
+       boolean isWithDetail = true;
+       if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+           isWithDetail = jsonObj.getBoolean("iswithdetail");
+       }
+       jsonObj.put("iswithdetail", false);
 		
-		if(productattribute_ID != 0 || productattributevalueparent_ID != 0){
+       if (jsonObj.has("productattribute_ID") && !jsonObj.isNull("productattribute_ID") && jsonObj.getLong("productattribute_ID") != 0) {
+           productattribute_ID = jsonObj.getLong("productattribute_ID");
+           productattribute_IDS.add((int) productattribute_ID);
+       } else if (jsonObj.has("productattribute") && !jsonObj.isNull("productattribute") && jsonObj.getLong("productattribute") != 0) {
+           if (active == true) {
+               searchObject = new JSONArray(ProductService.POST("productattribute/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+           } else {
+               searchObject = new JSONArray(ProductService.POST("productattribute/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+           }
+
+           productattribute_ID = searchObject.length();
+           for (int i=0; i<searchObject.length(); i++) {
+               productattribute_IDS.add((int) searchObject.getJSONObject(i).getLong("productattribute_ID"));
+           }
+       }
+		
+       if (jsonObj.has("attributevalue_ID") && !jsonObj.isNull("attributevalue_ID") && jsonObj.getLong("attributevalue_ID") != 0) {
+           attributevalue_ID = jsonObj.getLong("attributevalue_ID");
+           attributevalue_IDS.add((int) attributevalue_ID);
+       } else if (jsonObj.has("attributevalue") && !jsonObj.isNull("attributevalue") && jsonObj.getLong("attributevalue") != 0) {
+           if (active == true) {
+               searchObject = new JSONArray(ProductService.POST("attributevalue/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+           } else {
+               searchObject = new JSONArray(ProductService.POST("attributevalue/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+           }
+
+           attributevalue_ID = searchObject.length();
+           for (int i=0; i<searchObject.length(); i++) {
+               attributevalue_IDS.add((int) searchObject.getJSONObject(i).getLong("attributevalue_ID"));
+           }
+       }
+       
+		if(productattribute_ID != 0 || attributevalue_ID != 0){
 			List<ProductAttributeValue> productattributevalue = ((active == true)
-				? productattributevaluerepository.findByAdvancedSearch(productattribute_ID,productattributevalueparent_ID)
-				: productattributevaluerepository.findAllByAdvancedSearch(productattribute_ID,productattributevalueparent_ID));
+				? productattributevaluerepository.findByAdvancedSearch(productattribute_ID,productattribute_IDS,attributevalue_ID,attributevalue_IDS)
+				: productattributevaluerepository.findAllByAdvancedSearch(productattribute_ID,productattribute_IDS,attributevalue_ID,attributevalue_IDS));
 		
-		 for (int i=0; i<productattributevalue.size(); i++) {
-	            boolean found = false;
-	            
-	            for (int j=0; j<productattributevalues.size(); j++) {
-	                if (productattributevalue.get(i).getPRODUCTATTRIBUTEVALUE_ID() == productattributevalues.get(j).getPRODUCTATTRIBUTEVALUE_ID()) {
-	                    found = true;
-	                    break;
-	                }
-	            }
-	            
-	            if (found == false) {
-	            	productattributevalues.add(productattributevalue.get(i));
-	            }
-	        }
 		}
-		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
@@ -370,7 +382,7 @@ public class productAttributeValueController {
 		return apiRequest;
 	}
 	
-	APIRequestDataLog getAPIResponse(List<ProductAttributeValue> productattributevalues, ProductAttributeValue productattributevalue , JSONArray jsonProductAttributeValues, JSONObject jsonProductAttributeValue, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<ProductAttributeValue> productattributevalues, ProductAttributeValue productattributevalue , JSONArray jsonProductAttributeValues, JSONObject jsonProductAttributeValue, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -383,29 +395,54 @@ public class productAttributeValueController {
 			if (productattributevalue != null) {
 				JSONObject productattribute = new JSONObject(ProductService.GET("productattribute/"+productattributevalue.getPRODUCTATTRIBUTE_ID(), apiRequest.getREQUEST_OUTPUT()));
 				productattributevalue.setPRODUCTATTRIBUTE_DETAIL(productattribute.toString());
+				
+//                if (productattributevalue.getATTRIBUTEVALUE_ID()==null) {
+//                    JSONObject attributevalue = new JSONObject(ProductService.GET("attributevalue/"+productattributevalue.getATTRIBUTEVALUE_ID(), apiRequest.getREQUEST_OUTPUT()));
+//                    productattributevalue.setATTRIBUTEVALUE_DETAIL(attributevalue.toString());
+//                }
+
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributevalue));
 				productattributevalueID = productattributevalue.getPRODUCTATTRIBUTEVALUE_ID();
-			} else if(productattributevalues != null){
+			} else if(productattributevalues != null) {
 				if (productattributevalues.size()>0) {
 					List<Integer> productattributeList = new ArrayList<Integer>();
-					for (int i=0; i<productattributevalues.size(); i++) {
+                    List<Integer> attributevalueList = new ArrayList<Integer>();
+					
+                    for (int i=0; i<productattributevalues.size(); i++) {
 						productattributeList.add(Integer.parseInt(productattributevalues.get(i).getPRODUCTATTRIBUTE_ID().toString()));
+//		                if (productattributevalues.get(i).getATTRIBUTEVALUE_ID()==null) {
+//	                        attributevalueList.add(Integer.parseInt(productattributevalues.get(i).getATTRIBUTEVALUE_ID().toString()));
+//		                }
 					}
+                    
 					JSONArray productattributeObject = new JSONArray(ProductService.POST("productattribute/ids", "{productattributes: "+productattributeList+"}", apiRequest.getREQUEST_OUTPUT()));
+//					JSONArray attributevalueObject = new JSONArray(ProductService.POST("attributevalue/ids", "{attributevalues: "+attributevalueList+"}", apiRequest.getREQUEST_OUTPUT()));
 					
 					for (int i=0; i<productattributevalues.size(); i++) {
 						for (int j=0; j<productattributeObject.length(); j++) {
 							JSONObject productattribute = productattributeObject.getJSONObject(j);
-							if(productattributevalues.get(i).getPRODUCTATTRIBUTE_ID() == productattribute.getLong("productattribute_ID") ) {
+							if(productattributevalues.get(i).getPRODUCTATTRIBUTE_ID() == productattribute.getLong("productattribute_ID")) {
 								productattributevalues.get(i).setPRODUCTATTRIBUTE_DETAIL(productattribute.toString());
 							}
 						}
+						
+//                        for (int j=0; j<attributevalueObject.length(); j++) {
+//                            JSONObject attributevalue = attributevalueObject.getJSONObject(j);
+//	                        if (productattributevalues.get(i).getATTRIBUTEVALUE_ID() != null && productattributevalues.get(i).getATTRIBUTEVALUE_ID() == attributevalue.getLong("attributevalue_ID")) {
+//	                            productattributevalues.get(i).setATTRIBUTEVALUE_DETAIL(attributevalue.toString());
+//	                        }
+//						}
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributevalues));
-			}else if (jsonProductAttributeValues != null){
+			} else if (jsonProductAttributeValues != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductAttributeValues.toString());
 			
+			} else if (jsonProductAttributeValue != null){
+				apiRequest.setREQUEST_OUTPUT(jsonProductAttributeValue.toString());
+			}
+			else if (jsonProductAttributeValues != null){
+				apiRequest.setREQUEST_OUTPUT(jsonProductAttributeValues.toString());
 			} else if (jsonProductAttributeValue != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductAttributeValue.toString());
 			}

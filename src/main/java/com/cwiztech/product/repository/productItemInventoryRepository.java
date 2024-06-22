@@ -25,23 +25,21 @@ public interface productItemInventoryRepository extends JpaRepository<ProductIte
 			+ "where PRODUCTITEM_NAME like ?1 or  PRODUCTITEM_DESC like ?1 ", nativeQuery = true)
 	public List<ProductItemInventory> findAllBySearch(String search);
 
-	@Query(value = "select a.* from TBLPRODUCTITEMINVENTORY as a "
-			+ "where (a.LOCATION_ID like CASE WHEN ?1=0 THEN a.LOCATION_ID ELSE ?1 END or a.LOCATION_ID is NULL) "
-			+ "and (a.INVENTORYCLASSIFICTION_ID LIKE CASE WHEN ?2= 0 THEN a.INVENTORYCLASSIFICTION_ID ELSE ?2 END or a.INVENTORYCLASSIFICTION_ID is NULL) "
-			+ "and (a.LASTCOUNT_DATE LIKE CASE WHEN ?3= 0 THEN a.LASTCOUNT_DATE ELSE ?4 END or a.LASTCOUNT_DATE is NULL) "
-			+ "and (a.NECTCOUNT_DATE LIKE CASE WHEN ?5= 0 THEN a.NECTCOUNT_DATE ELSE ?6 END or a.NECTCOUNT_DATE is NULL) "
-			+ "and a.PRODUCTITEM_ID like CASE WHEN ?7=0 THEN a.PRODUCTITEM_ID ELSE ?7 END "
-			+ "and a.ISACTIVE='Y'", nativeQuery = true)
-	List<ProductItemInventory> findByAdvancedSearch(Long lid,Long icid, Long lcd, String lastcountdate, Long ncd, String nectcountdate, Long pitid);
+	@Query(value = "select * from TBLPRODUCTITEMINVENTORY "
+            + "where CASE WHEN :PRODUCTITEM_ID = 0 THEN PRODUCTITEM_ID=PRODUCTITEM_ID ELSE PRODUCTITEM_ID IN (:PRODUCTITEM_IDS) END "
+            + "where CASE WHEN :LOCATION_ID = 0 THEN LOCATION_ID=LOCATION_ID ELSE LOCATION_ID IN (:LOCATION_IDS) END "
+			+ "and ISACTIVE='Y'", nativeQuery = true)
+	List<ProductItemInventory> findByAdvancedSearch(
+	   @Param("LOCATION_ID") Long LOCATION_ID, @Param("LOCATION_IDS") List<Integer> LOCATION_IDS,
+	    @Param("PRODUCTITEM_ID") Long PRODUCTITEM_ID, @Param("PRODUCTITEM_IDS") List<Integer> PRODUCTITEM_IDS); 
 
-	@Query(value = "select a.* from TBLPRODUCTITEMINVENTORY  as a "
-			+ "where (a.LOCATION_ID like CASE WHEN ?1=0 THEN a.LOCATION_ID ELSE ?1 END or a.LOCATION_ID is NULL) "
-			+ "and (a.INVENTORYCLASSIFICTION_ID LIKE CASE WHEN ?2= 0 THEN a.INVENTORYCLASSIFICTION_ID ELSE ?2 END or a.INVENTORYCLASSIFICTION_ID is NULL) "
-			+ "and (a.LASTCOUNT_DATE LIKE CASE WHEN ?3= 0 THEN a.LASTCOUNT_DATE ELSE ?4 END or a.LASTCOUNT_DATE is NULL) "
-			+ "and (a.NECTCOUNT_DATE LIKE CASE WHEN ?5= 0 THEN a.NECTCOUNT_DATE ELSE ?6 END or a.NECTCOUNT_DATE is NULL) "
-			+ "and a.PRODUCTITEM_ID like CASE WHEN ?7=0 THEN a.PRODUCTITEM_ID ELSE ?7 END "
+	@Query(value = "select * from TBLPRODUCTITEMINVENTORY  "
+			+ "where CASE WHEN :PRODUCTITEM_ID = 0 THEN PRODUCTITEM_ID=PRODUCTITEM_ID ELSE PRODUCTITEM_ID IN (:PRODUCTITEM_IDS) END "
+			+ "where CASE WHEN :LOCATION_ID = 0 THEN LOCATION_ID=LOCATION_ID ELSE LOCATION_ID IN (:LOCATION_IDS) END "
 			+ "", nativeQuery = true)
-	List<ProductItemInventory> findAllByAdvancedSearch(Long lid,Long icid, Long lcd, String lastcountdate, Long ncd, String nectcountdate, Long pitid);
+	List<ProductItemInventory> findAllByAdvancedSearch(
+	   @Param("LOCATION_ID") Long LOCATION_ID, @Param("LOCATION_IDS") List<Integer> LOCATION_IDS,
+	    @Param("PRODUCTITEM_ID") Long PRODUCTITEM_ID, @Param("PRODUCTITEM_IDS") List<Integer> PRODUCTITEM_IDS); 
 
 	@Query(value = "select * from TBLPRODUCTITEMINVENTORY "
 			+ "where PRODUCTITEMINVENTORY_ID in (:ids) "

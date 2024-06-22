@@ -8,12 +8,14 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "TBLPRODUCT")
 public class Product {
-	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long PRODUCT_ID;
@@ -47,6 +49,9 @@ public class Product {
 	
     @Column(name = "PRODUCTICON_URL")
     private String PRODUCTICON_URL ;
+    
+    @Column(name = "PURCHASE_PRICE")
+    private Double PURCHASE_PRICE ;
     
 	@Column(name = "ISACTIVE")
 	private String ISACTIVE;
@@ -150,6 +155,14 @@ public class Product {
     public void setPRODUCTICON_URL(String pRODUCTICON_URL) {
         PRODUCTICON_URL = pRODUCTICON_URL;
     }
+
+    public Double getPURCHASE_PRICE() {
+		return PURCHASE_PRICE;
+	}
+
+	public void setPURCHASE_PRICE(Double pURCHASE_PRICE) {
+		PURCHASE_PRICE = pURCHASE_PRICE;
+	}
 
     public String getISACTIVE() {
 		return ISACTIVE;

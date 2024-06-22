@@ -32,7 +32,7 @@ import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.Attribute;
 import com.cwiztech.product.repository.attributeRepository;
 import com.cwiztech.services.LookupService;
-
+import com.cwiztech.services.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.cwiztech.token.AccessToken;
@@ -64,7 +64,7 @@ public class attributeController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<Attribute> attributes = attributerepository.findActive();
-		return new ResponseEntity(getAPIResponse(attributes, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(attributes, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -75,7 +75,7 @@ public class attributeController {
 
 		List<Attribute> attributes = attributerepository.findAll();
 		
-		return new ResponseEntity(getAPIResponse(attributes, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(attributes, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -86,7 +86,7 @@ public class attributeController {
 
 		Attribute attribute = attributerepository.findOne(id);
 		
-		return new ResponseEntity(getAPIResponse(null, attribute , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, attribute , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -106,7 +106,7 @@ public class attributeController {
 		if (jsonattributes.length()>0)
 			attributes = attributerepository.findByIDs(attribute_IDS);
 		
-		return new ResponseEntity(getAPIResponse(attributes, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(attributes, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -165,19 +165,19 @@ public class attributeController {
 					attribute = attributerepository.findOne(attributeid);
 					
 					if (attribute == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid Attribute Data!", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid Attribute Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				}
 			}
 			
 			if (attributeid == 0) {
 				if (!jsonObj.has("attribute_NAME") || jsonObj.isNull("attribute_NAME"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "attribute_NAME is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "attribute_NAME is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 				if (!jsonObj.has("attribute_KEY") || jsonObj.isNull("attribute_KEY"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "attribute_KEY is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "attribute_KEY is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 					
 				if (!jsonObj.has("datatype_ID") || jsonObj.isNull("datatype_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "datatype_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "datatype_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 			}
 
 		if (jsonObj.has("attribute_NAME") && !jsonObj.isNull("attribute_NAME"))
@@ -219,9 +219,9 @@ public class attributeController {
 		
 		ResponseEntity responseentity;
 		if (jsonAttribute != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, attributes.get(0) , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, attributes.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(attributes, null , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(attributes, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		return responseentity;
 	}
 	
@@ -234,7 +234,7 @@ public class attributeController {
 		Attribute attribute = attributerepository.findOne(id);
 		attributerepository.delete(attribute);
 		
-		return new ResponseEntity(getAPIResponse(null, attribute , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, attribute , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -273,7 +273,7 @@ public class attributeController {
 				? attributerepository.findBySearch("%" + jsonObj.getString("search") + "%")
 				: attributerepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 		
-		return new ResponseEntity(getAPIResponse(attributes, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(attributes, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -296,18 +296,44 @@ public class attributeController {
 		String rtn = null;
 		ObjectMapper mapper = new ObjectMapper();
 		JSONObject jsonObj = new JSONObject(data);
-		long datatype_ID = 0;
+		
+		   JSONArray searchObject = new JSONArray();
+	        List<Integer> datatype_IDS = new ArrayList<Integer>(); 
 
-		if (jsonObj.has("datatype_ID") && !jsonObj.isNull("datatype_ID"))
-			datatype_ID = jsonObj.getLong("datatype_ID");
+	        datatype_IDS.add((int) 0);
+	        
+		long datatype_ID = 0;
+		
+       boolean isWithDetail = true;
+       if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+           isWithDetail = jsonObj.getBoolean("iswithdetail");
+       }
+       jsonObj.put("iswithdetail", false);
+		
+       if (jsonObj.has("datatype_ID") && !jsonObj.isNull("datatype_ID") && jsonObj.getLong("datatype_ID") != 0) {
+           datatype_ID = jsonObj.getLong("datatype_ID");
+           datatype_IDS.add((int) datatype_ID);
+       } else if (jsonObj.has("datatype") && !jsonObj.isNull("datatype") && jsonObj.getLong("datatype") != 0) {
+           if (active == true) {
+               searchObject = new JSONArray(ProductService.POST("datatype/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+           } else {
+               searchObject = new JSONArray(ProductService.POST("datatype/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+           }
+
+           datatype_ID = searchObject.length();
+           for (int i=0; i<searchObject.length(); i++) {
+               datatype_IDS.add((int) searchObject.getJSONObject(i).getLong("datatype_ID"));
+           }
+       }
+
 		 else if (jsonObj.has("datatype_CODE") && !jsonObj.isNull("datatype_CODE")) {
 	  			JSONObject datatype = new JSONObject(LookupService.POST("lookup/bycode", "{entityname: 'DATATYPE', code: "+jsonObj.getString("datatype_CODE")+"}", apiRequest.getREQUEST_OUTPUT()));
 	  			if (datatype != null)
 	  				datatype_ID = datatype.getLong("id");
 		 }
 		List<Attribute> attribute = ((active == true)
-				? attributerepository.findByAdvancedSearch(datatype_ID)
-				: attributerepository.findAllByAdvancedSearch(datatype_ID));
+				? attributerepository.findByAdvancedSearch(datatype_ID, datatype_IDS)
+				: attributerepository.findAllByAdvancedSearch(datatype_ID, datatype_IDS));
 		
 		rtn = mapper.writeValueAsString(attribute);
 
@@ -346,7 +372,7 @@ public class attributeController {
 		return apiRequest;
 	}
 	
-	APIRequestDataLog getAPIResponse(List<Attribute> attributes, Attribute attribute , JSONArray jsonAttributes, JSONObject jsonAttribute, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<Attribute> attributes, Attribute attribute , JSONArray jsonAttributes, JSONObject jsonAttribute, String message, APIRequestDataLog apiRequest, boolean isTableLog, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -355,14 +381,14 @@ public class attributeController {
 			apiRequest = tableDataLogs.errorDataLog(apiRequest, "Attribute", message);
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
-			if (attribute != null) {
+			if (attribute != null && isWithDetail == true) {
 				if(attribute.getDATATYPE_ID() != null) {
 				JSONObject datatype = new JSONObject(LookupService.GET("lookup/"+attribute.getDATATYPE_ID(), apiRequest.getREQUEST_OUTPUT()));
 				attribute.setDATATYPE_DETAIL(datatype.toString());
 			   }
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(attribute));
 				attributeID = attribute.getATTRIBUTE_ID();
-			} else if(attributes != null){
+			} else if(attributes != null && isWithDetail == true){
 				if (attributes.size()>0) {
 				List<Integer> datatypeList = new ArrayList<Integer>();
 				for (int i=0; i<attributes.size(); i++) {
@@ -382,15 +408,20 @@ public class attributeController {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(attributes));
 		}else if (jsonAttributes != null){
 				apiRequest.setREQUEST_OUTPUT(jsonAttributes.toString());
-			
+		
 			} else if (jsonAttribute != null){
 				apiRequest.setREQUEST_OUTPUT(jsonAttribute.toString());
+			
+			} else if (jsonAttributes != null){
+			apiRequest.setREQUEST_OUTPUT(jsonAttributes.toString());
+			} else if (jsonAttribute != null){
+			apiRequest.setREQUEST_OUTPUT(jsonAttribute.toString());
 			}
 			apiRequest.setRESPONSE_DATETIME(dateFormat1.format(date));
 			apiRequest.setREQUEST_STATUS("Success");
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
-		}
 		
+		}
 		if (isTableLog)
 			tbldatalogrepository.saveAndFlush(tableDataLogs.TableSaveDataLog(attributeID, apiRequest.getDATABASETABLE_ID(), apiRequest.getREQUEST_ID(), apiRequest.getREQUEST_OUTPUT()));
 		

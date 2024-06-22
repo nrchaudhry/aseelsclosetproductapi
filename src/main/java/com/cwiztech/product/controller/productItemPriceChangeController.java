@@ -61,7 +61,7 @@ public class productItemPriceChangeController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<ProductItemPriceChange> productitempricechanges = productitempricechangerepository.findActive();
-		return new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -72,7 +72,7 @@ public class productItemPriceChangeController {
 
 		List<ProductItemPriceChange> productitempricechanges = productitempricechangerepository.findAll();
 		
-		return new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -83,7 +83,7 @@ public class productItemPriceChangeController {
 
 		ProductItemPriceChange productitempricechange = productitempricechangerepository.findOne(id);
 		
-		return new ResponseEntity(getAPIResponse(null, productitempricechange , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productitempricechange , null, null, null, apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -103,7 +103,7 @@ public class productItemPriceChangeController {
 		if (jsonproductitempricechanges.length()>0)
 			productitempricechanges = productitempricechangerepository.findByIDs(productitempricechange_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -123,7 +123,7 @@ public class productItemPriceChangeController {
 		if (jsonproductitempricechanges.length()>0)
 			productitempricechanges = productitempricechangerepository.findByNotInIDs(productitempricechange_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -182,19 +182,19 @@ public class productItemPriceChangeController {
 					productitempricechange = productitempricechangerepository.findOne(productitempricechangeid);
 					
 					if (productitempricechange == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemPriceChange Data!", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemPriceChange Data!", apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				}
 			}
 			
 			if (productitempricechangeid == 0) {
 				if (!jsonObj.has("productitem_ID") || jsonObj.isNull("productitem_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 				if (!jsonObj.has("productitem_PURCHASEPRICE") || jsonObj.isNull("productitem_PURCHASEPRICE"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_PURCHASEPRICE is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_PURCHASEPRICE is missing", apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 					
 				if (!jsonObj.has("productitem_LASTPURCHASEPRICE") || jsonObj.isNull("productitem_LASTPURCHASEPRICE"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_LASTPURCHASEPRICE is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_LASTPURCHASEPRICE is missing", apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 			}
 			
 		if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID"))
@@ -230,9 +230,9 @@ public class productItemPriceChangeController {
 		
 		ResponseEntity responseentity;
 		if (jsonProductItemPriceChange != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productitempricechanges.get(0) , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productitempricechanges.get(0) , null, null, null, apiRequest, true,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, true,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		return responseentity;
 	}
 	
@@ -245,7 +245,7 @@ public class productItemPriceChangeController {
 		ProductItemPriceChange productitempricechange = productitempricechangerepository.findOne(id);
 		productitempricechangerepository.delete(productitempricechange);
 		
-		return new ResponseEntity(getAPIResponse(null, productitempricechange , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productitempricechange , null, null, null, apiRequest, true,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -284,7 +284,7 @@ public class productItemPriceChangeController {
 				? productitempricechangerepository.findBySearch("%" + jsonObj.getString("search") + "%")
 				: productitempricechangerepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 		
-		return new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -303,60 +303,63 @@ public class productItemPriceChangeController {
 	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken) throws JsonProcessingException, JSONException, ParseException {
 		APIRequestDataLog apiRequest = checkToken("POST", "/productitempricechange/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-		
-		JSONObject jsonObj = new JSONObject(data);
-		long currency_ID = 0, productitem_ID=0;
+	
 		List<ProductItemPriceChange> productitempricechanges = new ArrayList<ProductItemPriceChange>();
-		
-        if (jsonObj.has("currency_ID") && !jsonObj.isNull("currency_ID"))
-	         currency_ID = jsonObj.getLong("currency_ID");
-        else if (jsonObj.has("currency_CODE") && !jsonObj.isNull("currency_CODE")) {
-			JSONObject currency = new JSONObject(LookupService.POST("lookup/bycode", "{entityname: 'CURRENCY', code: "+jsonObj.getString("currency_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
-			if (currency != null)
-				currency_ID = currency.getLong("id");
-		} 
+		JSONObject jsonObj = new JSONObject(data);
+		JSONArray searchObject = new JSONArray();
+        List<Integer> currency_IDS = new ArrayList<Integer>(); 
+        List<Integer> productitem_IDS = new ArrayList<Integer>(); 
 
-        if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID"))
-	         productitem_ID = jsonObj.getLong("productitem_ID");
-        if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID") && productitem_ID == 0 ) {
-            JSONArray productsObject;
+        currency_IDS.add((int) 0);
+        productitem_IDS.add((int) 0);
+		long currency_ID = 0, productitem_ID=0;
+		
+		
+		boolean isWithDetail = true;
+        if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+            isWithDetail = jsonObj.getBoolean("iswithdetail");
+        }
+        jsonObj.put("iswithdetail", false);
+		
+        if (jsonObj.has("currency_ID") && !jsonObj.isNull("currency_ID") && jsonObj.getLong("currency_ID") != 0) {
+            currency_ID = jsonObj.getLong("currency_ID");
+            currency_IDS.add((int) currency_ID);
+        } else if (jsonObj.has("currency") && !jsonObj.isNull("currency") && jsonObj.getLong("currency") != 0) {
             if (active == true) {
-            	productsObject = new JSONArray(ProductService.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ProductService.POST("currency/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
             } else {
-            	productsObject = new JSONArray(ProductService.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ProductService.POST("currency/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
             }
-            for (int i=0; i<productsObject.length(); i++) {
-                List<ProductItemPriceChange> productitempricechange = new ArrayList<ProductItemPriceChange>();
-                productitempricechange = ((active == true)
-                        ? productitempricechangerepository.findByAdvancedSearch((long) 0, productsObject.getJSONObject(i).getLong("productitem_ID") )
-                        : productitempricechangerepository.findAllByAdvancedSearch((long) 0, productsObject.getJSONObject(i).getLong("productitem_ID")));
-                for (int j=0; j<productitempricechange.size(); j++) {
-                	productitempricechanges.add(productitempricechange.get(j));
-                }
+
+            currency_ID = searchObject.length();
+            for (int i=0; i<searchObject.length(); i++) {
+                currency_IDS.add((int) searchObject.getJSONObject(i).getLong("currency_ID"));
+            }
+        }
+		
+        if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID") && jsonObj.getLong("productitem_ID") != 0) {
+            productitem_ID = jsonObj.getLong("productitem_ID");
+            productitem_IDS.add((int) productitem_ID);
+        } else if (jsonObj.has("productitem") && !jsonObj.isNull("productitem") && jsonObj.getLong("productitem") != 0) {
+            if (active == true) {
+                searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+            } else {
+                searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+            }
+
+            productitem_ID = searchObject.length();
+            for (int i=0; i<searchObject.length(); i++) {
+                productitem_IDS.add((int) searchObject.getJSONObject(i).getLong("productitem_ID"));
             }
         }
 
         if(currency_ID != 0 || productitem_ID != 0){
         	List<ProductItemPriceChange> productitempricechange = ((active == true)
-		        ? productitempricechangerepository.findByAdvancedSearch(currency_ID,productitem_ID)
-		        : productitempricechangerepository.findAllByAdvancedSearch(currency_ID,productitem_ID));
-        	
-        	for (int i=0; i<productitempricechange.size(); i++) {
-                boolean found = false;
-                
-                for (int j=0; j<productitempricechanges.size(); j++) {
-                    if (productitempricechange.get(i).getPRODUCTITEMPRICECHANGE_ID() == productitempricechanges.get(j).getPRODUCTITEMPRICECHANGE_ID()) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (found == false) {
-                	productitempricechanges.add(productitempricechange.get(i));
-                }
-            }
-        	
+		        ? productitempricechangerepository.findByAdvancedSearch(currency_ID,currency_IDS,productitem_ID,productitem_IDS)
+		        : productitempricechangerepository.findAllByAdvancedSearch(currency_ID,currency_IDS,productitem_ID,productitem_IDS));
+       	
         }
-		return new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitempricechanges, null , null, null, null, apiRequest, false,isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
@@ -384,7 +387,7 @@ public class productItemPriceChangeController {
 		return apiRequest;
 	}
 	
-	APIRequestDataLog getAPIResponse(List<ProductItemPriceChange> productitempricechanges, ProductItemPriceChange productitempricechange , JSONArray jsonProductItemPriceChanges, JSONObject jsonProductItemPriceChange, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<ProductItemPriceChange> productitempricechanges, ProductItemPriceChange productitempricechange , JSONArray jsonProductItemPriceChanges, JSONObject jsonProductItemPriceChange, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -394,7 +397,7 @@ public class productItemPriceChangeController {
 			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductItemPriceChange", message);
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
-			if (productitempricechange != null) {
+			if (productitempricechange != null && isWithDetail == true) {
 				JSONObject productitem = new JSONObject(ProductService.GET("productitem/"+productitempricechange.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT()));
 				productitempricechange.setPRODUCTITEM_DETAIL(productitem.toString());
 				
@@ -404,7 +407,7 @@ public class productItemPriceChangeController {
 			}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitempricechange));
 				productitempricechangeID = productitempricechange.getPRODUCTITEMPRICECHANGE_ID();
-			} else if(productitempricechanges != null){
+			} else if(productitempricechanges != null && isWithDetail == true){
 				if (productitempricechanges.size()>0) {
 					List<Integer> productitemList = new ArrayList<Integer>();
 					List<Integer> currencyList = new ArrayList<Integer>();
@@ -433,6 +436,12 @@ public class productItemPriceChangeController {
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitempricechanges));
 			}else if (jsonProductItemPriceChanges != null){
+				apiRequest.setREQUEST_OUTPUT(jsonProductItemPriceChanges.toString());
+			
+			} else if (jsonProductItemPriceChange != null){
+				apiRequest.setREQUEST_OUTPUT(jsonProductItemPriceChange.toString());
+			}
+			else if (jsonProductItemPriceChanges != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductItemPriceChanges.toString());
 			
 			} else if (jsonProductItemPriceChange != null){

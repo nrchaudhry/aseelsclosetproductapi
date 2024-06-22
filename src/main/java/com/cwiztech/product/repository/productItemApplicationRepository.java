@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.cwiztech.product.model.ProductItem;
 import com.cwiztech.product.model.ProductItemApplication;
 
 public interface productItemApplicationRepository extends JpaRepository<ProductItemApplication, Long>{
@@ -14,18 +13,22 @@ public interface productItemApplicationRepository extends JpaRepository<ProductI
 	@Query(value = "select * from TBLPRODUCTITEMAPPLICATION where ISACTIVE='Y'" , nativeQuery = true)
 	public List<ProductItemApplication> findActive();
 
-	@Query(value = "select a.* from TBLPRODUCTITEMAPPLICATION as a "
-			+ "where APPLICATION_ID like CASE WHEN ?1=0 THEN APPLICATION_ID ELSE ?1 END "
-			+ "and PRODUCTITEM_ID like CASE WHEN ?2=0 THEN PRODUCTITEM_ID ELSE ?2 END "
+    @Query(value = "select a.* from TBLPRODUCTITEMAPPLICATION as a "
+            + "where CASE WHEN :APPLICATION_ID = 0 THEN APPLICATION_ID=APPLICATION_ID ELSE APPLICATION_ID IN (:APPLICATION_IDS) END "
+            + "where CASE WHEN :PRODUCTITEM_ID = 0 THEN PRODUCTITEM_ID=PRODUCTITEM_ID ELSE PRODUCTITEM_ID IN (:PRODUCTITEM_IDS) END "
 			+ "and a.ISACTIVE='Y'", nativeQuery = true)
-	List<ProductItemApplication> findByAdvancedSearch(Long application_ID, Long productitem_ID);
+	List<ProductItemApplication> findByAdvancedSearch(
+		    @Param("PRODUCTITEM_ID") Long PRODUCTITEM_ID, @Param("PRODUCTITEM_IDS") List<Integer> PRODUCTITEM_IDS,
+		    @Param("APPLICATION_ID") Long APPLICATION_ID, @Param("APPLICATION_IDS") List<Integer> APPLICATION_IDS);
 
 	@Query(value = "select a.* from TBLPRODUCTITEMAPPLICATION as a "
-			+ "where APPLICATION_ID like CASE WHEN ?1=0 THEN APPLICATION_ID ELSE ?1 END "
-			+ "and PRODUCTITEM_ID like CASE WHEN ?2=0 THEN PRODUCTITEM_ID ELSE ?2 END "
+			+ "where CASE WHEN :APPLICATION_ID = 0 THEN APPLICATION_ID=APPLICATION_ID ELSE APPLICATION_ID IN (:APPLICATION_IDS) END "
+			+ "where CASE WHEN :PRODUCTITEM_ID = 0 THEN PRODUCTITEM_ID=PRODUCTITEM_ID ELSE PRODUCTITEM_ID IN (:PRODUCTITEM_IDS) END "
 			, nativeQuery = true)
-	List<ProductItemApplication> findAllByAdvancedSearch(Long application_ID, Long productitem_ID );
-
+	List<ProductItemApplication> findAllByAdvancedSearch(
+    @Param("PRODUCTITEM_ID") Long PRODUCTITEM_ID, @Param("PRODUCTITEM_IDS") List<Integer> PRODUCTITEM_IDS,
+    @Param("APPLICATION_ID") Long APPLICATION_ID, @Param("APPLICATION_IDS") List<Integer> APPLICATION_IDS);
+	
 	@Query(value = "select * from TBLPRODUCTITEMAPPLICATION "
 			+ "where PRODUCTITEMAPPLICATION_ID in (:ids) "
 			+ "", nativeQuery = true)

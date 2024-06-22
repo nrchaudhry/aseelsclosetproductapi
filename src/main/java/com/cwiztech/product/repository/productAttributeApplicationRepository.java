@@ -7,34 +7,36 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.cwiztech.product.model.ProductAttributeApplication;
-import com.cwiztech.product.model.ProductItem;
 
 public interface productAttributeApplicationRepository extends JpaRepository<ProductAttributeApplication, Long>{
-	
 	@Query(value = "select * from TBLPRODUCTATTRIBUTEAPPLICATION where ISACTIVE='Y'" , nativeQuery = true)
 	public List<ProductAttributeApplication> findActive();
 
-	@Query(value = "select * from TBLPRODUCTATTRIBUTEAPPLICATION "
-			+ "where APPLICATION_ID like CASE WHEN ?1=0 THEN APPLICATION_ID ELSE ?1 END "
-			+ "and PRODUCTATTRIBUTE_ID like CASE WHEN ?2=0 THEN PRODUCTATTRIBUTE_ID ELSE ?2 END "
+    @Query(value = "select * from TBLPRODUCTATTRIBUTEAPPLICATION "
+            + "where PRODUCTATTRIBUTEAPPLICATION_ID in (:ids) "
+            + "", nativeQuery = true)
+    public List<ProductAttributeApplication> findByIDs(@Param("ids") List<Integer> ids);
+
+    @Query(value = "select * from TBLPRODUCTATTRIBUTEAPPLICATION "
+            + "where PRODUCTATTRIBUTEAPPLICATION_ID not in (:ids) "
+            + "", nativeQuery = true)
+    public List<ProductAttributeApplication> findByNotInIDs(@Param("ids") List<Integer> ids);
+
+    @Query(value = "select * from TBLPRODUCTATTRIBUTEAPPLICATION "
+            + "where CASE WHEN :APPLICATION_ID = 0 THEN APPLICATION_ID=APPLICATION_ID ELSE APPLICATION_ID IN (:APPLICATION_IDS) END "
+            + "and CASE WHEN :PRODUCTATTRIBUTE_ID = 0 THEN PRODUCTATTRIBUTE_ID=PRODUCTATTRIBUTE_ID ELSE PRODUCTATTRIBUTE_ID IN (:PRODUCTATTRIBUTE_IDS) END "
 			+ "and ISACTIVE='Y'", nativeQuery = true)
-	List<ProductAttributeApplication> findByAdvancedSearch(Long application_ID, Long productattribute_ID);
+	List<ProductAttributeApplication> findByAdvancedSearch(
+		    @Param("PRODUCTATTRIBUTE_ID") Long PRODUCTATTRIBUTE_ID, @Param("PRODUCTATTRIBUTE_IDS") List<Integer> PRODUCTATTRIBUTE_IDS,
+		    @Param("APPLICATION_ID") Long APPLICATION_ID, @Param("APPLICATION_IDS") List<Integer> APPLICATION_IDS);
 
-	@Query(value = "select * from TBLPRODUCTATTRIBUTEAPPLICATION "
-			+ "where APPLICATION_ID like CASE WHEN ?1=0 THEN APPLICATION_ID ELSE ?1 END "
-			+ "and PRODUCTATTRIBUTE_ID like CASE WHEN ?2=0 THEN PRODUCTATTRIBUTE_ID ELSE ?2 END "
+    @Query(value = "select * from TBLPRODUCTATTRIBUTEAPPLICATION "
+            + "where CASE WHEN :APPLICATION_ID = 0 THEN APPLICATION_ID=APPLICATION_ID ELSE APPLICATION_ID IN (:APPLICATION_IDS) END "
+            + "and CASE WHEN :PRODUCTATTRIBUTE_ID = 0 THEN PRODUCTATTRIBUTE_ID=PRODUCTATTRIBUTE_ID ELSE PRODUCTATTRIBUTE_ID IN (:PRODUCTATTRIBUTE_IDS) END "
 			, nativeQuery = true)
-	List<ProductAttributeApplication> findAllByAdvancedSearch(Long application_ID, Long productattribute_ID);
+	List<ProductAttributeApplication> findAllByAdvancedSearch(
+		    @Param("PRODUCTATTRIBUTE_ID") Long PRODUCTATTRIBUTE_ID, @Param("PRODUCTATTRIBUTE_IDS") List<Integer> PRODUCTATTRIBUTE_IDS,
+		    @Param("APPLICATION_ID") Long APPLICATION_ID, @Param("APPLICATION_IDS") List<Integer> APPLICATION_IDS);
 	
-	@Query(value = "select * from TBLPRODUCTATTRIBUTEAPPLICATION "
-			+ "where PRODUCTATTRIBUTEAPPLICATION_ID in (:ids) "
-			+ "", nativeQuery = true)
-	public List<ProductAttributeApplication> findByIDs(@Param("ids") List<Integer> ids);
-
-	@Query(value = "select * from TBLPRODUCTATTRIBUTEAPPLICATION "
-			+ "where PRODUCTATTRIBUTEAPPLICATION_ID not in (:ids) "
-			+ "", nativeQuery = true)
-	public List<ProductAttributeApplication> findByNotInIDs(@Param("ids") List<Integer> ids);
-
 }
 

@@ -32,6 +32,7 @@ import com.cwiztech.product.model.Product;
 import com.cwiztech.product.model.ProductApplication;
 import com.cwiztech.product.repository.productApplicationRepository;
 import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ProductService;
 import com.cwiztech.services.UserLoginService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,7 +65,7 @@ public class productApplicationController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<ProductApplication> productapplications = productapplicationrepository.findActive();
-		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -75,7 +76,7 @@ public class productApplicationController {
 
 		List<ProductApplication> productapplications = productapplicationrepository.findAll();
 		
-		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -86,7 +87,7 @@ public class productApplicationController {
 
 		ProductApplication productapplication = productapplicationrepository.findOne(id);
 		
-		return new ResponseEntity(getAPIResponse(null, productapplication , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productapplication , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 
@@ -107,7 +108,7 @@ public class productApplicationController {
 		if (jsonproductapplications.length()>0)
 			productapplications = productapplicationrepository.findByIDs(productapplication_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -127,7 +128,7 @@ public class productApplicationController {
 		if (jsonproductapplications.length()>0)
 			productapplications = productapplicationrepository.findByNotInIDs(productapplication_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.POST)
@@ -186,17 +187,17 @@ public class productApplicationController {
 					productapplication = productapplicationrepository.findOne(productapplicationid);
 					
 					if (productapplication == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductApplication Data!", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductApplication Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				}
 			}
 
 				
 			if (productapplicationid == 0) {
 				if (!jsonObj.has("application_ID") || jsonObj.isNull("application_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "application_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "application_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 				if (!jsonObj.has("product_ID") || jsonObj.isNull("product_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 			}
 			if (jsonObj.has("application_ID") && !jsonObj.isNull("application_ID"))
@@ -224,9 +225,9 @@ public class productApplicationController {
 		
 		ResponseEntity responseentity;
 		if (jsonProductApplication != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productapplications.get(0) , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productapplications.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		return responseentity;
 	}
 	
@@ -241,7 +242,7 @@ public class productApplicationController {
 		ProductApplication productapplication = productapplicationrepository.findOne(id);
 		productapplicationrepository.delete(productapplication);
 		
-		return new ResponseEntity(getAPIResponse(null, productapplication , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productapplication , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -269,62 +270,70 @@ public class productApplicationController {
 		return ByAdvancedSearch(data, false, headToken);
 	}
 
+	
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken) throws JsonProcessingException, JSONException, ParseException {
 		APIRequestDataLog apiRequest = checkToken("POST", "/productapplication/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-
-		JSONObject jsonObj = new JSONObject(data);
-		long application_ID = 0;
-		long product_ID = 0;
+		
 		List<ProductApplication> productapplications = new ArrayList<ProductApplication>();
+		JSONObject jsonObj = new JSONObject(data);
+		
+		   JSONArray searchObject = new JSONArray();
+	        List<Integer> product_IDS = new ArrayList<Integer>(); 
+	        List<Integer> application_IDS = new ArrayList<Integer>(); 
 
-		if (jsonObj.has("application_ID") && !jsonObj.isNull("application_ID"))
-			application_ID = jsonObj.getLong("application_ID");
+	        product_IDS.add((int) 0);
+	        application_IDS.add((int) 0);
+	        
+		long product_ID = 0 , application_ID = 0;
 		
+        boolean isWithDetail = true;
+        if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+        }
+        jsonObj.put("iswithdetail", false);
 		
-		if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID"))
-			product_ID = jsonObj.getLong("product_ID");
-		if (jsonObj.has("productcategory_ID") && !jsonObj.isNull("productcategory_ID") && product_ID == 0) {
-            JSONArray productsObject;
+        if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID") && jsonObj.getLong("product_ID") != 0) {
+            product_ID = jsonObj.getLong("product_ID");
+            product_IDS.add((int) product_ID);
+        } else if (jsonObj.has("product") && !jsonObj.isNull("product") && jsonObj.getLong("product") != 0) {
             if (active == true) {
-            	productsObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
             } else {
-            	productsObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
             }
-            for (int i=0; i<productsObject.length(); i++) {
-                List<ProductApplication> productapplication = new ArrayList<ProductApplication>();
-                productapplication = ((active == true)
-                        ? productapplicationrepository.findByAdvancedSearch((long) 0,  productsObject.getJSONObject(i).getLong("product_ID"))
-                        : productapplicationrepository.findAllByAdvancedSearch((long) 0, productsObject.getJSONObject(i).getLong("product_ID")));
-                for (int j=0; j<productapplication.size(); j++) {
-                    productapplications.add(productapplication.get(j));
-                }
-            }
-		}
-		
-		if(application_ID !=0 || product_ID !=0){
-			List<ProductApplication> productapplication = ((active == true)
-				? productapplicationrepository.findByAdvancedSearch(application_ID, product_ID)
-				: productapplicationrepository.findAllByAdvancedSearch(application_ID, product_ID));
-	    for (int i=0; i<productapplication.size(); i++) {
-            boolean found = false;
-            
-            for (int j=0; j<productapplications.size(); j++) {
-                if (productapplication.get(i).getPRODUCTAPPLICATION_ID() == productapplications.get(j).getPRODUCTAPPLICATION_ID()) {
-                    found = true;
-                    break;
-                }
-            }
-            
-            if (found == false) {
-                productapplications.add(productapplication.get(i));
+
+            product_ID = searchObject.length();
+            for (int i=0; i<searchObject.length(); i++) {
+                product_IDS.add((int) searchObject.getJSONObject(i).getLong("product_ID"));
             }
         }
+		
+        if (jsonObj.has("application_ID") && !jsonObj.isNull("application_ID") && jsonObj.getLong("application_ID") != 0) {
+            application_ID = jsonObj.getLong("application_ID");
+            application_IDS.add((int) application_ID);
+        } else if (jsonObj.has("application") && !jsonObj.isNull("application") && jsonObj.getLong("application") != 0) {
+            if (active == true) {
+                searchObject = new JSONArray(ProductService.POST("application/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+            } else {
+                searchObject = new JSONArray(ProductService.POST("application/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+            }
+
+            application_ID = searchObject.length();
+            for (int i=0; i<searchObject.length(); i++) {
+                application_IDS.add((int) searchObject.getJSONObject(i).getLong("application_ID"));
+            }
+        }
+		
+		if(product_ID != 0 || product_ID != 0){
+		 productapplications = ((active == true)
+				? productapplicationrepository.findByAdvancedSearch(product_ID, product_IDS, application_ID, application_IDS)
+				: productapplicationrepository.findAllByAdvancedSearch(product_ID, product_IDS, application_ID, application_IDS));
+		}
+		return new ResponseEntity(getAPIResponse(productapplications, null, null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
-	
-		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
-}
+		
 	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
 		JSONObject checkTokenResponse = AccessToken.checkToken(accessToken);
 		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductApplication.getDatabaseTableID());
@@ -350,7 +359,7 @@ public class productApplicationController {
 		return apiRequest;
 	}
 	
-	APIRequestDataLog getAPIResponse(List<ProductApplication> productapplications, ProductApplication productapplication , JSONArray jsonProductApplications, JSONObject jsonProductApplication, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<ProductApplication> productapplications, ProductApplication productapplication , JSONArray jsonProductApplications, JSONObject jsonProductApplication, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -360,14 +369,14 @@ public class productApplicationController {
 			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductApplication", message);
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
-			if (productapplication != null) {
+			if (productapplication != null && isWithDetail == true) {
 				JSONObject application = new JSONObject(UserLoginService.GET("application/"+productapplication.getAPPLICATION_ID(), apiRequest.getREQUEST_OUTPUT()));
 				productapplication.setAPPLICATION_DETAIL(application.toString());
 				JSONObject product = new JSONObject(ProductService.GET("product/"+productapplication.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT()));
 				productapplication.setPRODUCT_DETAIL(product.toString());
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productapplication));
 				productapplicationID = productapplication.getPRODUCTAPPLICATION_ID();
-			} else if(productapplications != null){
+			} else if(productapplications != null && isWithDetail == true){
 				if (productapplications.size()>0) {
 					List<Integer> applicationList = new ArrayList<Integer>();
 					List<Integer> productList = new ArrayList<Integer>();
@@ -403,7 +412,12 @@ public class productApplicationController {
 			
 			} else if (jsonProductApplication != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductApplication.toString());
-			}
+			
+		} else if (jsonProductApplications != null){
+			apiRequest.setREQUEST_OUTPUT(jsonProductApplications.toString());
+		} else if (jsonProductApplication != null){
+			apiRequest.setREQUEST_OUTPUT(jsonProductApplication.toString());
+		}
 			apiRequest.setRESPONSE_DATETIME(dateFormat1.format(date));
 			apiRequest.setREQUEST_STATUS("Success");
 			apirequestdatalogRepository.saveAndFlush(apiRequest);

@@ -60,7 +60,7 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<ProductPriceLevel> productpricelevels = productpricelevelrepository.findActive();
-		return new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -71,7 +71,7 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 
 		List<ProductPriceLevel> productpricelevels = productpricelevelrepository.findAll();
 		
-		return new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -82,7 +82,7 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 
 		ProductPriceLevel productpricelevel = productpricelevelrepository.findOne(id);
 		
-		return new ResponseEntity(getAPIResponse(null, productpricelevel , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productpricelevel , null, null, null, apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -102,7 +102,7 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 		if (jsonproductpricelevels.length()>0)
 			productpricelevels = productpricelevelrepository.findByIDs(productpricelevel_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -122,7 +122,7 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 		if (jsonproductpricelevels.length()>0)
 			productpricelevels = productpricelevelrepository.findByNotInIDs(productpricelevel_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -181,19 +181,19 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 					productpricelevel = productpricelevelrepository.findOne(productpricelevelid);
 					
 					if (productpricelevel == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductPriceLevel Data!", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductPriceLevel Data!", apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				}
 			}
 			
 			if (productpricelevelid == 0) {
 				if (!jsonObj.has("product_ID") || jsonObj.isNull("product_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 				if (!jsonObj.has("product_QUANTITY") || jsonObj.isNull("product_QUANTITY"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_QUANTITY is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_QUANTITY is missing", apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 					
 				if (!jsonObj.has("product_UNITPRICE") || jsonObj.isNull("product_UNITPRICE"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_UNITPRICE is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_UNITPRICE is missing", apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 			}
 			
 			if (jsonObj.has("currency_ID") && !jsonObj.isNull("currency_ID")) 			
@@ -234,9 +234,9 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 		
 		ResponseEntity responseentity;
 		if (jsonProductPriceLevel != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productpricelevels.get(0) , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productpricelevels.get(0) , null, null, null, apiRequest, true,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, true,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		return responseentity;
 	}
 	
@@ -249,7 +249,7 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 		ProductPriceLevel productpricelevel = productpricelevelrepository.findOne(id);
 		productpricelevelrepository.delete(productpricelevel);
 		
-		return new ResponseEntity(getAPIResponse(null, productpricelevel , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productpricelevel , null, null, null, apiRequest, true,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -288,7 +288,7 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 				? productpricelevelrepository.findBySearch("%" + jsonObj.getString("search") + "%")
 				: productpricelevelrepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 		
-		return new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, false,true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -310,66 +310,75 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 		
 		List<ProductPriceLevel> productpricelevels = new ArrayList<ProductPriceLevel>();
 		JSONObject jsonObj = new JSONObject(data);
-		long currency_ID = 0, product_ID=0, pricelevel_ID=0;
-				
-		if (jsonObj.has("currency_ID")&& !jsonObj.isNull("currency_ID"))
-			currency_ID = jsonObj.getLong("currency_ID");
-		else if (jsonObj.has("currency_CODE") && !jsonObj.isNull("currency_CODE")) {
-			JSONObject currency = new JSONObject(LookupService.POST("lookup/bycode", "{entityname: 'CURRENCY', code: "+jsonObj.getString("currency_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
-			if (currency != null)
-				currency_ID = currency.getLong("id");
-		} 
-		
-		if (jsonObj.has("pricelevel_ID") && !jsonObj.isNull("pricelevel_ID"))
-			pricelevel_ID = jsonObj.getLong("pricelevel_ID");
-		else if (jsonObj.has("pricelevel_CODE") && !jsonObj.isNull("pricelevel_CODE")) {
-			JSONObject pricelevel = new JSONObject(LookupService.POST("lookup/bycode", "{entityname: 'PRICELEVEL', code: "+jsonObj.getString("pricelevel_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
-			if (pricelevel != null)
-				pricelevel_ID = pricelevel.getLong("id");
-		} 
-		
-		if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID"))
-			product_ID = jsonObj.getLong("product_ID");
-		if (jsonObj.has("productcategory_ID") && !jsonObj.isNull("productcategory_ID") && product_ID == 0 ) {
-            JSONArray productcategorysObject;
-            if (active == true) {
-            	productcategorysObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
-            } else {
-            	productcategorysObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
-            }
+		 JSONArray searchObject = new JSONArray();
+	        List<Integer> currency_IDS = new ArrayList<Integer>(); 
+	        List<Integer> product_IDS = new ArrayList<Integer>(); 
+	        List<Integer> pricelevel_IDS = new ArrayList<Integer>(); 
 
-            for (int i=0; i<productcategorysObject.length(); i++) {
-                List<ProductPriceLevel> productpricelevel = new ArrayList<ProductPriceLevel>();
-                productpricelevel = ((active == true)
-                        ? productpricelevelrepository.findByAdvancedSearch((long) 0, productcategorysObject.getJSONObject(i).getLong("product_ID") , (long) 0 )
-                        : productpricelevelrepository.findAllByAdvancedSearch((long) 0, productcategorysObject.getJSONObject(i).getLong("product_ID") , (long) 0 ));
-                for (int j=0; j<productpricelevel.size(); j++) {
-                	productpricelevels.add(productpricelevel.get(j));
-                }
-            }
-        }
+	        currency_IDS.add((int) 0);
+	        product_IDS.add((int) 0);
+	        pricelevel_IDS.add((int) 0);
+		long currency_ID = 0, product_ID=0, pricelevel_ID=0;
+		
+		 boolean isWithDetail = true;
+	        if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+	            isWithDetail = jsonObj.getBoolean("iswithdetail");
+	        }
+	        jsonObj.put("iswithdetail", false);
+			
+	        if (jsonObj.has("currency_ID") && !jsonObj.isNull("currency_ID") && jsonObj.getLong("currency_ID") != 0) {
+	            currency_ID = jsonObj.getLong("currency_ID");
+	            currency_IDS.add((int) currency_ID);
+	        } else if (jsonObj.has("currency") && !jsonObj.isNull("currency") && jsonObj.getLong("currency") != 0) {
+	            if (active == true) {
+	                searchObject = new JSONArray(ProductService.POST("currency/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+	            } else {
+	                searchObject = new JSONArray(ProductService.POST("currency/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+	            }
+
+	            currency_ID = searchObject.length();
+	            for (int i=0; i<searchObject.length(); i++) {
+	                currency_IDS.add((int) searchObject.getJSONObject(i).getLong("currency_ID"));
+	            }
+	        }
+			
+	        if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID") && jsonObj.getLong("product_ID") != 0) {
+	            product_ID = jsonObj.getLong("product_ID");
+	            product_IDS.add((int) product_ID);
+	        } else if (jsonObj.has("product") && !jsonObj.isNull("product") && jsonObj.getLong("product") != 0) {
+	            if (active == true) {
+	                searchObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+	            } else {
+	                searchObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+	            }
+
+	            product_ID = searchObject.length();
+	            for (int i=0; i<searchObject.length(); i++) {
+	                product_IDS.add((int) searchObject.getJSONObject(i).getLong("product_ID"));
+	            }
+	        }
+	        if (jsonObj.has("pricelevel_ID") && !jsonObj.isNull("pricelevel_ID") && jsonObj.getLong("pricelevel_ID") != 0) {
+	            pricelevel_ID = jsonObj.getLong("pricelevel_ID");
+	            pricelevel_IDS.add((int) pricelevel_ID);
+	        } else if (jsonObj.has("pricelevel") && !jsonObj.isNull("pricelevel") && jsonObj.getLong("pricelevel") != 0) {
+	            if (active == true) {
+	                searchObject = new JSONArray(ProductService.POST("pricelevel/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+	            } else {
+	                searchObject = new JSONArray(ProductService.POST("pricelevel/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+	            }
+
+	            pricelevel_ID = searchObject.length();
+	            for (int i=0; i<searchObject.length(); i++) {
+	                pricelevel_IDS.add((int) searchObject.getJSONObject(i).getLong("pricelevel_ID"));
+	            }
+	        }
 		
 		if(currency_ID != 0 || product_ID != 0 || pricelevel_ID != 0){
 			 List<ProductPriceLevel> productpricelevel = ((active == true)
-				? productpricelevelrepository.findByAdvancedSearch(currency_ID,product_ID,pricelevel_ID)
-				: productpricelevelrepository.findAllByAdvancedSearch(currency_ID,product_ID,pricelevel_ID));
-		
-		   for (int i=0; i<productpricelevel.size(); i++) {
-	            boolean found = false;
-	            
-	            for (int j=0; j<productpricelevels.size(); j++) {
-	                if (productpricelevel.get(i).getPRODUCTPRICELEVEL_ID() == productpricelevels.get(j).getPRODUCTPRICELEVEL_ID()) {
-	                    found = true;
-	                    break;
-	                }
-	            }
-	            
-	            if (found == false) {
-	                productpricelevels.add(productpricelevel.get(i));
-	            }
-	        }
+				? productpricelevelrepository.findByAdvancedSearch(currency_ID,currency_IDS,product_ID,product_IDS,pricelevel_ID,pricelevel_IDS)
+				: productpricelevelrepository.findAllByAdvancedSearch(currency_ID,currency_IDS,product_ID,product_IDS,pricelevel_ID,pricelevel_IDS));
 		}
-		return new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productpricelevels, null , null, null, null, apiRequest, false,isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
@@ -397,7 +406,7 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 		return apiRequest;
 	}
 	
-	APIRequestDataLog getAPIResponse(List<ProductPriceLevel> productpricelevels, ProductPriceLevel productpricelevel , JSONArray jsonProductPriceLevels, JSONObject jsonProductPriceLevel, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<ProductPriceLevel> productpricelevels, ProductPriceLevel productpricelevel , JSONArray jsonProductPriceLevels, JSONObject jsonProductPriceLevel, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -407,7 +416,7 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductPriceLevel", message);
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
-			if (productpricelevel != null) {
+			if (productpricelevel != null && isWithDetail == true) {
 				JSONObject product = new JSONObject(ProductService.GET("product/"+productpricelevel.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT()));
 				productpricelevel.setPRODUCT_DETAIL(product.toString());
 				
@@ -429,7 +438,7 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productpricelevel));
 				productpricelevelID = productpricelevel.getPRODUCTPRICELEVEL_ID();
-			} else if(productpricelevels != null){
+			} else if(productpricelevels != null && isWithDetail == true){
 				if (productpricelevels.size()>0) {
 					List<Integer> productList = new ArrayList<Integer>();
 					List<Integer> lookupList = new ArrayList<Integer>();
@@ -466,6 +475,10 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 			}else if (jsonProductPriceLevels != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductPriceLevels.toString());
 			
+			} else if (jsonProductPriceLevel != null){
+				apiRequest.setREQUEST_OUTPUT(jsonProductPriceLevel.toString());
+			} else if (jsonProductPriceLevels != null){
+				apiRequest.setREQUEST_OUTPUT(jsonProductPriceLevels.toString());
 			} else if (jsonProductPriceLevel != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductPriceLevel.toString());
 			}

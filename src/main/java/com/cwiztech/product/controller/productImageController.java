@@ -31,6 +31,7 @@ import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductImage;
 import com.cwiztech.product.repository.productImageRepository;
 import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ProductService;
 import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,7 +63,7 @@ public class productImageController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<ProductImage> productimages = productimagerepository.findActive();
-		return new ResponseEntity(getAPIResponse(productimages, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productimages, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -73,7 +74,7 @@ public class productImageController {
 
 		List<ProductImage> productimages = productimagerepository.findAll();
 		
-		return new ResponseEntity(getAPIResponse(productimages, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productimages, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -84,7 +85,7 @@ public class productImageController {
 
 		ProductImage productimage = productimagerepository.findOne(id);
 		
-		return new ResponseEntity(getAPIResponse(null, productimage , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productimage , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -104,7 +105,7 @@ public class productImageController {
 		if (jsonproductimages.length()>0)
 			productimages = productimagerepository.findByIDs(productimage_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productimages, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productimages, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -124,7 +125,7 @@ public class productImageController {
 		if (jsonproductimages.length()>0)
 			productimages = productimagerepository.findByNotInIDs(productimage_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productimages, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productimages, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -183,16 +184,16 @@ public class productImageController {
 					productimage = productimagerepository.findOne(productimageid);
 					
 					if (productimage == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductImage Data!", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductImage Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				}
 			}
 			
 			if (productimageid == 0) {
 				if (!jsonObj.has("product_ID") || jsonObj.isNull("product_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				
 				if (!jsonObj.has("productimage_PATH") || jsonObj.isNull("productimage_PATH"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productimage_PATH is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productimage_PATH is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 					
 			}
 			
@@ -221,9 +222,9 @@ public class productImageController {
 		
 		ResponseEntity responseentity;
 		if (jsonProductImage != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productimages.get(0) , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productimages.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productimages, null , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productimages, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		return responseentity;
 	}
 	
@@ -236,7 +237,7 @@ public class productImageController {
 		ProductImage productimage = productimagerepository.findOne(id);
 		productimagerepository.delete(productimage);
 		
-		return new ResponseEntity(getAPIResponse(null, productimage , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productimage , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -271,17 +272,41 @@ public class productImageController {
 		
 		List<ProductImage> productimages = new ArrayList<ProductImage>();
 		JSONObject jsonObj = new JSONObject(data);
-		long product_ID = 0;
+		   JSONArray searchObject = new JSONArray();
+	        List<Integer> product_IDS = new ArrayList<Integer>(); 
 
-		if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID"))
-			product_ID = jsonObj.getLong("product_ID");
+	        product_IDS.add((int) 0);
+	        
+		long product_ID = 0;
+		
+       boolean isWithDetail = true;
+       if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+           isWithDetail = jsonObj.getBoolean("iswithdetail");
+       }
+       jsonObj.put("iswithdetail", false);
+		
+       if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID") && jsonObj.getLong("product_ID") != 0) {
+           product_ID = jsonObj.getLong("product_ID");
+           product_IDS.add((int) product_ID);
+       } else if (jsonObj.has("product") && !jsonObj.isNull("product") && jsonObj.getLong("product") != 0) {
+           if (active == true) {
+               searchObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+           } else {
+               searchObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+           }
+
+           product_ID = searchObject.length();
+           for (int i=0; i<searchObject.length(); i++) {
+               product_IDS.add((int) searchObject.getJSONObject(i).getLong("product_ID"));
+           }
+       }
 
 		if(product_ID != 0){
 		productimages = ((active == true)
-				? productimagerepository.findByAdvancedSearch(product_ID)
-				: productimagerepository.findAllByAdvancedSearch(product_ID));
+				? productimagerepository.findByAdvancedSearch(product_ID, product_IDS)
+				: productimagerepository.findAllByAdvancedSearch(product_ID, product_IDS));
 		}
-		return new ResponseEntity(getAPIResponse(productimages, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productimages, null , null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
@@ -309,7 +334,7 @@ public class productImageController {
 		return apiRequest;
 	}
 	
-	APIRequestDataLog getAPIResponse(List<ProductImage> productimages, ProductImage productimage , JSONArray jsonProductImages, JSONObject jsonProductImage, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<ProductImage> productimages, ProductImage productimage , JSONArray jsonProductImages, JSONObject jsonProductImage, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -319,12 +344,12 @@ public class productImageController {
 			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductImage", message);
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
-			if (productimage != null) {
+			if (productimage != null && isWithDetail == true) {
 				JSONObject product = new JSONObject(ProductService.GET("product/"+productimage.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT()));
 				productimage.setPRODUCT_DETAIL(product.toString());
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productimage));
 				productimageID = productimage.getPRODUCTIMAGE_ID();
-			} else if(productimages != null){
+			} else if(productimages != null && isWithDetail == true){
 				if (productimages.size()>0) {
 					List<Integer> productList = new ArrayList<Integer>();
 					for (int i=0; i<productimages.size(); i++) {
@@ -345,6 +370,11 @@ public class productImageController {
 			}else if (jsonProductImages != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductImages.toString());
 			
+			} else if (jsonProductImage != null){
+				apiRequest.setREQUEST_OUTPUT(jsonProductImage.toString());
+			}
+			else if (jsonProductImages != null){
+				apiRequest.setREQUEST_OUTPUT(jsonProductImages.toString());
 			} else if (jsonProductImage != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductImage.toString());
 			}

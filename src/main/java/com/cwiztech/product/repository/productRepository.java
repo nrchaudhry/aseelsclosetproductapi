@@ -7,10 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.cwiztech.product.model.Product;
-import com.cwiztech.product.model.ProductItem;
 
 public interface productRepository extends JpaRepository<Product, Long>{
-	
 	@Query(value = "select * from TBLPRODUCT where ISACTIVE='Y'", nativeQuery = true)
 	public List<Product> findActive();
 	
@@ -41,31 +39,33 @@ public interface productRepository extends JpaRepository<Product, Long>{
 	@Query(value = "select * from TBLPRODUCT where PRODUCT_NEWCODE=?1", nativeQuery = true)
 	public Product findByNewCode(String code);
 	
-	@Query(value = "select distinct a.* from TBLPRODUCT as a "
-			+ "left outer join TBLPRODUCTAPPLICATION as b on a.PRODUCT_ID=b.PRODUCT_ID "
+	@Query(value = "select distinct * from TBLPRODUCT "
+			+ "left outer join TBLPRODUCTAPPLICATION as b on PRODUCT_ID=b.PRODUCT_ID "
 			+ "where APPLICATION_ID LIKE CASE WHEN ?1 = 0 THEN APPLICATION_ID ELSE ?1 END " 
 			+ "and (PRODUCT_NAME LIKE ?2 "
 			+ "OR PRODUCT_DESC LIKE ?2) "
-			+ "and a.ISACTIVE='Y'", nativeQuery = true)
+			+ "and ISACTIVE='Y'", nativeQuery = true)
 	public List<Product> findBySearch(Long applicationID, String search);
 
-	@Query(value = "select distinct a.* from TBLPRODUCT as a "
-			+ "left outer join TBLPRODUCTAPPLICATION as b on a.PRODUCT_ID=b.PRODUCT_ID "
+	@Query(value = "select distinct * from TBLPRODUCT "
+			+ "left outer join TBLPRODUCTAPPLICATION as b on PRODUCT_ID=b.PRODUCT_ID "
 			+ "where APPLICATION_ID LIKE CASE WHEN ?1 = 0 THEN APPLICATION_ID ELSE ?1 END " 
 			+ "and (PRODUCT_NAME LIKE ?2 "
 			+ "OR PRODUCT_DESC LIKE ?2) ", nativeQuery = true)
 	public List<Product> findAllBySearch(Long applicationID, String search);
 
-	@Query(value = "select * from TBLPRODUCT as a "
-			+ "where a.PRODUCTCATEGORY_ID LIKE CASE WHEN ?1 = 0 THEN a.PRODUCTCATEGORY_ID ELSE ?1 END or a.PRODUCTCATEGORY_ID is NULL " 
-			+ " and a.ISACTIVE='Y' order by PRODUCT_NAME", nativeQuery = true)
-	List<Product> findByAdvancedSearch(Long productcategoryID);
+	@Query(value = "select * from TBLPRODUCT "
+            + "where CASE WHEN :PRODUCTCATEGORY_ID = 0 THEN PRODUCTCATEGORY_ID=PRODUCTCATEGORY_ID ELSE PRODUCTCATEGORY_ID IN (:PRODUCTCATEGORY_IDS) END "
+			+ " and ISACTIVE='Y' order by PRODUCT_NAME", nativeQuery = true)
+	List<Product> findByAdvancedSearch(
+    @Param("PRODUCTCATEGORY_ID") Long PRODUCTCATEGORY_ID, @Param("PRODUCTCATEGORY_IDS") List<Integer> PRODUCTCATEGORY_IDS); 
 
-	@Query(value = "select distinct a.* from TBLPRODUCT as a "
-			+ "where a.PRODUCTCATEGORY_ID LIKE CASE WHEN ?1 = 0 THEN a.PRODUCTCATEGORY_ID ELSE ?1 END or a.PRODUCTCATEGORY_ID is NULL " 
+	@Query(value = "select distinct * from TBLPRODUCT "
+			+ "where CASE WHEN :PRODUCTCATEGORY_ID = 0 THEN PRODUCTCATEGORY_ID=PRODUCTCATEGORY_ID ELSE PRODUCTCATEGORY_ID IN (:PRODUCTCATEGORY_IDS) END "
 			+ "order by PRODUCT_NAME", nativeQuery = true)
-	List<Product> findAllByAdvancedSearch(Long productcategoryID);
-	
+	List<Product> findAllByAdvancedSearch(
+    @Param("PRODUCTCATEGORY_ID") Long PRODUCTCATEGORY_ID, @Param("PRODUCTCATEGORY_IDS") List<Integer> PRODUCTCATEGORY_IDS); 
+
 	@Query(value = "select * from TBLPRODUCT "
 			+ "where PRODUCT_ID in (:ids) "
 			+ "", nativeQuery = true)

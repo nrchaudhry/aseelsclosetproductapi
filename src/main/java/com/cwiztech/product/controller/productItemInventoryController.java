@@ -30,6 +30,7 @@ import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductItemInventory;
 import com.cwiztech.product.repository.productItemInventoryRepository;
+import com.cwiztech.services.LocationService;
 import com.cwiztech.services.LookupService;
 import com.cwiztech.services.ProductService;
 import com.cwiztech.token.AccessToken;
@@ -62,7 +63,7 @@ public class productItemInventoryController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<ProductItemInventory> productiteminventories = productiteminventoryrepository.findActive();
-		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -73,7 +74,7 @@ public class productItemInventoryController {
 
 		List<ProductItemInventory> productiteminventories = productiteminventoryrepository.findAll();
 
-		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -84,7 +85,7 @@ public class productItemInventoryController {
 
 		ProductItemInventory productiteminventory = productiteminventoryrepository.findOne(id);
 
-		return new ResponseEntity(getAPIResponse(null, productiteminventory , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productiteminventory , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -104,7 +105,7 @@ public class productItemInventoryController {
 		if (jsonproductiteminventories.length()>0)
 			productiteminventories = productiteminventoryrepository.findByIDs(productiteminventory_IDS);
 
-		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -124,7 +125,7 @@ public class productItemInventoryController {
 		if (jsonproductiteminventories.length()>0)
 			productiteminventories = productiteminventoryrepository.findByNotInIDs(productiteminventory_IDS);
 
-		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -183,16 +184,16 @@ public class productItemInventoryController {
 					productiteminventory = productiteminventoryrepository.findOne(productiteminventoryid);
 
 					if (productiteminventory == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemInventory Data!", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemInventory Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 				}
 			}
 
 			if (productiteminventoryid == 0) {
 				if (!jsonObj.has("productitem_ID") || jsonObj.isNull("productitem_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 				if (!jsonObj.has("location_ID") || jsonObj.isNull("location_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "location_ID is missing", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "location_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 			}
 			if (jsonObj.has("productitem_ID")  && !jsonObj.isNull("productitem_ID"))
@@ -314,9 +315,9 @@ public class productItemInventoryController {
 
 		ResponseEntity responseentity;
 		if (jsonProductItemInventory != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productiteminventories.get(0) , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productiteminventories.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 		return responseentity;
 	}
 
@@ -329,7 +330,7 @@ public class productItemInventoryController {
 		ProductItemInventory productiteminventory = productiteminventoryrepository.findOne(id);
 		productiteminventoryrepository.delete(productiteminventory);
 
-		return new ResponseEntity(getAPIResponse(null, productiteminventory , null, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productiteminventory , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -368,7 +369,7 @@ public class productItemInventoryController {
 				? productiteminventoryrepository.findBySearch("%" + jsonObj.getString("search") + "%")
 						: productiteminventoryrepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 
-		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -390,76 +391,60 @@ public class productItemInventoryController {
 
 		List<ProductItemInventory> productiteminventories = new ArrayList<ProductItemInventory>();
 		JSONObject jsonObj = new JSONObject(data);
-		long  productitem_ID = 0,location_ID = 0, inventoryclassifiction_ID=0, lastcountdate=0, nectcountdate=0;
-		String lastcount_DATE="", nectcount_DATE="";
+		   JSONArray searchObject = new JSONArray();
+	        List<Integer> productitem_IDS = new ArrayList<Integer>(); 
+	        List<Integer> location_IDS = new ArrayList<Integer>(); 
 
-		if (jsonObj.has("location_ID") && !jsonObj.isNull("location_ID"))
-			location_ID = jsonObj.getLong("location_ID");
-		else if (jsonObj.has("location_CODE") && !jsonObj.isNull("location_CODE")) {
-			JSONObject location = new JSONObject(LookupService.POST("lookup/bycode", "{entityname: 'LOCATION', code: "+jsonObj.getString("location_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
-			if (location != null)
-				location_ID = location.getLong("id");
-		} 
+	        productitem_IDS.add((int) 0);
+	        location_IDS.add((int) 0);
+	        
+		long productitem_ID = 0 , location_ID = 0;
+		
+       boolean isWithDetail = true;
+       if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+           isWithDetail = jsonObj.getBoolean("iswithdetail");
+       }
+       jsonObj.put("iswithdetail", false);
+		
+       if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID") && jsonObj.getLong("productitem_ID") != 0) {
+           productitem_ID = jsonObj.getLong("productitem_ID");
+           productitem_IDS.add((int) productitem_ID);
+       } else if (jsonObj.has("productitem") && !jsonObj.isNull("productitem") && jsonObj.getLong("productitem") != 0) {
+           if (active == true) {
+               searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+           } else {
+               searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+           }
 
-		if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID"))
-			productitem_ID = jsonObj.getLong("productitem_ID");
-		if (jsonObj.has("productattribute_ID") && !jsonObj.isNull("productattribute_ID") && productitem_ID == 0 ) {
-			JSONArray productattributesObject;
-			if (active == true) {
-				productattributesObject = new JSONArray(ProductService.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
-			} else {
-				productattributesObject = new JSONArray(ProductService.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
-			}
+           productitem_ID = searchObject.length();
+           for (int i=0; i<searchObject.length(); i++) {
+               productitem_IDS.add((int) searchObject.getJSONObject(i).getLong("productitem_ID"));
+           }
+       }
+		
+       if (jsonObj.has("location_ID") && !jsonObj.isNull("location_ID") && jsonObj.getLong("location_ID") != 0) {
+           location_ID = jsonObj.getLong("location_ID");
+           location_IDS.add((int) location_ID);
+       } else if (jsonObj.has("location") && !jsonObj.isNull("location") && jsonObj.getLong("location") != 0) {
+           if (active == true) {
+               searchObject = new JSONArray(LocationService.POST("location/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+           } else {
+               searchObject = new JSONArray(LocationService.POST("location/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+           }
 
-			for (int i=0; i<productattributesObject.length(); i++) {
-				List<ProductItemInventory> productiteminventory = new ArrayList<ProductItemInventory>();
-				productiteminventory = ((active == true)
-						? productiteminventoryrepository.findByAdvancedSearch((long) 0, (long) 0, (long) 0, "",  (long) 0,"", productattributesObject.getJSONObject(i).getLong("productitem_ID") )
-								: productiteminventoryrepository.findAllByAdvancedSearch((long) 0, (long) 0, (long) 0, "",  (long) 0,"", productattributesObject.getJSONObject(i).getLong("productitem_ID") ));
-				for (int j=0; j<productiteminventory.size(); j++) {
-					productiteminventories.add(productiteminventory.get(j));
-				}
-			}
+           location_ID = searchObject.length();
+           for (int i=0; i<searchObject.length(); i++) {
+               location_IDS.add((int) searchObject.getJSONObject(i).getLong("location_ID"));
+           }
+       }
+       
+		if(productitem_ID != 0 || productitem_ID != 0){
+			productiteminventories = ((active == true)
+				? productiteminventoryrepository.findByAdvancedSearch(productitem_ID, productitem_IDS, location_ID, location_IDS)
+				: productiteminventoryrepository.findAllByAdvancedSearch(productitem_ID, productitem_IDS, location_ID, location_IDS));
 		}
-
-		if (jsonObj.has("inventoryclassifiction_ID") && !jsonObj.isNull("inventoryclassifiction_CODE"))
-			inventoryclassifiction_ID = jsonObj.getLong("inventoryclassifiction_ID");
-		else if (jsonObj.has("inventoryclassifiction_CODE") && !jsonObj.isNull("inventoryclassifiction_CODE")) {
-			JSONObject inventoryclassifiction = new JSONObject(LookupService.POST("lookup/bycode", "{entityname: 'INVENTORYCLASSIFICATION', code: "+jsonObj.getString("inventoryclassifiction_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
-			if (inventoryclassifiction != null)
-				inventoryclassifiction_ID = inventoryclassifiction.getLong("id");
-		} 
-
-		if (jsonObj.has("lastcount_DATE")) {
-			lastcountdate = 1;
-			lastcount_DATE = jsonObj.getString("lastcount_DATE");
-		}
-
-		if (jsonObj.has("nectcount_DATE")) {
-			nectcountdate = 1;
-			nectcount_DATE = jsonObj.getString("nectcount_DATE");
-		}
-		if(location_ID != 0 || productitem_ID != 0 || inventoryclassifiction_ID != 0 || lastcountdate != 0 || nectcountdate != 0){
-			List<ProductItemInventory> productiteminventorie = ((active == true)
-					? productiteminventoryrepository.findByAdvancedSearch(location_ID,inventoryclassifiction_ID,lastcountdate,lastcount_DATE,nectcountdate,nectcount_DATE,productitem_ID)
-							: productiteminventoryrepository.findAllByAdvancedSearch(location_ID,inventoryclassifiction_ID,lastcountdate,lastcount_DATE,nectcountdate,nectcount_DATE,productitem_ID));
-			for (int i=0; i<productiteminventorie.size(); i++) {
-				boolean found = false;
-
-				for (int j=0; j<productiteminventories.size(); j++) {
-					if (productiteminventorie.get(i).getPRODUCTITEMINVENTORY_ID() == productiteminventories.get(j).getPRODUCTITEMINVENTORY_ID()) {
-						found = true;
-						break;
-					}
-				}
-
-				if (found == false) {
-					productiteminventories.add(productiteminventorie.get(i));
-				}
-			}
-		}
-		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
-	}
+		return new ResponseEntity(getAPIResponse(productiteminventories, null, null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
+	}       
 
 	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
 		JSONObject checkTokenResponse = AccessToken.checkToken(accessToken);
@@ -486,7 +471,7 @@ public class productItemInventoryController {
 		return apiRequest;
 	}
 
-	APIRequestDataLog getAPIResponse(List<ProductItemInventory> productiteminventories, ProductItemInventory productiteminventory , JSONArray jsonProductItemInventorys, JSONObject jsonProductItemInventory, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<ProductItemInventory> productiteminventories, ProductItemInventory productiteminventory , JSONArray jsonProductItemInventorys, JSONObject jsonProductItemInventory, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -496,7 +481,7 @@ public class productItemInventoryController {
 			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductItemInventory", message);
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
-			if (productiteminventory != null) {
+			if (productiteminventory != null && isWithDetail == true) {
 
 				JSONObject productitem = new JSONObject(ProductService.GET("productitem/"+productiteminventory.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT()));
 				productiteminventory.setPRODUCTITEM_DETAIL(productitem.toString());
@@ -511,7 +496,7 @@ public class productItemInventoryController {
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventory));
 				productiteminventoryID = productiteminventory.getPRODUCTITEMINVENTORY_ID();
-			} else if(productiteminventories != null){	
+			} else if(productiteminventories != null && isWithDetail == true){	
 				if (productiteminventories.size()>0) {
 					List<Integer> productitemList = new ArrayList<Integer>();
 					List<Integer> lookupList = new ArrayList<Integer>();
@@ -552,6 +537,11 @@ public class productItemInventoryController {
 			} else if (jsonProductItemInventory != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventory.toString());
 			}
+			else if (jsonProductItemInventorys != null){
+				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventorys.toString());
+			} else if (jsonProductItemInventory != null){
+				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventory.toString());
+			}
 			apiRequest.setRESPONSE_DATETIME(dateFormat1.format(date));
 			apiRequest.setREQUEST_STATUS("Success");
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
@@ -569,144 +559,5 @@ public class productItemInventoryController {
 		return apiRequest;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/commitment" ,method = RequestMethod.POST)
-	public ResponseEntity Commitment(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken)
-			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/commitment", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-
-		long saleorderdetailstatusID1 = 0, saleorderdetailstatusID2 = 0;
-		JSONArray saleorderdetailstatus = new JSONArray(LookupService.POST("lookup/entity", "{entityname: 'SALEORDERDETAILSTATUS'}", headToken));
-		for (int i=0; i<saleorderdetailstatus.length(); i++) {
-			if (saleorderdetailstatus.getJSONObject(i).getString("code").compareTo("F") == 0) {
-				saleorderdetailstatusID1 = saleorderdetailstatus.getJSONObject(i).getLong("id");
-			} else if (saleorderdetailstatus.getJSONObject(i).getString("code").compareTo("PF") == 0) {
-				saleorderdetailstatusID2 = saleorderdetailstatus.getJSONObject(i).getLong("id");
-			} 
-		}
-
-		JSONArray jsonPAV = new JSONArray(data);
-		JSONArray rtnArray = new JSONArray();
-
-		for (int i = 0; i < jsonPAV.length(); i++) {
-			JSONObject orderdetail = jsonPAV.getJSONObject(i);
-			JSONObject rtnobj = new JSONObject();
-			long quantity = orderdetail.getLong("productitem_QUANTITY");
-
-			ProductItemInventory productiteminventory = productiteminventoryrepository.findByProductItemId(orderdetail.getLong("productitem_ID"));
-
-			if(quantity > 0 && productiteminventory.getQUANTITY_AVAILABLE() > 0 && productiteminventory.getQUANTITY_AVAILABLE() < (double) quantity) {
-				quantity = (long) (productiteminventory.getQUANTITY_AVAILABLE() - 0);
-			} else if (quantity > 0 && productiteminventory.getQUANTITY_AVAILABLE() <= 0) {
-				quantity = 0;
-			}
-
-			productiteminventory.setQUANTITY_AVAILABLE(productiteminventory.getQUANTITY_AVAILABLE() -  quantity);
-			productiteminventory.setQUANTITY_COMMITTED(productiteminventory.getQUANTITY_COMMITTED() +  quantity);
-			productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
-
-			rtnobj.put("saleorder_ID", orderdetail.getLong("saleorder_ID"));
-			rtnobj.put("productitem_ID", orderdetail.getLong("productitem_ID"));
-			rtnobj.put("productitem_COMMITTED", quantity);
-			if (quantity == orderdetail.getLong("productitem_QUANTITY"))
-				rtnobj.put("saleorderdetailstatus_ID", saleorderdetailstatusID1);
-			else
-				rtnobj.put("saleorderdetailstatus_ID", saleorderdetailstatusID2);
-
-			rtnArray.put(rtnobj);
-		}
-
-		return new ResponseEntity(getAPIResponse(null, null, rtnArray, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/fulfillment" ,method = RequestMethod.POST)
-	public ResponseEntity Fulfillment(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken)
-			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/fulfillment", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-
-		JSONArray jsonPAV = new JSONArray(data);
-		JSONArray rtnArray = new JSONArray();
-		JSONObject saleorderdetailstatusID = new JSONObject(LookupService.POST("lookup/bycode", "{entityname: 'SALEORDERDETAILSTATUS', code: 'B'}", headToken));
-
-		for (int i = 0; i < jsonPAV.length(); i++) {
-			JSONObject orderdetail = jsonPAV.getJSONObject(i);
-			JSONObject rtnobj = new JSONObject();
-
-			long commitment = orderdetail.getLong("committed");
-			long backordered = orderdetail.getLong("back_ORDERED");
-
-			ProductItemInventory productiteminventory = productiteminventoryrepository.findByProductItemId(orderdetail.getLong("productitem_ID"));
-			productiteminventory.setQUANTITY_ONHAND(productiteminventory.getQUANTITY_ONHAND() - commitment + backordered);
-			productiteminventory.setQUANTITY_AVAILABLE(productiteminventory.getQUANTITY_AVAILABLE() +  backordered);
-			productiteminventory.setQUANTITY_COMMITTED(productiteminventory.getQUANTITY_COMMITTED() - commitment - backordered);
-			productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
-
-			rtnobj.put("saleorderdetail_ID", orderdetail.getLong("saleorderdetail_ID"));
-			rtnobj.put("productitem_FULFILLED", commitment - backordered);
-			rtnobj.put("saleorderdetailstatus_ID", saleorderdetailstatusID.getLong("id"));
-			rtnArray.put(rtnobj);
-		}
-
-		return new ResponseEntity(getAPIResponse(null, null, rtnArray, null, null, apiRequest, true).getREQUEST_OUTPUT(), HttpStatus.OK);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/received" ,method = RequestMethod.POST)
-	public ResponseEntity Received(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken)
-			throws JsonProcessingException, JSONException, ParseException {
-		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
-		String rtn = null, workstation = null;
-		APIRequestDataLog apiRequest;
-
-		log.info("POST: /productiteminventory/received");
-		log.info("Input: " + data);
-
-		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItemInventory.getDatabaseTableID());
-
-		if (checkTokenResponse.has("error")) {
-			apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, (long) 0, "/productiteminventory/received", data, workstation);
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
-			return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-		}
-
-		ObjectMapper mapper = new ObjectMapper();
-		Long requestUser = checkTokenResponse.getLong("user_ID");
-		apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, requestUser, "/productiteminventory/received", data, workstation);
-
-		JSONArray jsonPAV = new JSONArray(data);
-		List<ProductItemInventory> productiteminventorylist = new ArrayList<ProductItemInventory>();
-
-		for (int i = 0; i < jsonPAV.length(); i++) {
-			JSONObject productitem = jsonPAV.getJSONObject(i);		
-			long productitem_id = productitem.getLong("productitem_ID");
-			long quantity_received = productitem.getLong("quantity_RECEIVED");
-			if(quantity_received != 0){
-				ProductItemInventory productiteminventory = productiteminventoryrepository.findByProductItemId(productitem_id);
-				if(productiteminventory != null)
-				{
-					double quantity_onhand = productiteminventory.getQUANTITY_ONHAND() + (double) quantity_received;
-					productiteminventory.setQUANTITY_ONHAND(quantity_onhand);
-					double quantity_available = productiteminventory.getQUANTITY_AVAILABLE() + (double) quantity_received;
-					productiteminventory.setQUANTITY_AVAILABLE(quantity_available);
-					productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
-					productiteminventorylist.add(productiteminventory);
-				}
-			}
-
-		}
-
-		rtn = mapper.writeValueAsString(productiteminventorylist);
-		apiRequest.setREQUEST_OUTPUT(rtn);
-		apiRequest.setREQUEST_STATUS("Success");
-		apirequestdatalogRepository.saveAndFlush(apiRequest);
-
-		log.info("Output: " + rtn);
-		log.info("--------------------------------------------------------");
-
-		return new ResponseEntity(rtn, HttpStatus.OK);
-	}	
+	
 }

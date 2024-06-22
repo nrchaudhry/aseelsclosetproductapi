@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.cwiztech.product.model.ProductItem;
 import com.cwiztech.product.model.ProductPriceLevel;
 
 public interface productPriceLevelRepository extends JpaRepository<ProductPriceLevel, Long> {
@@ -29,29 +28,35 @@ public interface productPriceLevelRepository extends JpaRepository<ProductPriceL
 			+ "", nativeQuery = true)
 	public List<ProductPriceLevel> findByNotInIDs(@Param("ids") List<Integer> ids);
 
-	@Query(value = "select * from TBLPRODUCTPRICELEVEL as a "
-			+ "inner join TBLPRODUCTPRICELEVELCATEGORY as b on a.PRODUCTCATEGORY_ID=b.PRODUCTCATEGORY_ID "
+	@Query(value = "select * from TBLPRODUCTPRICELEVEL "
+			+ "inner join TBLPRODUCTPRICELEVELCATEGORY as b on PRODUCTCATEGORY_ID=b.PRODUCTCATEGORY_ID "
 			+ "where PRODUCT_CODE like ?1 "
-			+ "and a.ISACTIVE='Y'", nativeQuery = true)
+			+ "and ISACTIVE='Y'", nativeQuery = true)
 	public List<ProductPriceLevel> findBySearch(String search);
 
-	@Query(value = "select * from TBLPRODUCTPRICELEVEL as a "
-			+ "inner join TBLPRODUCTPRICELEVELCATEGORY as b on a.PRODUCT_ID=b.PRODUCT_ID "
+	@Query(value = "select * from TBLPRODUCTPRICELEVEL "
+			+ "inner join TBLPRODUCTPRICELEVELCATEGORY as b on PRODUCT_ID=b.PRODUCT_ID "
 			+ "where PRODUCT_CODE like ?1 "
 			+ "", nativeQuery = true)
 	public List<ProductPriceLevel> findAllBySearch(String search);
 
-	@Query(value = "select * from TBLPRODUCTPRICELEVEL as a " 
-			+ "where a.CURRENCY_ID LIKE CASE WHEN ?1 = 0 THEN a.CURRENCY_ID ELSE ?1 END or a.CURRENCY_ID is NULL "
-			+ "and a.PRODUCT_ID LIKE CASE WHEN ?2 = 0 THEN a.PRODUCT_ID ELSE ?2 END "
-			+ "and a.PRICELEVEL_ID LIKE CASE WHEN ?3 = 0 THEN a.PRICELEVEL_ID ELSE ?3 END or a.PRICELEVEL_ID is NULL "
-	        + "and a.ISACTIVE='Y'", nativeQuery = true)
-	List<ProductPriceLevel> findByAdvancedSearch(Long cid, Long pid, Long plid);
+	@Query(value = "select * from TBLPRODUCTPRICELEVEL " 
+            + "where CASE WHEN :CURRENCY_ID = 0 THEN CURRENCY_ID=CURRENCY_ID ELSE CURRENCY_ID IN (:CURRENCY_IDS) END "
+            + "and CASE WHEN :PRODUCT_ID = 0 THEN PRODUCT_ID=PRODUCT_ID ELSE PRODUCT_ID IN (:PRODUCT_IDS) END "
+            + "and CASE WHEN :PRICELEVEL_ID = 0 THEN PRICELEVEL_ID=PRICELEVEL_ID ELSE PRICELEVEL_ID IN (:PRICELEVEL_IDS) END "
+	        + "and ISACTIVE='Y'", nativeQuery = true)
+	List<ProductPriceLevel> findByAdvancedSearch(
+		    @Param("PRODUCT_ID") Long PRODUCT_ID, @Param("PRODUCT_IDS") List<Integer> PRODUCT_IDS,
+		    @Param("PRICELEVEL_ID") Long PRICELEVEL_ID, @Param("PRICELEVEL_IDS") List<Integer> PRICELEVEL_IDS,
+		    @Param("CURRENCY_ID") Long CURRENCY_ID, @Param("CURRENCY_IDS") List<Integer> CURRENCY_IDS);
 	
-	@Query(value = "select * from TBLPRODUCTPRICELEVEL as a "
-			+ "where a.CURRENCY_ID LIKE CASE WHEN ?1 = 0 THEN a.CURRENCY_ID ELSE ?1 END or a.CURRENCY_ID is NULL "
-			+ "and a.PRODUCT_ID LIKE CASE WHEN ?2 = 0 THEN a.PRODUCT_ID ELSE ?2 END "
-			+ "and a.PRICELEVEL_ID LIKE CASE WHEN ?3 = 0 THEN a.PRICELEVEL_ID ELSE ?3 END or a.PRICELEVEL_ID is NULL "
+	@Query(value = "select * from TBLPRODUCTPRICELEVEL "
+			+ "where CASE WHEN :CURRENCY_ID = 0 THEN CURRENCY_ID=CURRENCY_ID ELSE CURRENCY_ID IN (:CURRENCY_IDS) END "
+			+ "and CASE WHEN :PRODUCT_ID = 0 THEN PRODUCT_ID=PRODUCT_ID ELSE PRODUCT_ID IN (:PRODUCT_IDS) END "
+			+ "and CASE WHEN :PRICELEVEL_ID = 0 THEN PRICELEVEL_ID=PRICELEVEL_ID ELSE PRICELEVEL_ID IN (:PRICELEVEL_IDS) END "
 		    + "", nativeQuery = true)
-	List<ProductPriceLevel> findAllByAdvancedSearch(Long cid, Long pid, Long plid);
+	List<ProductPriceLevel> findAllByAdvancedSearch(
+		    @Param("PRODUCT_ID") Long PRODUCT_ID, @Param("PRODUCT_IDS") List<Integer> PRODUCT_IDS,
+		    @Param("PRICELEVEL_ID") Long PRICELEVEL_ID, @Param("PRICELEVEL_IDS") List<Integer> PRICELEVEL_IDS,
+		    @Param("CURRENCY_ID") Long CURRENCY_ID, @Param("CURRENCY_IDS") List<Integer> CURRENCY_IDS);
 }
