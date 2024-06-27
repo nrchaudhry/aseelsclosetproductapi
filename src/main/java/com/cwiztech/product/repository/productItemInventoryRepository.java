@@ -27,7 +27,7 @@ public interface productItemInventoryRepository extends JpaRepository<ProductIte
 
 	@Query(value = "select * from TBLPRODUCTITEMINVENTORY "
             + "where CASE WHEN :PRODUCTITEM_ID = 0 THEN PRODUCTITEM_ID=PRODUCTITEM_ID ELSE PRODUCTITEM_ID IN (:PRODUCTITEM_IDS) END "
-            + "where CASE WHEN :LOCATION_ID = 0 THEN LOCATION_ID=LOCATION_ID ELSE LOCATION_ID IN (:LOCATION_IDS) END "
+            + "and CASE WHEN :LOCATION_ID = 0 THEN LOCATION_ID=LOCATION_ID ELSE LOCATION_ID IN (:LOCATION_IDS) END "
 			+ "and ISACTIVE='Y'", nativeQuery = true)
 	List<ProductItemInventory> findByAdvancedSearch(
 	   @Param("LOCATION_ID") Long LOCATION_ID, @Param("LOCATION_IDS") List<Integer> LOCATION_IDS,
@@ -35,7 +35,7 @@ public interface productItemInventoryRepository extends JpaRepository<ProductIte
 
 	@Query(value = "select * from TBLPRODUCTITEMINVENTORY  "
 			+ "where CASE WHEN :PRODUCTITEM_ID = 0 THEN PRODUCTITEM_ID=PRODUCTITEM_ID ELSE PRODUCTITEM_ID IN (:PRODUCTITEM_IDS) END "
-			+ "where CASE WHEN :LOCATION_ID = 0 THEN LOCATION_ID=LOCATION_ID ELSE LOCATION_ID IN (:LOCATION_IDS) END "
+			+ "and CASE WHEN :LOCATION_ID = 0 THEN LOCATION_ID=LOCATION_ID ELSE LOCATION_ID IN (:LOCATION_IDS) END "
 			+ "", nativeQuery = true)
 	List<ProductItemInventory> findAllByAdvancedSearch(
 	   @Param("LOCATION_ID") Long LOCATION_ID, @Param("LOCATION_IDS") List<Integer> LOCATION_IDS,
