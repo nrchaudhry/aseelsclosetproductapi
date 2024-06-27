@@ -391,57 +391,57 @@ public class productItemInventoryController {
 
 		List<ProductItemInventory> productiteminventories = new ArrayList<ProductItemInventory>();
 		JSONObject jsonObj = new JSONObject(data);
-		   JSONArray searchObject = new JSONArray();
-	        List<Integer> productitem_IDS = new ArrayList<Integer>(); 
-	        List<Integer> location_IDS = new ArrayList<Integer>(); 
+		JSONArray searchObject = new JSONArray();
+		List<Integer> productitem_IDS = new ArrayList<Integer>(); 
+		List<Integer> location_IDS = new ArrayList<Integer>(); 
 
-	        productitem_IDS.add((int) 0);
-	        location_IDS.add((int) 0);
-	        
+		productitem_IDS.add((int) 0);
+		location_IDS.add((int) 0);
+
 		long productitem_ID = 0 , location_ID = 0;
-		
-       boolean isWithDetail = true;
-       if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
-           isWithDetail = jsonObj.getBoolean("iswithdetail");
-       }
-       jsonObj.put("iswithdetail", false);
-		
-       if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID") && jsonObj.getLong("productitem_ID") != 0) {
-           productitem_ID = jsonObj.getLong("productitem_ID");
-           productitem_IDS.add((int) productitem_ID);
-       } else if (jsonObj.has("productitem") && !jsonObj.isNull("productitem") && jsonObj.getLong("productitem") != 0) {
-           if (active == true) {
-               searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
-           } else {
-               searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
-           }
 
-           productitem_ID = searchObject.length();
-           for (int i=0; i<searchObject.length(); i++) {
-               productitem_IDS.add((int) searchObject.getJSONObject(i).getLong("productitem_ID"));
-           }
-       }
-		
-       if (jsonObj.has("location_ID") && !jsonObj.isNull("location_ID") && jsonObj.getLong("location_ID") != 0) {
-           location_ID = jsonObj.getLong("location_ID");
-           location_IDS.add((int) location_ID);
-       } else if (jsonObj.has("location") && !jsonObj.isNull("location") && jsonObj.getLong("location") != 0) {
-           if (active == true) {
-               searchObject = new JSONArray(LocationService.POST("location/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
-           } else {
-               searchObject = new JSONArray(LocationService.POST("location/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
-           }
+		boolean isWithDetail = true;
+		if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+			isWithDetail = jsonObj.getBoolean("iswithdetail");
+		}
+		jsonObj.put("iswithdetail", false);
 
-           location_ID = searchObject.length();
-           for (int i=0; i<searchObject.length(); i++) {
-               location_IDS.add((int) searchObject.getJSONObject(i).getLong("location_ID"));
-           }
-       }
-       
+		if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID") && jsonObj.getLong("productitem_ID") != 0) {
+			productitem_ID = jsonObj.getLong("productitem_ID");
+			productitem_IDS.add((int) productitem_ID);
+		} else if (jsonObj.has("productitem") && !jsonObj.isNull("productitem") && jsonObj.getLong("productitem") != 0) {
+			if (active == true) {
+				searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+			} else {
+				searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+			}
+
+			productitem_ID = searchObject.length();
+			for (int i=0; i<searchObject.length(); i++) {
+				productitem_IDS.add((int) searchObject.getJSONObject(i).getLong("productitem_ID"));
+			}
+		}
+
+		if (jsonObj.has("location_ID") && !jsonObj.isNull("location_ID") && jsonObj.getLong("location_ID") != 0) {
+			location_ID = jsonObj.getLong("location_ID");
+			location_IDS.add((int) location_ID);
+		} else if (jsonObj.has("location") && !jsonObj.isNull("location") && jsonObj.getLong("location") != 0) {
+			if (active == true) {
+				searchObject = new JSONArray(LocationService.POST("location/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+			} else {
+				searchObject = new JSONArray(LocationService.POST("location/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+			}
+
+			location_ID = searchObject.length();
+			for (int i=0; i<searchObject.length(); i++) {
+				location_IDS.add((int) searchObject.getJSONObject(i).getLong("location_ID"));
+			}
+		}
+
 		if(productitem_ID != 0 || productitem_ID != 0){
 			productiteminventories = ((active == true)
-				? productiteminventoryrepository.findByAdvancedSearch(productitem_ID, productitem_IDS, location_ID, location_IDS)
-				: productiteminventoryrepository.findAllByAdvancedSearch(productitem_ID, productitem_IDS, location_ID, location_IDS));
+					? productiteminventoryrepository.findByAdvancedSearch(productitem_ID, productitem_IDS, location_ID, location_IDS)
+							: productiteminventoryrepository.findAllByAdvancedSearch(productitem_ID, productitem_IDS, location_ID, location_IDS));
 		}
 		return new ResponseEntity(getAPIResponse(productiteminventories, null, null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}       
@@ -559,5 +559,144 @@ public class productItemInventoryController {
 		return apiRequest;
 	}
 
-	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/commitment" ,method = RequestMethod.POST)
+	public ResponseEntity Commitment(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken)
+			throws JsonProcessingException, JSONException, ParseException {
+		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/commitment", data, null, headToken);
+		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+
+		long saleorderdetailstatusID1 = 0, saleorderdetailstatusID2 = 0;
+		JSONArray saleorderdetailstatus = new JSONArray(LookupService.POST("lookup/entity", "{entityname: 'SALEORDERDETAILSTATUS'}", headToken));
+		for (int i=0; i<saleorderdetailstatus.length(); i++) {
+			if (saleorderdetailstatus.getJSONObject(i).getString("code").compareTo("F") == 0) {
+				saleorderdetailstatusID1 = saleorderdetailstatus.getJSONObject(i).getLong("id");
+			} else if (saleorderdetailstatus.getJSONObject(i).getString("code").compareTo("PF") == 0) {
+				saleorderdetailstatusID2 = saleorderdetailstatus.getJSONObject(i).getLong("id");
+			} 
+		}
+
+		JSONArray jsonPAV = new JSONArray(data);
+		JSONArray rtnArray = new JSONArray();
+
+		for (int i = 0; i < jsonPAV.length(); i++) {
+			JSONObject orderdetail = jsonPAV.getJSONObject(i);
+			JSONObject rtnobj = new JSONObject();
+			long quantity = orderdetail.getLong("productitem_QUANTITY");
+
+			ProductItemInventory productiteminventory = productiteminventoryrepository.findByProductItemId(orderdetail.getLong("productitem_ID"));
+
+			if(quantity > 0 && productiteminventory.getQUANTITY_AVAILABLE() > 0 && productiteminventory.getQUANTITY_AVAILABLE() < (double) quantity) {
+				quantity = (long) (productiteminventory.getQUANTITY_AVAILABLE() - 0);
+			} else if (quantity > 0 && productiteminventory.getQUANTITY_AVAILABLE() <= 0) {
+				quantity = 0;
+			}
+
+			productiteminventory.setQUANTITY_AVAILABLE(productiteminventory.getQUANTITY_AVAILABLE() -  quantity);
+			productiteminventory.setQUANTITY_COMMITTED(productiteminventory.getQUANTITY_COMMITTED() +  quantity);
+			productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
+
+			rtnobj.put("saleorder_ID", orderdetail.getLong("saleorder_ID"));
+			rtnobj.put("productitem_ID", orderdetail.getLong("productitem_ID"));
+			rtnobj.put("productitem_COMMITTED", quantity);
+			if (quantity == orderdetail.getLong("productitem_QUANTITY"))
+				rtnobj.put("saleorderdetailstatus_ID", saleorderdetailstatusID1);
+			else
+				rtnobj.put("saleorderdetailstatus_ID", saleorderdetailstatusID2);
+
+			rtnArray.put(rtnobj);
+		}
+
+		return new ResponseEntity(getAPIResponse(null, null, rtnArray, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/fulfillment" ,method = RequestMethod.POST)
+	public ResponseEntity Fulfillment(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken)
+			throws JsonProcessingException, JSONException, ParseException {
+		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/fulfillment", data, null, headToken);
+		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+
+		JSONArray jsonPAV = new JSONArray(data);
+		JSONArray rtnArray = new JSONArray();
+		JSONObject saleorderdetailstatusID = new JSONObject(LookupService.POST("lookup/bycode", "{entityname: 'SALEORDERDETAILSTATUS', code: 'B'}", headToken));
+
+		for (int i = 0; i < jsonPAV.length(); i++) {
+			JSONObject orderdetail = jsonPAV.getJSONObject(i);
+			JSONObject rtnobj = new JSONObject();
+
+			long commitment = orderdetail.getLong("committed");
+			long backordered = orderdetail.getLong("back_ORDERED");
+
+			ProductItemInventory productiteminventory = productiteminventoryrepository.findByProductItemId(orderdetail.getLong("productitem_ID"));
+			productiteminventory.setQUANTITY_ONHAND(productiteminventory.getQUANTITY_ONHAND() - commitment + backordered);
+			productiteminventory.setQUANTITY_AVAILABLE(productiteminventory.getQUANTITY_AVAILABLE() +  backordered);
+			productiteminventory.setQUANTITY_COMMITTED(productiteminventory.getQUANTITY_COMMITTED() - commitment - backordered);
+			productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
+
+			rtnobj.put("saleorderdetail_ID", orderdetail.getLong("saleorderdetail_ID"));
+			rtnobj.put("productitem_FULFILLED", commitment - backordered);
+			rtnobj.put("saleorderdetailstatus_ID", saleorderdetailstatusID.getLong("id"));
+			rtnArray.put(rtnobj);
+		}
+
+		return new ResponseEntity(getAPIResponse(null, null, rtnArray, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/received" ,method = RequestMethod.POST)
+	public ResponseEntity Received(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken)
+			throws JsonProcessingException, JSONException, ParseException {
+		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
+		String rtn = null, workstation = null;
+		APIRequestDataLog apiRequest;
+
+		log.info("POST: /productiteminventory/received");
+		log.info("Input: " + data);
+
+		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItemInventory.getDatabaseTableID());
+
+		if (checkTokenResponse.has("error")) {
+			apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, (long) 0, "/productiteminventory/received", data, workstation);
+			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
+			apirequestdatalogRepository.saveAndFlush(apiRequest);
+			return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		Long requestUser = checkTokenResponse.getLong("user_ID");
+		apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, requestUser, "/productiteminventory/received", data, workstation);
+
+		JSONArray jsonPAV = new JSONArray(data);
+		List<ProductItemInventory> productiteminventorylist = new ArrayList<ProductItemInventory>();
+
+		for (int i = 0; i < jsonPAV.length(); i++) {
+			JSONObject productitem = jsonPAV.getJSONObject(i);		
+			long productitem_id = productitem.getLong("productitem_ID");
+			long quantity_received = productitem.getLong("quantity_RECEIVED");
+			if(quantity_received != 0){
+				ProductItemInventory productiteminventory = productiteminventoryrepository.findByProductItemId(productitem_id);
+				if(productiteminventory != null)
+				{
+					double quantity_onhand = productiteminventory.getQUANTITY_ONHAND() + (double) quantity_received;
+					productiteminventory.setQUANTITY_ONHAND(quantity_onhand);
+					double quantity_available = productiteminventory.getQUANTITY_AVAILABLE() + (double) quantity_received;
+					productiteminventory.setQUANTITY_AVAILABLE(quantity_available);
+					productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
+					productiteminventorylist.add(productiteminventory);
+				}
+			}
+
+		}
+
+		rtn = mapper.writeValueAsString(productiteminventorylist);
+		apiRequest.setREQUEST_OUTPUT(rtn);
+		apiRequest.setREQUEST_STATUS("Success");
+		apirequestdatalogRepository.saveAndFlush(apiRequest);
+
+		log.info("Output: " + rtn);
+		log.info("--------------------------------------------------------");
+
+		return new ResponseEntity(rtn, HttpStatus.OK);
+	}	
 }
