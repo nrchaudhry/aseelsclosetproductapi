@@ -8,12 +8,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "TBLATTRIBUTECATEGORY")
-//@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class AttributeCategory {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
