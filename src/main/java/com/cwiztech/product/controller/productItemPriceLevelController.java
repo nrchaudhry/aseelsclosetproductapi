@@ -32,8 +32,7 @@ import com.cwiztech.product.model.ProductItemInventory;
 import com.cwiztech.product.model.ProductItemPriceLevel;
 import com.cwiztech.product.repository.productItemInventoryRepository;
 import com.cwiztech.product.repository.productItemPriceLevelRepository;
-import com.cwiztech.services.LookupService;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -336,9 +335,9 @@ public class productItemPriceLevelController {
             currency_IDS.add((int) currency_ID);
         } else if (jsonObj.has("currency") && !jsonObj.isNull("currency") && jsonObj.getLong("currency") != 0) {
             if (active == true) {
-                searchObject = new JSONArray(ProductService.POST("currency/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("currency/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
             } else {
-                searchObject = new JSONArray(ProductService.POST("currency/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("currency/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
             }
 
             currency_ID = searchObject.length();
@@ -352,9 +351,9 @@ public class productItemPriceLevelController {
             productitem_IDS.add((int) productitem_ID);
         } else if (jsonObj.has("productitem") && !jsonObj.isNull("productitem") && jsonObj.getLong("productitem") != 0) {
             if (active == true) {
-                searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
             } else {
-                searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
             }
 
             productitem_ID = searchObject.length();
@@ -367,9 +366,9 @@ public class productItemPriceLevelController {
             pricelevel_IDS.add((int) pricelevel_ID);
         } else if (jsonObj.has("pricelevel") && !jsonObj.isNull("pricelevel") && jsonObj.getLong("pricelevel") != 0) {
             if (active == true) {
-                searchObject = new JSONArray(ProductService.POST("pricelevel/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("pricelevel/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
             } else {
-                searchObject = new JSONArray(ProductService.POST("pricelevel/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("pricelevel/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
             }
 
             pricelevel_ID = searchObject.length();
@@ -422,15 +421,15 @@ public class productItemPriceLevelController {
             apirequestdatalogRepository.saveAndFlush(apiRequest);
         } else {
             if (productitempricelevel != null && isWithDetail == true) {
-                JSONObject productitem = new JSONObject(ProductService.GET("productitem/"+productitempricelevel.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT()));
+                JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productitempricelevel.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT(), false));
                 productitempricelevel.setPRODUCTITEM_DETAIL(productitem.toString());
 
                 if(productitempricelevel.getCURRENCY_ID() != null) {
-                    JSONObject currency = new JSONObject(LookupService.GET("lookup/"+productitempricelevel.getCURRENCY_ID(), apiRequest.getREQUEST_OUTPUT()));
+                    JSONObject currency = new JSONObject(ServiceCall.GET("lookup/"+productitempricelevel.getCURRENCY_ID(), apiRequest.getREQUEST_OUTPUT(), true));
                     productitempricelevel.setCURRENCY_DETAIL(currency.toString());
                 }
                 if(productitempricelevel.getPRICELEVEL_ID() != null) {
-                    JSONObject priceLevel = new JSONObject(LookupService.GET("lookup/"+productitempricelevel.getPRICELEVEL_ID(), apiRequest.getREQUEST_OUTPUT()));
+                    JSONObject priceLevel = new JSONObject(ServiceCall.GET("lookup/"+productitempricelevel.getPRICELEVEL_ID(), apiRequest.getREQUEST_OUTPUT(), true));
                     productitempricelevel.setPRICELEVEL_DETAIL(priceLevel.toString());
                 }
 
@@ -447,8 +446,8 @@ public class productItemPriceLevelController {
                         if(productitempricelevels.get(i).getPRICELEVEL_ID() != null)
                             lookupList.add(Integer.parseInt(productitempricelevels.get(i).getPRICELEVEL_ID().toString()));
                     }
-                    JSONArray productitemObject = new JSONArray(ProductService.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getREQUEST_OUTPUT()));
-                    JSONArray lookupObject = new JSONArray(LookupService.POST("lookup/ids", "{lookups: "+ lookupList+"}", apiRequest.getREQUEST_OUTPUT()));
+                    JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+                    JSONArray lookupObject = new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+ lookupList+"}", apiRequest.getREQUEST_OUTPUT(), true));
 
                     for (int i=0; i<productitempricelevels.size(); i++) {
                         for (int j=0; j<productitemObject.length(); j++) {
@@ -515,10 +514,10 @@ public class productItemPriceLevelController {
             pricelevel_CODE = jsonObj.getString("pricelevel_CODE");
         }
 
-        JSONArray productitems = new JSONArray(ProductService.GET("productitem", headToken));
+        JSONArray productitems = new JSONArray(ServiceCall.GET("productitem", headToken, false));
         List<ProductItemInventory> productitemiventory = productiteminventoryrepository.findActive();
-        JSONArray productitemattributevalues = new JSONArray(ProductService.GET("productitemattributevalue", headToken));
-        JSONArray pricelevels = new JSONArray(LookupService.POST("lookup/entity/all", "{entityname: 'PRICELEVEL'}", headToken));
+        JSONArray productitemattributevalues = new JSONArray(ServiceCall.GET("productitemattributevalue", headToken, false));
+        JSONArray pricelevels = new JSONArray(ServiceCall.POST("lookup/entity/all", "{entityname: 'PRICELEVEL'}", headToken, true));
         List<ProductItemPriceLevel> productitempricelevel = productitempricelevelrepository.findActive();
 
         for (int i=0; i<productitems.length(); i++) {

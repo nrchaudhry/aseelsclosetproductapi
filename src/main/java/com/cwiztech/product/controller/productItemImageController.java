@@ -31,7 +31,7 @@ import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductItemImage;
 import com.cwiztech.product.model.ProductItemPriceLevel;
 import com.cwiztech.product.repository.productItemImageRepository;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -290,9 +290,9 @@ public class productItemImageController {
         productitem_IDS.add((int) productitem_ID);
     } else if (jsonObj.has("productitem") && !jsonObj.isNull("productitem") && jsonObj.getLong("productitem") != 0) {
         if (active == true) {
-            searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+            searchObject = new JSONArray(ServiceCall.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
         } else {
-            searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+            searchObject = new JSONArray(ServiceCall.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
         }
 
         productitem_ID = searchObject.length();
@@ -346,7 +346,7 @@ public class productItemImageController {
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
 			if (productitemimage != null && isWithDetail == true) {
-				JSONObject productitem = new JSONObject(ProductService.GET("productitem/"+productitemimage.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productitemimage.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				productitemimage.setPRODUCTITEM_DETAIL(productitem.toString());
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemimage));
 				productitemimageID = productitemimage.getPRODUCTITEMIMAGE_ID();
@@ -356,7 +356,7 @@ public class productItemImageController {
 					for (int i=0; i<productitemimages.size(); i++) {
 						productitemList.add(Integer.parseInt(productitemimages.get(i).getPRODUCTITEM_ID().toString()));
 					}
-					JSONArray productitemObject = new JSONArray(ProductService.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getREQUEST_OUTPUT()));
+					JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 					
 					for (int i=0; i<productitemimages.size(); i++) {
 						for (int j=0; j<productitemObject.length(); j++) {

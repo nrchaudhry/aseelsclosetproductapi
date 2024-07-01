@@ -30,9 +30,7 @@ import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductItemInventory;
 import com.cwiztech.product.repository.productItemInventoryRepository;
-import com.cwiztech.services.LocationService;
-import com.cwiztech.services.LookupService;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -411,9 +409,9 @@ public class productItemInventoryController {
 			productitem_IDS.add((int) productitem_ID);
 		} else if (jsonObj.has("productitem") && !jsonObj.isNull("productitem") && jsonObj.getLong("productitem") != 0) {
 			if (active == true) {
-				searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+				searchObject = new JSONArray(ServiceCall.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
 			} else {
-				searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+				searchObject = new JSONArray(ServiceCall.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
 			}
 
 			productitem_ID = searchObject.length();
@@ -427,9 +425,9 @@ public class productItemInventoryController {
 			location_IDS.add((int) location_ID);
 		} else if (jsonObj.has("location") && !jsonObj.isNull("location") && jsonObj.getLong("location") != 0) {
 			if (active == true) {
-				searchObject = new JSONArray(LocationService.POST("location/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+				searchObject = new JSONArray(ServiceCall.POST("location/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
 			} else {
-				searchObject = new JSONArray(LocationService.POST("location/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+				searchObject = new JSONArray(ServiceCall.POST("location/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
 			}
 
 			location_ID = searchObject.length();
@@ -483,15 +481,15 @@ public class productItemInventoryController {
 		} else {
 			if (productiteminventory != null && isWithDetail == true) {
 
-				JSONObject productitem = new JSONObject(ProductService.GET("productitem/"+productiteminventory.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productiteminventory.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				productiteminventory.setPRODUCTITEM_DETAIL(productitem.toString());
 
 				if(productiteminventory.getLOCATION_ID() != null) {
-					JSONObject location = new JSONObject(LookupService.GET("lookup/"+productiteminventory.getLOCATION_ID(), apiRequest.getREQUEST_OUTPUT()));
+					JSONObject location = new JSONObject(ServiceCall.GET("lookup/"+productiteminventory.getLOCATION_ID(), apiRequest.getREQUEST_OUTPUT(), true));
 					productiteminventory.setLOCATION_DETAIL(location.toString());
 				}
 				if(productiteminventory.getINVENTORYCLASSIFICTION_ID() != null) {
-					JSONObject inventoryclassification = new JSONObject(LookupService.GET("lookup/"+productiteminventory.getINVENTORYCLASSIFICTION_ID(), apiRequest.getREQUEST_OUTPUT()));
+					JSONObject inventoryclassification = new JSONObject(ServiceCall.GET("lookup/"+productiteminventory.getINVENTORYCLASSIFICTION_ID(), apiRequest.getREQUEST_OUTPUT(), true));
 					productiteminventory.setINVENTORYCLASSIFICTION_DETAIL(inventoryclassification.toString());
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventory));
@@ -508,8 +506,8 @@ public class productItemInventoryController {
 						if(productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() != null)
 							lookupList.add(Integer.parseInt(productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID().toString()));
 					}
-					JSONArray productitemObject = new JSONArray(ProductService.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getREQUEST_OUTPUT()));
-					JSONArray lookupObject = new JSONArray(LookupService.POST("lookup/ids", "{lookups: "+ lookupList+"}", apiRequest.getREQUEST_OUTPUT()));
+					JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+					JSONArray lookupObject = new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+ lookupList+"}", apiRequest.getREQUEST_OUTPUT(), true));
 
 					for (int i=0; i<productiteminventories.size(); i++) {
 						for (int j=0; j<productitemObject.length(); j++) {
@@ -567,7 +565,7 @@ public class productItemInventoryController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		long saleorderdetailstatusID1 = 0, saleorderdetailstatusID2 = 0;
-		JSONArray saleorderdetailstatus = new JSONArray(LookupService.POST("lookup/entity", "{entityname: 'SALEORDERDETAILSTATUS'}", headToken));
+		JSONArray saleorderdetailstatus = new JSONArray(ServiceCall.POST("lookup/entity", "{entityname: 'SALEORDERDETAILSTATUS'}", headToken, true));
 		for (int i=0; i<saleorderdetailstatus.length(); i++) {
 			if (saleorderdetailstatus.getJSONObject(i).getString("code").compareTo("F") == 0) {
 				saleorderdetailstatusID1 = saleorderdetailstatus.getJSONObject(i).getLong("id");
@@ -619,7 +617,7 @@ public class productItemInventoryController {
 
 		JSONArray jsonPAV = new JSONArray(data);
 		JSONArray rtnArray = new JSONArray();
-		JSONObject saleorderdetailstatusID = new JSONObject(LookupService.POST("lookup/bycode", "{entityname: 'SALEORDERDETAILSTATUS', code: 'B'}", headToken));
+		JSONObject saleorderdetailstatusID = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'SALEORDERDETAILSTATUS', code: 'B'}", headToken, true));
 
 		for (int i = 0; i < jsonPAV.length(); i++) {
 			JSONObject orderdetail = jsonPAV.getJSONObject(i);

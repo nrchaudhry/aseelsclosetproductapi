@@ -30,7 +30,7 @@ import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductCategory;
 import com.cwiztech.product.repository.productCategoryRepository;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -336,9 +336,9 @@ public class productCategoryController {
             productcategoryparent_IDS.add((int) productcategoryparent_ID);
         } else if (jsonObj.has("productcategoryparent") && !jsonObj.isNull("productcategoryparent") && jsonObj.getLong("productcategoryparent") != 0) {
             if (active == true) {
-                searchObject = new JSONArray(ProductService.POST("productcategoryparent/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("productcategoryparent/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
             } else {
-                searchObject = new JSONArray(ProductService.POST("productcategoryparent/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("productcategoryparent/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
             }
 
             productcategoryparent_ID = searchObject.length();
@@ -393,7 +393,7 @@ public class productCategoryController {
 		} else {
 			if (productcategory != null) {
 //				if(productcategory.getPRODUCTCATEGORYPARENT_ID() != null) {
-//					JSONObject productcategoryp = new JSONObject(ProductService.GET("productcategory/"+productcategory.getPRODUCTCATEGORYPARENT_ID(), apiRequest.getREQUEST_OUTPUT()));
+//					JSONObject productcategoryp = new JSONObject(ServiceCall.GET("productcategory/"+productcategory.getPRODUCTCATEGORYPARENT_ID(), apiRequest.getREQUEST_OUTPUT()));
 //					productcategory.setPRODUCTCATEGORYPARENT_DETAIL(productcategoryp.toString());
 //				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productcategory));
@@ -404,7 +404,7 @@ public class productCategoryController {
 //					for (int i=0; i<productcategories.size(); i++) {
 //						productcategorypList.add(Integer.parseInt(productcategories.get(i).getPRODUCTCATEGORYPARENT_ID().toString()));
 //					}
-//					JSONArray productcategorypObject = new JSONArray(ProductService.POST("productcategory/ids", "{productcategories: "+productcategorypList+"}", apiRequest.getREQUEST_OUTPUT()));
+//					JSONArray productcategorypObject = new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategorypList+"}", apiRequest.getREQUEST_OUTPUT()));
 //
 //					for (int i=0; i<productcategories.size(); i++) {
 //						for (int j=0; j<productcategorypObject.length(); j++) {

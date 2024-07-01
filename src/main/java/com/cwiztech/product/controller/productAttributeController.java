@@ -31,8 +31,7 @@ import com.cwiztech.datalogs.repository.tableDataLogRepository;
 
 import com.cwiztech.product.model.ProductAttribute;
 import com.cwiztech.product.repository.productAttributeRepository;
-import com.cwiztech.services.ProductService;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -349,9 +348,9 @@ public class productAttributeController {
            attributecategory_IDS.add((int) attributecategory_ID);
        } else if (jsonObj.has("attributecategory") && !jsonObj.isNull("attributecategory") && jsonObj.getLong("attributecategory") != 0) {
            if (active == true) {
-               searchObject = new JSONArray(ProductService.POST("attributecategory/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("attributecategory/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
            } else {
-               searchObject = new JSONArray(ProductService.POST("attributecategory/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("attributecategory/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
            }
 
            attributecategory_ID = searchObject.length();
@@ -365,9 +364,9 @@ public class productAttributeController {
            productcategory_IDS.add((int) productcategory_ID);
        } else if (jsonObj.has("productcategory") && !jsonObj.isNull("productcategory") && jsonObj.getLong("productcategory") != 0) {
            if (active == true) {
-               searchObject = new JSONArray(ProductService.POST("productcategory/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("productcategory/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
            } else {
-               searchObject = new JSONArray(ProductService.POST("productcategory/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("productcategory/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
            }
 
            productcategory_ID = searchObject.length();
@@ -381,9 +380,9 @@ public class productAttributeController {
            attribute_IDS.add((int) attribute_ID);
        } else if (jsonObj.has("attribute") && !jsonObj.isNull("attribute") && jsonObj.getLong("attribute") != 0) {
            if (active == true) {
-               searchObject = new JSONArray(ProductService.POST("attribute/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("attribute/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
            } else {
-               searchObject = new JSONArray(ProductService.POST("attribute/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("attribute/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
            }
 
            attribute_ID = searchObject.length();
@@ -397,9 +396,9 @@ public class productAttributeController {
            product_IDS.add((int) product_ID);
        } else if (jsonObj.has("product") && !jsonObj.isNull("product") && jsonObj.getLong("product") != 0) {
            if (active == true) {
-               searchObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
            } else {
-               searchObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
            }
 
            product_ID = searchObject.length();
@@ -417,8 +416,8 @@ public class productAttributeController {
 //			JSONArray productattributewithvalue = new JSONArray();
 //			for (int i=0; i<productattribute.size(); i++) {
 //				JSONObject obj = new JSONObject();
-//				JSONObject jsonproduct = new JSONObject(ProductService.GET("product/"+productattribute.get(i).getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT()));
-//				JSONObject jsonproductcategory = new JSONObject(ProductService.GET("productcategory/"+productattribute.get(i).getPRODUCTCATEGORY_ID(), apiRequest.getREQUEST_OUTPUT()));
+//				JSONObject jsonproduct = new JSONObject(ServiceCall.GET("product/"+productattribute.get(i).getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT()));
+//				JSONObject jsonproductcategory = new JSONObject(ServiceCall.GET("productcategory/"+productattribute.get(i).getPRODUCTCATEGORY_ID(), apiRequest.getREQUEST_OUTPUT()));
 //				obj.put("productattribute_ID", productattribute.get(i).getPRODUCTATTRIBUTE_ID());
 //				obj.put("product_ID", productattribute.get(i).getPRODUCT_ID());
 //				obj.put("product_NAME", jsonproduct.getString("product_NAME").replace("\"", ""));
@@ -491,18 +490,18 @@ public class productAttributeController {
 		} else {
 			if (productattribute != null && isWithDetail == true) {
 				if (productattribute.getPRODUCT_ID() != null) {
-					JSONObject product = new JSONObject(ProductService.GET("product/"+productattribute.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT()));
+					JSONObject product = new JSONObject(ServiceCall.GET("product/"+productattribute.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 					productattribute.setPRODUCT_DETAIL(product.toString());
 				}
 
 				if (productattribute.getPRODUCTCATEGORY_ID() != null) {
-					JSONObject productcategory = new JSONObject(ProductService.GET("productcategory/"+productattribute.getPRODUCTCATEGORY_ID(), apiRequest.getREQUEST_OUTPUT()));
+					JSONObject productcategory = new JSONObject(ServiceCall.GET("productcategory/"+productattribute.getPRODUCTCATEGORY_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 					productattribute.setPRODUCTCATEGORY_DETAIL(productcategory.toString());
 				}
-				JSONObject attribute = new JSONObject(ProductService.GET("attribute/"+productattribute.getATTRIBUTE_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject attribute = new JSONObject(ServiceCall.GET("attribute/"+productattribute.getATTRIBUTE_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				productattribute.setATTRIBUTE_DETAIL(attribute.toString());
 				
-				JSONObject attributecategory = new JSONObject(ProductService.GET("attributecategory/"+productattribute.getATTRIBUTECATEGORY_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject attributecategory = new JSONObject(ServiceCall.GET("attributecategory/"+productattribute.getATTRIBUTECATEGORY_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				productattribute.setATTRIBUTECATEGORY_DETAIL(attributecategory.toString());
 				
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattribute));
@@ -523,10 +522,10 @@ public class productAttributeController {
 						if (productattributes.get(i).getATTRIBUTECATEGORY_ID() != null)
 						    attributecategoryList.add(Integer.parseInt(productattributes.get(i).getATTRIBUTECATEGORY_ID().toString()));
 					}
-					JSONArray productObject = new JSONArray(ProductService.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT()));
-					JSONArray productcategoryObject = new JSONArray(ProductService.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getREQUEST_OUTPUT()));
-					JSONArray attributeObject = new JSONArray(ProductService.POST("attribute/ids", "{attributes: "+attributeList+"}", apiRequest.getREQUEST_OUTPUT()));
-					JSONArray attributecategoryObject = new JSONArray(ProductService.POST("attributecategory/ids", "{attributecategories: "+attributecategoryList+"}", apiRequest.getREQUEST_OUTPUT()));
+					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+					JSONArray productcategoryObject = new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+					JSONArray attributeObject = new JSONArray(ServiceCall.POST("attribute/ids", "{attributes: "+attributeList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+					JSONArray attributecategoryObject = new JSONArray(ServiceCall.POST("attributecategory/ids", "{attributecategories: "+attributecategoryList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 					
 					for (int i=0; i<productattributes.size(); i++) {
 						for (int j=0; j<productObject.length(); j++) {

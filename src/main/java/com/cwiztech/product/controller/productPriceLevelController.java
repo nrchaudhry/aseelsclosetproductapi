@@ -30,8 +30,7 @@ import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductPriceLevel;
 import com.cwiztech.product.repository.productPriceLevelRepository;
-import com.cwiztech.services.LookupService;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -331,9 +330,9 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 	            currency_IDS.add((int) currency_ID);
 	        } else if (jsonObj.has("currency") && !jsonObj.isNull("currency") && jsonObj.getLong("currency") != 0) {
 	            if (active == true) {
-	                searchObject = new JSONArray(ProductService.POST("currency/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+	                searchObject = new JSONArray(ServiceCall.POST("currency/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
 	            } else {
-	                searchObject = new JSONArray(ProductService.POST("currency/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+	                searchObject = new JSONArray(ServiceCall.POST("currency/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
 	            }
 
 	            currency_ID = searchObject.length();
@@ -347,9 +346,9 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 	            product_IDS.add((int) product_ID);
 	        } else if (jsonObj.has("product") && !jsonObj.isNull("product") && jsonObj.getLong("product") != 0) {
 	            if (active == true) {
-	                searchObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+	                searchObject = new JSONArray(ServiceCall.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
 	            } else {
-	                searchObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+	                searchObject = new JSONArray(ServiceCall.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
 	            }
 
 	            product_ID = searchObject.length();
@@ -362,9 +361,9 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 	            pricelevel_IDS.add((int) pricelevel_ID);
 	        } else if (jsonObj.has("pricelevel") && !jsonObj.isNull("pricelevel") && jsonObj.getLong("pricelevel") != 0) {
 	            if (active == true) {
-	                searchObject = new JSONArray(ProductService.POST("pricelevel/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+	                searchObject = new JSONArray(ServiceCall.POST("pricelevel/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
 	            } else {
-	                searchObject = new JSONArray(ProductService.POST("pricelevel/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+	                searchObject = new JSONArray(ServiceCall.POST("pricelevel/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
 	            }
 
 	            pricelevel_ID = searchObject.length();
@@ -417,7 +416,7 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
 			if (productpricelevel != null && isWithDetail == true) {
-				JSONObject product = new JSONObject(ProductService.GET("product/"+productpricelevel.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject product = new JSONObject(ServiceCall.GET("product/"+productpricelevel.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				productpricelevel.setPRODUCT_DETAIL(product.toString());
 				
 				List<Integer> lookupList = new ArrayList<Integer>();
@@ -426,7 +425,7 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 				if(productpricelevel.getPRICELEVEL_ID() != null)
 					lookupList.add(Integer.parseInt(productpricelevel.getPRICELEVEL_ID().toString()));
 	
-				JSONArray lookupObject = new JSONArray(LookupService.POST("lookup/ids", "{lookups: "+lookupList+"}", apiRequest.getREQUEST_OUTPUT()));	
+				JSONArray lookupObject = new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+lookupList+"}", apiRequest.getREQUEST_OUTPUT(), true));	
 				for (int j=0; j<lookupObject.length(); j++) {
 					JSONObject lookup = lookupObject.getJSONObject(j);
 					if(productpricelevel.getCURRENCY_ID() != null && productpricelevel.getCURRENCY_ID() == lookup.getLong("id") ) {
@@ -450,8 +449,8 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 						if(productpricelevels.get(i).getCURRENCY_ID() != null)
 							lookupList.add(Integer.parseInt(productpricelevels.get(i).getCURRENCY_ID().toString()));
 					}
-					JSONArray productObject = new JSONArray(ProductService.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT()));
-					JSONArray lookupObject = new JSONArray(LookupService.POST("lookup/ids", "{lookups: "+lookupList+"}", apiRequest.getREQUEST_OUTPUT()));	
+					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+					JSONArray lookupObject = new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+lookupList+"}", apiRequest.getREQUEST_OUTPUT(), true));	
 
 					for (int i=0; i<productpricelevels.size(); i++) {
 						for (int j=0; j<productObject.length(); j++) {

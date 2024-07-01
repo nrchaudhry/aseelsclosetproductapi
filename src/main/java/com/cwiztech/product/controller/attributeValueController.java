@@ -30,7 +30,7 @@ import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.AttributeValue;
 import com.cwiztech.product.repository.attributeValueRepository;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.cwiztech.token.AccessToken;
@@ -316,9 +316,9 @@ public class attributeValueController {
            attribute_IDS.add((int) attribute_ID);
        } else if (jsonObj.has("attribute") && !jsonObj.isNull("attribute") && jsonObj.getLong("attribute") != 0) {
            if (active == true) {
-               searchObject = new JSONArray(ProductService.POST("attribute/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("attribute/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
            } else {
-               searchObject = new JSONArray(ProductService.POST("attribute/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("attribute/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
            }
 
            attribute_ID = searchObject.length();
@@ -389,7 +389,7 @@ public class attributeValueController {
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
 			if (attributevalue != null && isWithDetail == true) {
-				JSONObject attribute = new JSONObject(ProductService.GET("attribute/"+attributevalue.getATTRIBUTE_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject attribute = new JSONObject(ServiceCall.GET("attribute/"+attributevalue.getATTRIBUTE_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				attributevalue.setATTRIBUTE_DETAIL(attribute.toString());
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(attributevalue));
 				attributevalueID = attributevalue.getATTRIBUTEVALUE_ID();
@@ -399,7 +399,7 @@ public class attributeValueController {
 					for (int i=0; i<attributevalues.size(); i++) {
 						attributeList.add(Integer.parseInt(attributevalues.get(i).getATTRIBUTE_ID().toString()));
 					}
-					JSONArray attributeObject = new JSONArray(ProductService.POST("attribute/ids", "{attributes: "+attributeList+"}", apiRequest.getREQUEST_OUTPUT()));
+					JSONArray attributeObject = new JSONArray(ServiceCall.POST("attribute/ids", "{attributes: "+attributeList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 					
 					for (int i=0; i<attributevalues.size(); i++) {
 						for (int j=0; j<attributeObject.length(); j++) {

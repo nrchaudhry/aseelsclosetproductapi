@@ -28,7 +28,7 @@ import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.Product;
 import com.cwiztech.product.repository.productRepository;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.cwiztech.services.SageService;
 import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -72,12 +72,12 @@ public class productSageController {
     		objProductDetail.put("sales_ledger_account_id", "819fd52d842f11ed84fa0252b90cda0d");
     		objProductDetail.put("purchase_ledger_account_id", "81a0cf2c842f11ed84fa0252b90cda0d");
 
-    		JSONArray productitems = new JSONArray(ProductService.POST("productitem/advancedsearch", "{product_ID: "+products.get(i).getPRODUCT_ID()+"}", apiRequest.getREQUEST_OUTPUT()));
+    		JSONArray productitems = new JSONArray(ServiceCall.POST("productitem/advancedsearch", "{product_ID: "+products.get(i).getPRODUCT_ID()+"}", apiRequest.getREQUEST_OUTPUT(), false));
 	        if (productitems.length()>0) {
 	    		List<Object> salesprices = new ArrayList<Object>();
 
 	    		JSONObject productitem = productitems.getJSONObject(0);
-				JSONArray productitempricelevels = new JSONArray(ProductService.POST("productitempricelevel/advancedsearch", "{productitem_ID: "+productitem.getLong("productitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
+				JSONArray productitempricelevels = new JSONArray(ServiceCall.POST("productitempricelevel/advancedsearch", "{productitem_ID: "+productitem.getLong("productitem_ID")+"}", apiRequest.getREQUEST_OUTPUT(), false));
 		        for (int j=0; j<productitempricelevels.length(); j++) {
 		    		JSONObject productitempricelevel = new JSONObject();	
 		    		productitempricelevel.put("product_sales_price_type_id", "264fdb5bd99e45c389e5e322f87d6780");
@@ -89,11 +89,11 @@ public class productSageController {
 		        objProductDetail.put("sales_prices", salesprices);
 				
 		        
-//				JSONArray productiteminventories = new JSONArray(ProductService.POST("productiteminventory/advancedsearch", "{productitem_ID: "+productitem.getLong("productitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
+//				JSONArray productiteminventories = new JSONArray(ServiceCall.POST("productiteminventory/advancedsearch", "{productitem_ID: "+productitem.getLong("productitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
 //		        for (int j=0; j<productitempricelevels.length(); j++) {
 //		        }
 
-				JSONArray productitemattributevalues = new JSONArray(ProductService.POST("productitemattributevalue/advancedsearch", "{productitem_ID: "+productitem.getLong("productitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
+				JSONArray productitemattributevalues = new JSONArray(ServiceCall.POST("productitemattributevalue/advancedsearch", "{productitem_ID: "+productitem.getLong("productitem_ID")+"}", apiRequest.getREQUEST_OUTPUT(), false));
 		        for (int j=0; j<productitemattributevalues.length(); j++) {
 		        	JSONObject productitemattributevalue = productitemattributevalues.getJSONObject(j);
 					JSONObject jsonproductattribute = new JSONObject(productitemattributevalue.getString("productattribute_DETAIL"));
@@ -118,12 +118,12 @@ public class productSageController {
 
 
 			objProduct.put("stock_item", objProductDetail);
-			JSONObject response = new JSONObject(SageService.POST("stock_items", objProduct.toString(), headToken));
+			JSONObject response = new JSONObject(SageService.POST("stock_items", objProduct.toString(), headToken, apiRequest.getDATABASETABLE_ID()));
 			
 			JSONObject product = new JSONObject();
 			product.put("product_ID", products.get(i).getPRODUCT_ID());
 			product.put("sage_ID", response.getString("id"));
-			product = new JSONObject(ProductService.POST("product", product.toString(), apiRequest.getREQUEST_OUTPUT()));
+			product = new JSONObject(ServiceCall.POST("product", product.toString(), apiRequest.getREQUEST_OUTPUT(), false));
 
 			objProducts.put(objProduct);
 			
@@ -168,7 +168,7 @@ public class productSageController {
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
 			if (product != null) {
-				JSONObject productcategory = new JSONObject(ProductService.GET("productcategory/"+product.getPRODUCTCATEGORY_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject productcategory = new JSONObject(ServiceCall.GET("productcategory/"+product.getPRODUCTCATEGORY_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				product.setPRODUCTCATEGORY_DETAIL(productcategory.toString());
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(product));
 				productID = product.getPRODUCT_ID();
@@ -178,7 +178,7 @@ public class productSageController {
 					for (int i=0; i<products.size(); i++) {
 						productcategoryList.add(Integer.parseInt(products.get(i).getPRODUCTCATEGORY_ID().toString()));
 					}
-					JSONArray productcategoryObject = new JSONArray(ProductService.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getREQUEST_OUTPUT()));
+					JSONArray productcategoryObject = new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 					
 					for (int i=0; i<products.size(); i++) {
 						for (int j=0; j<productcategoryObject.length(); j++) {

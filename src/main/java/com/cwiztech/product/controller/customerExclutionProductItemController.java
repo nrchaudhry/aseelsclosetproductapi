@@ -25,8 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cwiztech.datalogs.repository.apiRequestDataLogRepository;
 import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
-import com.cwiztech.services.CustomerService;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.cwiztech.datalogs.model.APIRequestDataLog;
@@ -319,9 +318,9 @@ public class customerExclutionProductItemController {
             customer_IDS.add((int) customer_ID);
         } else if (jsonObj.has("customer") && !jsonObj.isNull("customer") && jsonObj.getLong("customer") != 0) {
             if (active == true) {
-                searchObject = new JSONArray(ProductService.POST("customer/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("customer/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
             } else {
-                searchObject = new JSONArray(ProductService.POST("customer/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("customer/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
             }
 
             customer_ID = searchObject.length();
@@ -335,9 +334,9 @@ public class customerExclutionProductItemController {
             productitem_IDS.add((int) productitem_ID);
         } else if (jsonObj.has("productitem") && !jsonObj.isNull("productitem") && jsonObj.getLong("productitem") != 0) {
             if (active == true) {
-                searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
             } else {
-                searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
             }
 
             productitem_ID = searchObject.length();
@@ -390,9 +389,9 @@ public class customerExclutionProductItemController {
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
 			if (customerexclutionproductitem != null && isWithDetail == true) {
-				JSONObject customer = new JSONObject(CustomerService.GET("customer/"+customerexclutionproductitem.getCUSTOMER_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject customer = new JSONObject(ServiceCall.GET("customer/"+customerexclutionproductitem.getCUSTOMER_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				customerexclutionproductitem.setCUSTOMER_DETAIL(customer.toString());
-				JSONObject productitem = new JSONObject(ProductService.GET("productitem/"+customerexclutionproductitem.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+customerexclutionproductitem.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				customerexclutionproductitem.setPRODUCTITEM_DETAIL(productitem.toString());
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(customerexclutionproductitem));
 				customerexclutionproductitemID = customerexclutionproductitem.getCUSTOMEREXCLUSIONPRODUCTITEM_ID();
@@ -402,13 +401,13 @@ public class customerExclutionProductItemController {
 					for (int i=0; i<customerexclutionproductitems.size(); i++) {
 						customerList.add(Integer.parseInt(customerexclutionproductitems.get(i).getCUSTOMER_ID().toString()));
 					}
-					JSONArray logisticsObject = new JSONArray(CustomerService.POST("customer/ids", "{customers: "+customerList+"}", apiRequest.getREQUEST_OUTPUT()));
+					JSONArray logisticsObject = new JSONArray(ServiceCall.POST("customer/ids", "{customers: "+customerList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 					
 					List<Integer> productitemList = new ArrayList<Integer>();
 					for (int i=0; i<customerexclutionproductitems.size(); i++) {
 						productitemList.add(Integer.parseInt(customerexclutionproductitems.get(i).getPRODUCTITEM_ID().toString()));
 					}
-					JSONArray productitemObject = new JSONArray(ProductService.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getREQUEST_OUTPUT()));
+					JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 					
 					for (int i=0; i<customerexclutionproductitems.size(); i++) {
 						for (int j=0; j<logisticsObject.length(); j++) {

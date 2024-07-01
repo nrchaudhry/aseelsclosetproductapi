@@ -30,8 +30,7 @@ import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductItemPriceChange;
 import com.cwiztech.product.repository.productItemPriceChangeRepository;
-import com.cwiztech.services.LookupService;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.cwiztech.token.AccessToken;
@@ -326,9 +325,9 @@ public class productItemPriceChangeController {
             currency_IDS.add((int) currency_ID);
         } else if (jsonObj.has("currency") && !jsonObj.isNull("currency") && jsonObj.getLong("currency") != 0) {
             if (active == true) {
-                searchObject = new JSONArray(ProductService.POST("currency/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("currency/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, true));
             } else {
-                searchObject = new JSONArray(ProductService.POST("currency/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("currency/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, true));
             }
 
             currency_ID = searchObject.length();
@@ -342,9 +341,9 @@ public class productItemPriceChangeController {
             productitem_IDS.add((int) productitem_ID);
         } else if (jsonObj.has("productitem") && !jsonObj.isNull("productitem") && jsonObj.getLong("productitem") != 0) {
             if (active == true) {
-                searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, true));
             } else {
-                searchObject = new JSONArray(ProductService.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, true));
             }
 
             productitem_ID = searchObject.length();
@@ -398,11 +397,11 @@ public class productItemPriceChangeController {
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
 			if (productitempricechange != null && isWithDetail == true) {
-				JSONObject productitem = new JSONObject(ProductService.GET("productitem/"+productitempricechange.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productitempricechange.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT(), true));
 				productitempricechange.setPRODUCTITEM_DETAIL(productitem.toString());
 				
 				if(productitempricechange.getCURRENCY_ID() != null) {
-				JSONObject currency = new JSONObject(LookupService.GET("lookup/"+productitempricechange.getCURRENCY_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject currency = new JSONObject(ServiceCall.GET("lookup/"+productitempricechange.getCURRENCY_ID(), apiRequest.getREQUEST_OUTPUT(), true));
 				productitempricechange.setCURRENCY_DETAIL(currency.toString());
 			}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitempricechange));
@@ -417,8 +416,8 @@ public class productItemPriceChangeController {
 						if(productitempricechanges.get(i).getCURRENCY_ID() != null)
 						   currencyList.add(Integer.parseInt(productitempricechanges.get(i).getCURRENCY_ID().toString()));
 					}
-					JSONArray productitemObject = new JSONArray(ProductService.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getREQUEST_OUTPUT()));
-					JSONArray currencyObject = new JSONArray(LookupService.POST("lookup/ids", "{lookups: "+currencyList+"}", apiRequest.getREQUEST_OUTPUT()));		
+					JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getREQUEST_OUTPUT(), true));
+					JSONArray currencyObject = new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+currencyList+"}", apiRequest.getREQUEST_OUTPUT(), true));		
 					for (int i=0; i<productitempricechanges.size(); i++) {
 						for (int j=0; j<productitemObject.length(); j++) {
 							JSONObject productitem = productitemObject.getJSONObject(j);

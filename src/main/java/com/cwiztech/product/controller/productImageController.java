@@ -30,8 +30,7 @@ import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductImage;
 import com.cwiztech.product.repository.productImageRepository;
-import com.cwiztech.services.ProductService;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -290,9 +289,9 @@ public class productImageController {
            product_IDS.add((int) product_ID);
        } else if (jsonObj.has("product") && !jsonObj.isNull("product") && jsonObj.getLong("product") != 0) {
            if (active == true) {
-               searchObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
            } else {
-               searchObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
            }
 
            product_ID = searchObject.length();
@@ -345,7 +344,7 @@ public class productImageController {
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
 			if (productimage != null && isWithDetail == true) {
-				JSONObject product = new JSONObject(ProductService.GET("product/"+productimage.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject product = new JSONObject(ServiceCall.GET("product/"+productimage.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				productimage.setPRODUCT_DETAIL(product.toString());
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productimage));
 				productimageID = productimage.getPRODUCTIMAGE_ID();
@@ -355,7 +354,7 @@ public class productImageController {
 					for (int i=0; i<productimages.size(); i++) {
 						productList.add(Integer.parseInt(productimages.get(i).getPRODUCT_ID().toString()));
 					}
-					JSONArray productObject = new JSONArray(ProductService.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT()));
+					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 					
 					for (int i=0; i<productimages.size(); i++) {
 						for (int j=0; j<productObject.length(); j++) {

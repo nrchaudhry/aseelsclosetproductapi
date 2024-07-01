@@ -28,7 +28,7 @@ import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductItemInventory;
 import com.cwiztech.product.repository.productItemInventoryRepository;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.cwiztech.services.SageService;
 import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -72,12 +72,12 @@ public class productItemInventorySageController {
 //    		objProductItemInventoryDetail.put("sales_ledger_account_id", "819fd52d842f11ed84fa0252b90cda0d");
 //    		objProductItemInventoryDetail.put("purchase_ledger_account_id", "81a0cf2c842f11ed84fa0252b90cda0d");
 //
-//    		JSONArray productiteminventoryitems = new JSONArray(ProductService.POST("productiteminventoryitem/advancedsearch", "{productiteminventory_ID: "+productiteminventories.get(i).getPRODUCT_ID()+"}", apiRequest.getREQUEST_OUTPUT()));
+//    		JSONArray productiteminventoryitems = new JSONArray(ServiceCall.POST("productiteminventoryitem/advancedsearch", "{productiteminventory_ID: "+productiteminventories.get(i).getPRODUCT_ID()+"}", apiRequest.getREQUEST_OUTPUT()));
 //	        if (productiteminventoryitems.length()>0) {
 //	    		List<Object> salesprices = new ArrayList<Object>();
 //
 //	    		JSONObject productiteminventoryitem = productiteminventoryitems.getJSONObject(0);
-//				JSONArray productiteminventoryitempricelevels = new JSONArray(ProductService.POST("productiteminventoryitempricelevel/advancedsearch", "{productiteminventoryitem_ID: "+productiteminventoryitem.getLong("productiteminventoryitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
+//				JSONArray productiteminventoryitempricelevels = new JSONArray(ServiceCall.POST("productiteminventoryitempricelevel/advancedsearch", "{productiteminventoryitem_ID: "+productiteminventoryitem.getLong("productiteminventoryitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
 //		        for (int j=0; j<productiteminventoryitempricelevels.length(); j++) {
 //		    		JSONObject productiteminventoryitempricelevel = new JSONObject();	
 //		    		productiteminventoryitempricelevel.put("productiteminventory_sales_price_type_id", "264fdb5bd99e45c389e5e322f87d6780");
@@ -89,11 +89,11 @@ public class productItemInventorySageController {
 //		        objProductItemInventoryDetail.put("sales_prices", salesprices);
 //				
 //		        
-////				JSONArray productiteminventoryiteminventories = new JSONArray(ProductService.POST("productiteminventoryiteminventory/advancedsearch", "{productiteminventoryitem_ID: "+productiteminventoryitem.getLong("productiteminventoryitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
+////				JSONArray productiteminventoryiteminventories = new JSONArray(ServiceCall.POST("productiteminventoryiteminventory/advancedsearch", "{productiteminventoryitem_ID: "+productiteminventoryitem.getLong("productiteminventoryitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
 ////		        for (int j=0; j<productiteminventoryitempricelevels.length(); j++) {
 ////		        }
 //
-//				JSONArray productiteminventoryitemattributevalues = new JSONArray(ProductService.POST("productiteminventoryitemattributevalue/advancedsearch", "{productiteminventoryitem_ID: "+productiteminventoryitem.getLong("productiteminventoryitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
+//				JSONArray productiteminventoryitemattributevalues = new JSONArray(ServiceCall.POST("productiteminventoryitemattributevalue/advancedsearch", "{productiteminventoryitem_ID: "+productiteminventoryitem.getLong("productiteminventoryitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
 //		        for (int j=0; j<productiteminventoryitemattributevalues.length(); j++) {
 //		        	JSONObject productiteminventoryitemattributevalue = productiteminventoryitemattributevalues.getJSONObject(j);
 //					JSONObject jsonproductiteminventoryattribute = new JSONObject(productiteminventoryitemattributevalue.getString("productiteminventoryattribute_DETAIL"));
@@ -123,7 +123,7 @@ public class productItemInventorySageController {
 //			JSONObject productiteminventory = new JSONObject();
 //			productiteminventory.put("productiteminventory_ID", productiteminventories.get(i).getPRODUCT_ID());
 //			productiteminventory.put("sage_ID", response.getString("id"));
-//			productiteminventory = new JSONObject(ProductService.POST("productiteminventory", productiteminventory.toString(), apiRequest.getREQUEST_OUTPUT()));
+//			productiteminventory = new JSONObject(ServiceCall.POST("productiteminventory", productiteminventory.toString(), apiRequest.getREQUEST_OUTPUT()));
 //
 //			objProductItemInventorys.put(objProductItemInventory);
 //			
@@ -152,12 +152,12 @@ public class productItemInventorySageController {
 //            objProductItemInventoryDetail.put("sales_ledger_account_id", "819fd52d842f11ed84fa0252b90cda0d");
 //            objProductItemInventoryDetail.put("purchase_ledger_account_id", "81a0cf2c842f11ed84fa0252b90cda0d");
 //
-//            JSONArray productiteminventoryitems = new JSONArray(ProductService.POST("productiteminventoryitem/advancedsearch", "{productiteminventory_ID: "+productiteminventories.get(i).getPRODUCT_ID()+"}", apiRequest.getREQUEST_OUTPUT()));
+//            JSONArray productiteminventoryitems = new JSONArray(ServiceCall.POST("productiteminventoryitem/advancedsearch", "{productiteminventory_ID: "+productiteminventories.get(i).getPRODUCT_ID()+"}", apiRequest.getREQUEST_OUTPUT()));
 //            if (productiteminventoryitems.length()>0) {
 //                List<Object> salesprices = new ArrayList<Object>();
 //
 //                JSONObject productiteminventoryitem = productiteminventoryitems.getJSONObject(0);
-//                JSONArray productiteminventoryitempricelevels = new JSONArray(ProductService.POST("productiteminventoryitempricelevel/advancedsearch", "{productiteminventoryitem_ID: "+productiteminventoryitem.getLong("productiteminventoryitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
+//                JSONArray productiteminventoryitempricelevels = new JSONArray(ServiceCall.POST("productiteminventoryitempricelevel/advancedsearch", "{productiteminventoryitem_ID: "+productiteminventoryitem.getLong("productiteminventoryitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
 //                for (int j=0; j<productiteminventoryitempricelevels.length(); j++) {
 //                    JSONObject productiteminventoryitempricelevel = new JSONObject();    
 //                    productiteminventoryitempricelevel.put("productiteminventory_sales_price_type_id", "264fdb5bd99e45c389e5e322f87d6780");
@@ -169,11 +169,11 @@ public class productItemInventorySageController {
 //                objProductItemInventoryDetail.put("sales_prices", salesprices);
 //                
 //                
-////              JSONArray productiteminventoryiteminventories = new JSONArray(ProductService.POST("productiteminventoryiteminventory/advancedsearch", "{productiteminventoryitem_ID: "+productiteminventoryitem.getLong("productiteminventoryitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
+////              JSONArray productiteminventoryiteminventories = new JSONArray(ServiceCall.POST("productiteminventoryiteminventory/advancedsearch", "{productiteminventoryitem_ID: "+productiteminventoryitem.getLong("productiteminventoryitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
 ////              for (int j=0; j<productiteminventoryitempricelevels.length(); j++) {
 ////              }
 //
-//                JSONArray productiteminventoryitemattributevalues = new JSONArray(ProductService.POST("productiteminventoryitemattributevalue/advancedsearch", "{productiteminventoryitem_ID: "+productiteminventoryitem.getLong("productiteminventoryitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
+//                JSONArray productiteminventoryitemattributevalues = new JSONArray(ServiceCall.POST("productiteminventoryitemattributevalue/advancedsearch", "{productiteminventoryitem_ID: "+productiteminventoryitem.getLong("productiteminventoryitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
 //                for (int j=0; j<productiteminventoryitemattributevalues.length(); j++) {
 //                    JSONObject productiteminventoryitemattributevalue = productiteminventoryitemattributevalues.getJSONObject(j);
 //                    JSONObject jsonproductiteminventoryattribute = new JSONObject(productiteminventoryitemattributevalue.getString("productiteminventoryattribute_DETAIL"));
@@ -203,7 +203,7 @@ public class productItemInventorySageController {
 //            JSONObject productiteminventory = new JSONObject();
 //            productiteminventory.put("productiteminventory_ID", productiteminventories.get(i).getPRODUCT_ID());
 //            productiteminventory.put("sage_ID", response.getString("id"));
-//            productiteminventory = new JSONObject(ProductService.POST("productiteminventory", productiteminventory.toString(), apiRequest.getREQUEST_OUTPUT()));
+//            productiteminventory = new JSONObject(ServiceCall.POST("productiteminventory", productiteminventory.toString(), apiRequest.getREQUEST_OUTPUT()));
 //
 //            objProductItemInventorys.put(objProductItemInventory);
 //            
@@ -248,7 +248,7 @@ public class productItemInventorySageController {
 //			apirequestdatalogRepository.saveAndFlush(apiRequest);
 //		} else {
 //			if (productiteminventory != null) {
-//				JSONObject productiteminventorycategory = new JSONObject(ProductService.GET("productiteminventorycategory/"+productiteminventory.getPRODUCTCATEGORY_ID(), apiRequest.getREQUEST_OUTPUT()));
+//				JSONObject productiteminventorycategory = new JSONObject(ServiceCall.GET("productiteminventorycategory/"+productiteminventory.getPRODUCTCATEGORY_ID(), apiRequest.getREQUEST_OUTPUT()));
 //				productiteminventory.setPRODUCTCATEGORY_DETAIL(productiteminventorycategory.toString());
 //				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventory));
 //				productiteminventoryID = productiteminventory.getPRODUCT_ID();
@@ -258,7 +258,7 @@ public class productItemInventorySageController {
 //					for (int i=0; i<productiteminventories.size(); i++) {
 //						productiteminventorycategoryList.add(Integer.parseInt(productiteminventories.get(i).getPRODUCTCATEGORY_ID().toString()));
 //					}
-//					JSONArray productiteminventorycategoryObject = new JSONArray(ProductService.POST("productiteminventorycategory/ids", "{productiteminventorycategories: "+productiteminventorycategoryList+"}", apiRequest.getREQUEST_OUTPUT()));
+//					JSONArray productiteminventorycategoryObject = new JSONArray(ServiceCall.POST("productiteminventorycategory/ids", "{productiteminventorycategories: "+productiteminventorycategoryList+"}", apiRequest.getREQUEST_OUTPUT()));
 //					
 //					for (int i=0; i<productiteminventories.size(); i++) {
 //						for (int j=0; j<productiteminventorycategoryObject.length(); j++) {

@@ -32,7 +32,7 @@ import com.cwiztech.datalogs.repository.tableDataLogRepository;
 
 import com.cwiztech.product.model.AttributeCategory;
 import com.cwiztech.product.repository.attributeCategoryRepository;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.cwiztech.token.AccessToken;
@@ -323,9 +323,9 @@ public class attributeCategoryController {
             attributecategoryparent_IDS.add((int) attributecategoryparent_ID);
         } else if (jsonObj.has("attributecategoryparent") && !jsonObj.isNull("attributecategoryparent") && jsonObj.getLong("attributecategoryparent") != 0) {
             if (active == true) {
-                searchObject = new JSONArray(ProductService.POST("attributecategoryparent/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("attributecategoryparent/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
             } else {
-                searchObject = new JSONArray(ProductService.POST("attributecategoryparent/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+                searchObject = new JSONArray(ServiceCall.POST("attributecategoryparent/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
             }
 
             attributecategoryparent_ID = searchObject.length();

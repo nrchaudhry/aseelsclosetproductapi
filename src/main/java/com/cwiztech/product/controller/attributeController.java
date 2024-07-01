@@ -31,8 +31,7 @@ import com.cwiztech.datalogs.repository.tableDataLogRepository;
 
 import com.cwiztech.product.model.Attribute;
 import com.cwiztech.product.repository.attributeRepository;
-import com.cwiztech.services.LookupService;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.cwiztech.token.AccessToken;
@@ -192,7 +191,7 @@ public class attributeController {
 		if (jsonObj.has("datatype_ID") && !jsonObj.isNull("datatype_ID"))
 			attribute.setDATATYPE_ID(jsonObj.getLong("datatype_ID"));
 		 else if (jsonObj.has("datatype_CODE") && !jsonObj.isNull("datatype_CODE")) {
-	  			JSONObject datatype = new JSONObject(LookupService.POST("lookup/bycode", "{entityname: 'DATATYPE', code: "+jsonObj.getString("datatype_CODE")+"}", apiRequest.getREQUEST_OUTPUT()));
+	  			JSONObject datatype = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'DATATYPE', code: "+jsonObj.getString("datatype_CODE")+"}", apiRequest.getREQUEST_OUTPUT(), true));
 	  			if (datatype != null)
 	  				attribute.setDATATYPE_ID(datatype.getLong("id"));
 		 }
@@ -315,9 +314,9 @@ public class attributeController {
            datatype_IDS.add((int) datatype_ID);
        } else if (jsonObj.has("datatype") && !jsonObj.isNull("datatype") && jsonObj.getLong("datatype") != 0) {
            if (active == true) {
-               searchObject = new JSONArray(ProductService.POST("datatype/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("datatype/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
            } else {
-               searchObject = new JSONArray(ProductService.POST("datatype/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("datatype/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
            }
 
            datatype_ID = searchObject.length();
@@ -327,7 +326,7 @@ public class attributeController {
        }
 
 		 else if (jsonObj.has("datatype_CODE") && !jsonObj.isNull("datatype_CODE")) {
-	  			JSONObject datatype = new JSONObject(LookupService.POST("lookup/bycode", "{entityname: 'DATATYPE', code: "+jsonObj.getString("datatype_CODE")+"}", apiRequest.getREQUEST_OUTPUT()));
+	  			JSONObject datatype = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'DATATYPE', code: "+jsonObj.getString("datatype_CODE")+"}", apiRequest.getREQUEST_OUTPUT(), true));
 	  			if (datatype != null)
 	  				datatype_ID = datatype.getLong("id");
 		 }
@@ -383,7 +382,7 @@ public class attributeController {
 		} else {
 			if (attribute != null && isWithDetail == true) {
 				if(attribute.getDATATYPE_ID() != null) {
-				JSONObject datatype = new JSONObject(LookupService.GET("lookup/"+attribute.getDATATYPE_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject datatype = new JSONObject(ServiceCall.GET("lookup/"+attribute.getDATATYPE_ID(), apiRequest.getREQUEST_OUTPUT(), true));
 				attribute.setDATATYPE_DETAIL(datatype.toString());
 			   }
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(attribute));
@@ -394,7 +393,7 @@ public class attributeController {
 				for (int i=0; i<attributes.size(); i++) {
 					datatypeList.add(Integer.parseInt(attributes.get(i).getDATATYPE_ID().toString()));
 				}
-				JSONArray datatypeObject = new JSONArray(LookupService.POST("lookup/ids", "{lookups: "+datatypeList+"}", apiRequest.getREQUEST_OUTPUT()));
+				JSONArray datatypeObject = new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+datatypeList+"}", apiRequest.getREQUEST_OUTPUT(), true));
 
 				for (int i=0; i<attributes.size(); i++) {
 					for (int j=0; j<datatypeObject.length(); j++) {

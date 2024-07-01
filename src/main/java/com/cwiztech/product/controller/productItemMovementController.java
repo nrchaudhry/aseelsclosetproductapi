@@ -31,8 +31,7 @@ import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductItemMovement;
 import com.cwiztech.product.repository.productItemMovementRepository;
-import com.cwiztech.services.EmployeeService;
-import com.cwiztech.services.ProductService;
+import com.cwiztech.services.ServiceCall;
 import com.cwiztech.token.AccessToken;
 
 @RestController
@@ -338,9 +337,9 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
            employee_IDS.add((int) employee_ID);
        } else if (jsonObj.has("employee") && !jsonObj.isNull("employee") && jsonObj.getLong("employee") != 0) {
            if (active == true) {
-               searchObject = new JSONArray(EmployeeService.POST("employee/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("employee/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, true));
            } else {
-               searchObject = new JSONArray(EmployeeService.POST("employee/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("employee/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, true));
            }
 
            employee_ID = searchObject.length();
@@ -354,9 +353,9 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
            product_IDS.add((int) product_ID);
        } else if (jsonObj.has("product") && !jsonObj.isNull("product") && jsonObj.getLong("product") != 0) {
            if (active == true) {
-               searchObject = new JSONArray(ProductService.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, true));
            } else {
-               searchObject = new JSONArray(ProductService.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken));
+               searchObject = new JSONArray(ServiceCall.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, true));
            }
 
            product_ID = searchObject.length();
@@ -409,10 +408,10 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
 			if (productitemmovement != null) {
-				JSONObject product = new JSONObject(ProductService.GET("product/"+productitemmovement.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT()));
+				JSONObject product = new JSONObject(ServiceCall.GET("product/"+productitemmovement.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT(), true));
 				productitemmovement.setPRODUCT_DETAIL(product.toString());
 				if(productitemmovement.getEMPLOYEE_ID() != null) {
-					JSONObject employee = new JSONObject(EmployeeService.GET("employee/"+productitemmovement.getEMPLOYEE_ID(), apiRequest.getREQUEST_OUTPUT()));
+					JSONObject employee = new JSONObject(ServiceCall.GET("employee/"+productitemmovement.getEMPLOYEE_ID(), apiRequest.getREQUEST_OUTPUT(), true));
 					productitemmovement.setEMPLOYEE_DETAIL(employee.toString());
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemmovement));
@@ -427,8 +426,8 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 						if(productitemmovements.get(i).getEMPLOYEE_ID() != null) 
 						  employeeList.add(Integer.parseInt(productitemmovements.get(i).getEMPLOYEE_ID().toString()));
 					}
-					JSONArray productObject = new JSONArray(ProductService.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT()));
-					JSONArray employeeObject = new JSONArray(EmployeeService.POST("employee/ids", "{employees: "+employeeList+"}", apiRequest.getREQUEST_OUTPUT()));	
+					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT(), true));
+					JSONArray employeeObject = new JSONArray(ServiceCall.POST("employee/ids", "{employees: "+employeeList+"}", apiRequest.getREQUEST_OUTPUT(), true));	
 					for (int i=0; i<productitemmovements.size(); i++) {
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
