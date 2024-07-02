@@ -402,9 +402,9 @@ public class productItemController {
 			application_IDS.add((int) application_ID);
 		} else if (jsonObj.has("application") && !jsonObj.isNull("application") && jsonObj.getLong("application") != 0) {
 			if (active == true) {
-				searchObject = new JSONArray(ServiceCall.POST("application/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
+				searchObject = new JSONArray(ServiceCall.POST("application/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, true));
 			} else {
-				searchObject = new JSONArray(ServiceCall.POST("application/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
+				searchObject = new JSONArray(ServiceCall.POST("application/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, true));
 			}
 
 			application_ID = searchObject.length();
@@ -483,7 +483,7 @@ public class productItemController {
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
 			if (productitem != null && isWithDetail == true) {
-				JSONObject application = new JSONObject(ServiceCall.GET("application/"+productitem.getAPPLICATION_ID(), apiRequest.getREQUEST_OUTPUT(), false));
+				JSONObject application = new JSONObject(ServiceCall.GET("application/"+productitem.getAPPLICATION_ID(), apiRequest.getREQUEST_OUTPUT(), true));
 				productitem.setAPPLICATION_DETAIL(application.toString());
 				JSONObject product = new JSONObject(ServiceCall.GET("product/"+productitem.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				productitem.setPRODUCT_DETAIL(product.toString());
@@ -499,7 +499,7 @@ public class productItemController {
 						if(productitems.get(i).getPRODUCT_ID() != null)
 							productList.add(Integer.parseInt(productitems.get(i).getPRODUCT_ID().toString()));
 					}
-					JSONArray logisticsObject = new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+					JSONArray logisticsObject = new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getREQUEST_OUTPUT(), true));
 					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 
 					for (int i=0; i<productitems.size(); i++) {
