@@ -288,6 +288,11 @@ public class productItemController {
 			if (jsonObj.has("productitem_IMAGE") && !jsonObj.isNull("productitem_IMAGE"))
 				productitem.setPRODUCTITEM_IMAGE(jsonObj.getString("productitem_IMAGE"));
 
+			if (jsonObj.has("deactive_AUTO"))
+				productitem.setDEACTIVE_AUTO(jsonObj.getString("deactive_AUTO"));
+			else if (productitemid == 0)
+				productitem.setDEACTIVE_AUTO("N");
+
 			if (productitemid == 0)
 				productitem.setISACTIVE("Y");
 			else if (jsonObj.has("isactive"))
