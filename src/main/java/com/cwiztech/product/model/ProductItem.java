@@ -90,7 +90,6 @@ public class ProductItem {
 		APPLICATION_ID = aPPLICATION_ID;
 	}
 
-
 	public String getAPPLICATION_DETAIL() {
 		return APPLICATION_DETAIL;
 	}
@@ -107,19 +106,20 @@ public class ProductItem {
 		PRODUCTITEM_NAME = pRODUCTITEM_NAME;
 	}
 
-	public String getPRODUCTITEM_IMAGE() {
-		return PRODUCTITEM_IMAGE;
-	}
-
-	public void setPRODUCTITEM_IMAGE(String pRODUCTITEM_IMAGE) {
-		PRODUCTITEM_IMAGE = pRODUCTITEM_IMAGE;
-	}
 	public String getPRODUCTITEM_DESC() {
 		return PRODUCTITEM_DESC;
 	}
 
 	public void setPRODUCTITEM_DESC(String pRODUCTITEM_DESC) {
 		PRODUCTITEM_DESC = pRODUCTITEM_DESC;
+	}
+
+	public String getPRODUCTITEM_IMAGE() {
+		return PRODUCTITEM_IMAGE;
+	}
+
+	public void setPRODUCTITEM_IMAGE(String pRODUCTITEM_IMAGE) {
+		PRODUCTITEM_IMAGE = pRODUCTITEM_IMAGE;
 	}
 
 	public String getDEACTIVE_AUTO() {
