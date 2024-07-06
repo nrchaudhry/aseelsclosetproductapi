@@ -48,8 +48,6 @@ public class ServiceCall {
 		ResponseEntity<String> response = restTemplate.exchange(servicePath + URI, HttpMethod.GET, entity, String.class);
 		rtnAPIResponse=response.getBody().toString();
 
-		log.info("Response: " + rtnAPIResponse);
-		log.info("----------------------------------------------------------------------------------");
 		return rtnAPIResponse;
 	}
 
@@ -75,8 +73,6 @@ public class ServiceCall {
 		ResponseEntity<String> response = restTemplate.exchange(servicePath + URI, HttpMethod.POST, entity, String.class);
 		rtnAPIResponse=response.getBody().toString();
 
-		log.info("Response: " + rtnAPIResponse);
-		log.info("----------------------------------------------------------------------------------");
 		return rtnAPIResponse;
 	}
 
@@ -102,8 +98,6 @@ public class ServiceCall {
 		ResponseEntity<String> response = restTemplate.exchange(servicePath + URI, HttpMethod.PUT, entity, String.class);
 		rtnAPIResponse=response.getBody().toString();
 
-		log.info("Response: " + rtnAPIResponse);
-		log.info("----------------------------------------------------------------------------------");
 		return rtnAPIResponse;
 	}
 
@@ -128,8 +122,6 @@ public class ServiceCall {
 		ResponseEntity<String> response = restTemplate.exchange(servicePath + URI, HttpMethod.DELETE, entity, String.class);
 		rtnAPIResponse=response.getBody().toString();
 
-		log.info("Response: " + rtnAPIResponse);
-		log.info("----------------------------------------------------------------------------------");
 		return rtnAPIResponse;
 	}
 }
