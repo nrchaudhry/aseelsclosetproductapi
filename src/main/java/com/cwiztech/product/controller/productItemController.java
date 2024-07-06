@@ -548,9 +548,6 @@ public class productItemController {
 		if (apiRequest.getREQUEST_OUTPUT().contains("bearer"))
 			apiRequest.setREQUEST_OUTPUT(null);
 
-		log.info("Output: " + apiRequest.getREQUEST_OUTPUT());
-		log.info("--------------------------------------------------------");
-
 		return apiRequest;
 	}
 
