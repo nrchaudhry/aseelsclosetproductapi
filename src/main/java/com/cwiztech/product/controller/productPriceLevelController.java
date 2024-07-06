@@ -402,6 +402,9 @@ private static final Logger log = LoggerFactory.getLogger(productPriceLevelContr
 		apiRequest = tableDataLogs.apiRequestDataLog(requestType, databaseTableID, requestUser, requestURI, requestBody, workstation);
 		apiRequest.setREQUEST_OUTPUT(accessToken);
 
+		if (checkTokenResponse.has("employee_ID") && !checkTokenResponse.isNull("employee_ID"))
+			apiRequest.setRESPONSE_DATETIME(""+checkTokenResponse.getLong("employee_ID"));
+
 		return apiRequest;
 	}
 	
