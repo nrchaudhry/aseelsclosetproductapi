@@ -407,7 +407,7 @@ public class productCategoryController {
 				if (productcategories.size()>0) {
 					List<Integer> productcategoryList = new ArrayList<Integer>();
 					for (int i=0; i<productcategories.size(); i++) {
-						if(productcategory.getPRODUCTCATEGORYPARENT_ID() != null)
+						if(productcategories.get(i).getPRODUCTCATEGORYPARENT_ID() != null)
 							productcategoryList.add(Integer.parseInt(productcategories.get(i).getPRODUCTCATEGORYPARENT_ID().toString()));
 					}
 					JSONArray productcategorypObject = new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getREQUEST_OUTPUT(), false));
