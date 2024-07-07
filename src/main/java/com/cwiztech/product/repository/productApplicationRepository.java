@@ -10,35 +10,33 @@ import com.cwiztech.product.model.ProductApplication;
 
 
 public interface productApplicationRepository extends JpaRepository<ProductApplication, Long>{
-	
+
 	@Query(value = "select * from TBLPRODUCTAPPLICATION where ISACTIVE='Y'" , nativeQuery = true)
 	public List<ProductApplication> findActive();
 
-    @Query(value = "select * from TBLPRODUCTAPPLICATION  "
-            + "where CASE WHEN :APPLICATION_ID = 0 THEN APPLICATION_ID=APPLICATION_ID ELSE APPLICATION_ID IN (:APPLICATION_IDS) END "
-            + "and CASE WHEN :PRODUCT_ID = 0 THEN PRODUCT_ID=PRODUCT_ID ELSE PRODUCT_ID IN (:PRODUCT_IDS) END "
+	@Query(value = "select * from TBLPRODUCTAPPLICATION  "
+			+ "where CASE WHEN :APPLICATION_ID = 0 THEN APPLICATION_ID=APPLICATION_ID ELSE APPLICATION_ID IN (:APPLICATION_IDS) END "
+			+ "and CASE WHEN :PRODUCT_ID = 0 THEN PRODUCT_ID=PRODUCT_ID ELSE PRODUCT_ID IN (:PRODUCT_IDS) END "
 			+ "and ISACTIVE='Y'", nativeQuery = true)
-    
-public List<ProductApplication> findAllBySearch(String search);
-	
+
+	public List<ProductApplication> findAllBySearch(String search);
+
 	@Query(value = "select * from TBLPRODUCTAPPLICATION"
 			+ "where (CASE WHEN :APPLICATION_ID = 0 THEN APPLICATION_ID=APPLICATION_ID ELSE APPLICATION_ID IN (:APPLICATION_IDS) END or APPLICATION_ID is NULL) "
 			+ "and (CASE WHEN :PRODUCT_ID = 0 THEN PRODUCT_ID=PRODUCT_ID ELSE PRODUCT_ID IN (:PRODUCT_IDS) END or PRODUCT_ID is NULL) "
-			+ "and ISACTIVE='Y' order by ProductApplication", nativeQuery = true)
-	
-	List<ProductApplication> findByAdvancedSearch(			
+			+ "and ISACTIVE='Y'", nativeQuery = true)
+	public List<ProductApplication> findByAdvancedSearch(			
 			@Param("APPLICATION_ID") Long APPLICATION_ID, @Param("APPLICATION_IDS") List<Integer> APPLICATION_IDS,  
 			@Param("PRODUCT_ID") Long PRODUCT_ID, @Param("PRODUCT_IDS") List<Integer> PRODUCT_IDS);
 
-			@Query(value = "select * from TBLPRODUCTAPPLICATION " 
-					+ "where (CASE WHEN :APPLICATION_ID = 0 THEN APPLICATION_ID=APPLICATION_ID ELSE APPLICATION_ID IN (:APPLICATION_IDS) END or APPLICATION_ID is NULL) "
-					+ "where (CASE WHEN :PRODUCT_ID = 0 THEN PRODUCT_ID=PRODUCT_ID ELSE PRODUCT_ID IN (:PRODUCT_IDS) END or PRODUCT_ID is NULL) "
-					, nativeQuery = true)	
-
-	List<ProductApplication> findAllByAdvancedSearch(
+	@Query(value = "select * from TBLPRODUCTAPPLICATION " 
+			+ "where (CASE WHEN :APPLICATION_ID = 0 THEN APPLICATION_ID=APPLICATION_ID ELSE APPLICATION_ID IN (:APPLICATION_IDS) END or APPLICATION_ID is NULL) "
+			+ "and (CASE WHEN :PRODUCT_ID = 0 THEN PRODUCT_ID=PRODUCT_ID ELSE PRODUCT_ID IN (:PRODUCT_IDS) END or PRODUCT_ID is NULL) "
+			, nativeQuery = true)
+	public List<ProductApplication> findAllByAdvancedSearch(
 			@Param("APPLICATION_ID") Long APPLICATION_ID, @Param("APPLICATION_IDS") List<Integer> APPLICATION_IDS,    
 			@Param("PRODUCT_ID") Long PRODUCT_ID, @Param("PRODUCT_IDS") List<Integer> PRODUCT_IDS);  
-	
+
 	@Query(value = "select * from TBLPRODUCTAPPLICATION "
 			+ "where PRODUCTAPPLICATION_ID in (:ids) "
 			+ "", nativeQuery = true)
