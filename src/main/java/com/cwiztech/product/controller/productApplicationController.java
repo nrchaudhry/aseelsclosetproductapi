@@ -373,7 +373,7 @@ public class productApplicationController {
 		} else {
 			if (productapplication != null && isWithDetail == true) {
 				if(productapplication.getAPPLICATION_ID() != null) {
-					JSONObject application = new JSONObject(ServiceCall.GET("application/"+productapplication.getAPPLICATION_ID(), apiRequest.getREQUEST_OUTPUT(), false));
+					JSONObject application = new JSONObject(ServiceCall.GET("application/"+productapplication.getAPPLICATION_ID(), apiRequest.getREQUEST_OUTPUT(), true));
 					productapplication.setAPPLICATION_DETAIL(application.toString());
 				}
 				if(productapplication.getPRODUCT_ID() != null) {
@@ -399,7 +399,7 @@ public class productApplicationController {
 						}
 					}
 
-					JSONArray applicationObject = new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+					JSONArray applicationObject = new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getREQUEST_OUTPUT(), true));
 					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 
 					for (int i=0; i<productapplications.size(); i++) {
