@@ -395,7 +395,7 @@ public class productApplicationController {
 							applicationList.add(Integer.parseInt(productapplications.get(i).getAPPLICATION_ID().toString()));
 						}
 						if(productapplications.get(i).getPRODUCT_ID() != null) {
-							applicationList.add(Integer.parseInt(productapplications.get(i).getPRODUCT_ID().toString()));
+							productList.add(Integer.parseInt(productapplications.get(i).getPRODUCT_ID().toString()));
 						}
 					}
 
