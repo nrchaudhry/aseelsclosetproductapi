@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -26,10 +27,12 @@ public class ProductCategory {
 	@Column(name = "QUICKBOOK_ID")
 	private String QUICKBOOK_ID;
 	
-	@OneToOne
-	@JoinColumn(name = "PRODUCTCATEGORYPARENT_ID")
-	private ProductCategory PRODUCTCATEGORYPARENT_ID;
+	@Column(name = "PRODUCTCATEGORYPARENT_ID")
+	private Long PRODUCTCATEGORYPARENT_ID;
 	
+	@Transient
+	private String PRODUCTCATEGORYPARENT_DETAIL;
+
 	@Column(name = "PRODUCTCATEGORYORDER_NO")
 	private Long  PRODUCTCATEGORYORDER_NO;
 	
@@ -85,12 +88,20 @@ public class ProductCategory {
 		NETSUITE_ID = nETSUITE_ID;
 	}
 
-	public ProductCategory getPRODUCTCATEGORYPARENT_ID() {
+	public Long getPRODUCTCATEGORYPARENT_ID() {
 		return PRODUCTCATEGORYPARENT_ID;
 	}
 
-	public void setPRODUCTCATEGORYPARENT_ID(ProductCategory pRODUCTCATEGORYPARENT_ID) {
+	public void setPRODUCTCATEGORYPARENT_ID(Long pRODUCTCATEGORYPARENT_ID) {
 		PRODUCTCATEGORYPARENT_ID = pRODUCTCATEGORYPARENT_ID;
+	}
+
+	public String getPRODUCTCATEGORYPARENT_DETAIL() {
+		return PRODUCTCATEGORYPARENT_DETAIL;
+	}
+
+	public void setPRODUCTCATEGORYPARENT_DETAIL(String pRODUCTCATEGORYPARENT_DETAIL) {
+		PRODUCTCATEGORYPARENT_DETAIL = pRODUCTCATEGORYPARENT_DETAIL;
 	}
 
 	public Long getPRODUCTCATEGORYORDER_NO() {

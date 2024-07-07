@@ -301,19 +301,37 @@ public class productAttributeValueController {
 		JSONObject jsonObj = new JSONObject(data);
 		
 		   JSONArray searchObject = new JSONArray();
+	        List<Integer> product_IDS = new ArrayList<Integer>(); 
 	        List<Integer> productattribute_IDS = new ArrayList<Integer>(); 
 	        List<Integer> attributevalue_IDS = new ArrayList<Integer>(); 
 
+	        product_IDS.add((int) 0);
 	        productattribute_IDS.add((int) 0);
 	        attributevalue_IDS.add((int) 0);
 	        
-		long productattribute_ID = 0 , attributevalue_ID = 0;
+		long product_ID = 0, productattribute_ID = 0 , attributevalue_ID = 0;
 		
        boolean isWithDetail = true;
        if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
            isWithDetail = jsonObj.getBoolean("iswithdetail");
        }
        jsonObj.put("iswithdetail", false);
+		
+       if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID") && jsonObj.getLong("product_ID") != 0) {
+    	   product_ID = jsonObj.getLong("product_ID");
+    	   product_IDS.add((int) product_ID);
+       } else if (jsonObj.has("product") && !jsonObj.isNull("product") && jsonObj.getLong("product") != 0) {
+           if (active == true) {
+               searchObject = new JSONArray(ServiceCall.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
+           } else {
+               searchObject = new JSONArray(ServiceCall.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
+           }
+
+           product_ID = searchObject.length();
+           for (int i=0; i<searchObject.length(); i++) {
+        	   product_IDS.add((int) searchObject.getJSONObject(i).getLong("product_ID"));
+           }
+       }
 		
        if (jsonObj.has("productattribute_ID") && !jsonObj.isNull("productattribute_ID") && jsonObj.getLong("productattribute_ID") != 0) {
            productattribute_ID = jsonObj.getLong("productattribute_ID");
@@ -347,10 +365,11 @@ public class productAttributeValueController {
            }
        }
        
-		if(productattribute_ID != 0 || attributevalue_ID != 0){
-			List<ProductAttributeValue> productattributevalue = ((active == true)
-				? productattributevaluerepository.findByAdvancedSearch(productattribute_ID,productattribute_IDS,attributevalue_ID,attributevalue_IDS)
-				: productattributevaluerepository.findAllByAdvancedSearch(productattribute_ID,productattribute_IDS,attributevalue_ID,attributevalue_IDS));
+		if(product_ID != 0 || productattribute_ID != 0 || attributevalue_ID != 0) {
+			productattributevalues = ((active == true)
+
+				? productattributevaluerepository.findByAdvancedSearch( product_ID, product_IDS, productattribute_ID,productattribute_IDS,attributevalue_ID,attributevalue_IDS)
+				: productattributevaluerepository.findAllByAdvancedSearch( product_ID, product_IDS, productattribute_ID,productattribute_IDS,attributevalue_ID,attributevalue_IDS));
 		
 		}
 		return new ResponseEntity(getAPIResponse(productattributevalues, null , null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
@@ -394,57 +413,86 @@ public class productAttributeValueController {
 			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductAttributeValue", message);
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
-			if (productattributevalue != null) {
+			if (productattributevalue != null && isWithDetail == true) {
+				 if (productattributevalue.getPRODUCT_ID()==null) {
+	                    JSONObject product = new JSONObject(ServiceCall.GET("product/"+productattributevalue.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT(), false));
+	                   productattributevalue.setPRODUCT_DETAIL(product.toString());
+	               }
+			
+				if(productattributevalue.getPRODUCTATTRIBUTE_ID() != null) {
 				JSONObject productattribute = new JSONObject(ServiceCall.GET("productattribute/"+productattributevalue.getPRODUCTATTRIBUTE_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				productattributevalue.setPRODUCTATTRIBUTE_DETAIL(productattribute.toString());
 				
-//                if (productattributevalue.getATTRIBUTEVALUE_ID()==null) {
-//                    JSONObject attributevalue = new JSONObject(ServiceCall.GET("attributevalue/"+productattributevalue.getATTRIBUTEVALUE_ID(), apiRequest.getREQUEST_OUTPUT()));
-//                    productattributevalue.setATTRIBUTEVALUE_DETAIL(attributevalue.toString());
-//                }
+            if (productattributevalue.getATTRIBUTEVALUE_ID()==null) {
+                    JSONObject attributevalue = new JSONObject(ServiceCall.GET("attributevalue/"+productattributevalue.getATTRIBUTEVALUE_ID(), apiRequest.getREQUEST_OUTPUT(), false));
+                   productattributevalue.setATTRIBUTEVALUE_DETAIL(attributevalue.toString());
+               }
+				}
 
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributevalue));
 				productattributevalueID = productattributevalue.getPRODUCTATTRIBUTEVALUE_ID();
-			} else if(productattributevalues != null) {
+				
+			} else if (productattributevalues != null && isWithDetail == true) {
 				if (productattributevalues.size()>0) {
+					List<Integer> productList = new ArrayList<Integer>();
 					List<Integer> productattributeList = new ArrayList<Integer>();
                     List<Integer> attributevalueList = new ArrayList<Integer>();
 					
                     for (int i=0; i<productattributevalues.size(); i++) {
-						productattributeList.add(Integer.parseInt(productattributevalues.get(i).getPRODUCTATTRIBUTE_ID().toString()));
-//		                if (productattributevalues.get(i).getATTRIBUTEVALUE_ID()==null) {
-//	                        attributevalueList.add(Integer.parseInt(productattributevalues.get(i).getATTRIBUTEVALUE_ID().toString()));
-//		                }
-					}
+ 		               if (productattributevalues.get(i).getPRODUCT_ID()==null) {
+ 	                        attributevalueList.add(Integer.parseInt(productattributevalues.get(i).getPRODUCT_ID().toString()));
+ 		                }
+ 					}
+
+                    for (int i=0; i<productattributevalues.size(); i++) {
+ 		               if (productattributevalues.get(i).getPRODUCTATTRIBUTE_ID()==null) {
+ 	                        attributevalueList.add(Integer.parseInt(productattributevalues.get(i).getPRODUCTATTRIBUTE_ID().toString()));
+ 		                }
+ 					}
                     
+                    for (int i=0; i<productattributevalues.size(); i++) {
+		               if (productattributevalues.get(i).getATTRIBUTEVALUE_ID()==null) {
+	                        attributevalueList.add(Integer.parseInt(productattributevalues.get(i).getATTRIBUTEVALUE_ID().toString()));
+		                }
+					}
+					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 					JSONArray productattributeObject = new JSONArray(ServiceCall.POST("productattribute/ids", "{productattributes: "+productattributeList+"}", apiRequest.getREQUEST_OUTPUT(), false));
-//					JSONArray attributevalueObject = new JSONArray(ServiceCall.POST("attributevalue/ids", "{attributevalues: "+attributevalueList+"}", apiRequest.getREQUEST_OUTPUT()));
+					JSONArray attributevalueObject = new JSONArray(ServiceCall.POST("attributevalue/ids", "{attributevalues: "+attributevalueList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 					
 					for (int i=0; i<productattributevalues.size(); i++) {
+						
+						for (int j=0; j<productObject.length(); j++) {
+							JSONObject product = productObject.getJSONObject(j);
+							if(productattributevalues.get(i).getPRODUCT_ID() == product.getLong("product_ID")) {
+								productattributevalues.get(i).setPRODUCT_DETAIL(product.toString());
+							}
+						}
+						
 						for (int j=0; j<productattributeObject.length(); j++) {
 							JSONObject productattribute = productattributeObject.getJSONObject(j);
 							if(productattributevalues.get(i).getPRODUCTATTRIBUTE_ID() == productattribute.getLong("productattribute_ID")) {
 								productattributevalues.get(i).setPRODUCTATTRIBUTE_DETAIL(productattribute.toString());
 							}
 						}
-						
-//                        for (int j=0; j<attributevalueObject.length(); j++) {
-//                            JSONObject attributevalue = attributevalueObject.getJSONObject(j);
-//	                        if (productattributevalues.get(i).getATTRIBUTEVALUE_ID() != null && productattributevalues.get(i).getATTRIBUTEVALUE_ID() == attributevalue.getLong("attributevalue_ID")) {
-//	                            productattributevalues.get(i).setATTRIBUTEVALUE_DETAIL(attributevalue.toString());
-//	                        }
-//						}
+						for (int j=0; j<attributevalueObject.length(); j++) {
+							JSONObject attributevalue = productattributeObject.getJSONObject(j);
+							if(productattributevalues.get(i).getATTRIBUTEVALUE_ID() == attributevalue.getLong("attributevalue_ID")) {
+								productattributevalues.get(i).setATTRIBUTEVALUE_DETAIL(attributevalue.toString());
+							}
+						}                     
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributevalues));
+
+			} else if (productattributevalue != null && isWithDetail == false){
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributevalue));
+			
+			} else if (productattributevalues != null && isWithDetail == false){
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributevalues));
+			
 			} else if (jsonProductAttributeValues != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductAttributeValues.toString());
 			
-			} else if (jsonProductAttributeValue != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductAttributeValue.toString());
-			}
-			else if (jsonProductAttributeValues != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductAttributeValues.toString());
 			} else if (jsonProductAttributeValue != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductAttributeValue.toString());
 			}

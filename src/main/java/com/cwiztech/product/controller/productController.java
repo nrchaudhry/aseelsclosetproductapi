@@ -562,15 +562,7 @@ public class productController {
 
 		if (apiRequest.getREQUEST_OUTPUT().contains("bearer"))
 			apiRequest.setREQUEST_OUTPUT(null);
-<<<<<<< HEAD
-		
-=======
 
-		log.info("Output: " + apiRequest.getREQUEST_OUTPUT());
-		log.info("--------------------------------------------------------");
-
->>>>>>> 3f685fb22e0f27da9c6496d4cd41dbf4f94299e8
 		return apiRequest;
 	}
-
 };

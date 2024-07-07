@@ -351,6 +351,7 @@ public class productImageController {
 				productimage.setPRODUCT_DETAIL(product.toString());
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productimage));
 				productimageID = productimage.getPRODUCTIMAGE_ID();
+				
 			} else if(productimages != null && isWithDetail == true){
 				if (productimages.size()>0) {
 					List<Integer> productList = new ArrayList<Integer>();
@@ -369,11 +370,11 @@ public class productImageController {
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productimages));
-			}else if (jsonProductImages != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductImages.toString());
+			}else if (jsonProductImages != null  && isWithDetail == true){
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productimages));
 			
-			} else if (jsonProductImage != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductImage.toString());
+			} else if (jsonProductImage != null  && isWithDetail == true){
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productimage));
 			}
 			else if (jsonProductImages != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductImages.toString());

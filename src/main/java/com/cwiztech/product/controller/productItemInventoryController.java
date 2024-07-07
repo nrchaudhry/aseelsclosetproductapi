@@ -392,11 +392,14 @@ public class productItemInventoryController {
 		JSONArray searchObject = new JSONArray();
 		List<Integer> productitem_IDS = new ArrayList<Integer>(); 
 		List<Integer> location_IDS = new ArrayList<Integer>(); 
+		List<Integer> inventoryclassification_IDS = new ArrayList<Integer>(); 
+
 
 		productitem_IDS.add((int) 0);
 		location_IDS.add((int) 0);
+		inventoryclassification_IDS.add((int) 0);
 
-		long productitem_ID = 0 , location_ID = 0;
+		long productitem_ID = 0 , location_ID = 0, inventoryclassification_ID;
 
 		boolean isWithDetail = true;
 		if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
@@ -421,6 +424,21 @@ public class productItemInventoryController {
 		}
 
 		if (jsonObj.has("location_ID") && !jsonObj.isNull("location_ID") && jsonObj.getLong("location_ID") != 0) {
+			location_ID = jsonObj.getLong("location_ID");
+			location_IDS.add((int) location_ID);
+		} else if (jsonObj.has("location") && !jsonObj.isNull("location") && jsonObj.getLong("location") != 0) {
+			if (active == true) {
+				searchObject = new JSONArray(ServiceCall.POST("location/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
+			} else {
+				searchObject = new JSONArray(ServiceCall.POST("location/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
+			}
+
+			location_ID = searchObject.length();
+			for (int i=0; i<searchObject.length(); i++) {
+				location_IDS.add((int) searchObject.getJSONObject(i).getLong("location_ID"));
+			}
+		}
+		if (jsonObj.has("inventoryclassification_ID") && !jsonObj.isNull("inventoryclassification_ID") && jsonObj.getLong("location_ID") != 0) {
 			location_ID = jsonObj.getLong("location_ID");
 			location_IDS.add((int) location_ID);
 		} else if (jsonObj.has("location") && !jsonObj.isNull("location") && jsonObj.getLong("location") != 0) {
