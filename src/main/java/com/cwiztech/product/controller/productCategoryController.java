@@ -397,7 +397,7 @@ public class productCategoryController {
 			if (productcategory != null && isWithDetail == true) {
 				if(productcategory.getPRODUCTCATEGORYPARENT_ID() != null) {
 					JSONObject productCategory = new JSONObject(ServiceCall.GET("productcategory/"+productcategory.getPRODUCTCATEGORYPARENT_ID(), apiRequest.getREQUEST_OUTPUT(), false));
-					productcategory.setPRODUCTCATEGORYPARENT_DETAIL(productcategory.toString());
+					productcategory.setPRODUCTCATEGORYPARENT_DETAIL(productCategory.toString());
 				}
 
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productcategory));
@@ -405,17 +405,17 @@ public class productCategoryController {
 
 			} else if (productcategories != null && isWithDetail == true){
 				if (productcategories.size()>0) {
-
-					List<Integer> productcategorypList = new ArrayList<Integer>();
+					List<Integer> productcategoryList = new ArrayList<Integer>();
 					for (int i=0; i<productcategories.size(); i++) {
-						productcategorypList.add(Integer.parseInt(productcategories.get(i).getPRODUCTCATEGORYPARENT_ID().toString()));
+						if(productcategory.getPRODUCTCATEGORYPARENT_ID() != null)
+							productcategoryList.add(Integer.parseInt(productcategories.get(i).getPRODUCTCATEGORYPARENT_ID().toString()));
 					}
-					JSONArray productcategorypObject = new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategorypList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+					JSONArray productcategorypObject = new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 
 					for (int i=0; i<productcategories.size(); i++) {
 						for (int j=0; j<productcategorypObject.length(); j++) {
 							JSONObject productcategoryp = productcategorypObject.getJSONObject(j);
-							if(productcategories.get(i).getPRODUCTCATEGORYPARENT_ID() != null && productcategories.get(i).getPRODUCTCATEGORYPARENT_ID() == productcategoryp.getLong("PRODUCTCATEGORYPARENT_ID")) {
+							if(productcategories.get(i).getPRODUCTCATEGORYPARENT_ID() != null && productcategories.get(i).getPRODUCTCATEGORYPARENT_ID() == productcategoryp.getLong("productcategoryparent_ID")) {
 								productcategories.get(i).setPRODUCTCATEGORYPARENT_DETAIL(productcategoryp.toString());
 							}
 						}
