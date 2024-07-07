@@ -21,7 +21,7 @@ public interface productApplicationRepository extends JpaRepository<ProductAppli
 
 	public List<ProductApplication> findAllBySearch(String search);
 
-	@Query(value = "select * from TBLPRODUCTAPPLICATION"
+	@Query(value = "select * from TBLPRODUCTAPPLICATION "
 			+ "where (CASE WHEN :APPLICATION_ID = 0 THEN APPLICATION_ID=APPLICATION_ID ELSE APPLICATION_ID IN (:APPLICATION_IDS) END or APPLICATION_ID is NULL) "
 			+ "and (CASE WHEN :PRODUCT_ID = 0 THEN PRODUCT_ID=PRODUCT_ID ELSE PRODUCT_ID IN (:PRODUCT_IDS) END or PRODUCT_ID is NULL) "
 			+ "and ISACTIVE='Y'", nativeQuery = true)
