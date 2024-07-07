@@ -533,7 +533,7 @@ public class productController {
 					for (int i=0; i<products.size(); i++) {
 						for (int j=0; j<productcategoryObject.length(); j++) {
 							JSONObject productcategory = productcategoryObject.getJSONObject(j);
-							if(products.get(i).getPRODUCTCATEGORY_ID() != null && products.get(i).getPRODUCTCATEGORY_ID() == productcategory.getLong("PRODUCTCATEGORY_ID")) {
+							if(products.get(i).getPRODUCTCATEGORY_ID() != null && products.get(i).getPRODUCTCATEGORY_ID() == productcategory.getLong("productcategory_ID")) {
 								products.get(i).setPRODUCTCATEGORY_DETAIL(productcategory.toString());
 							}
 						}
