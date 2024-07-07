@@ -60,6 +60,7 @@ public class productController {
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		List<Product> products = productrepository.findActive();
+		
 		return new ResponseEntity(getAPIResponse(products, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
