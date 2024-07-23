@@ -37,17 +37,21 @@ public interface productItemPriceChangeRepository extends JpaRepository<ProductI
 	@Query(value = "select * from TBLPRODUCTITEMPRICECHANGE " 
             + "where CASE WHEN :CURRENCY_ID = 0 THEN CURRENCY_ID=CURRENCY_ID ELSE CURRENCY_ID IN (:CURRENCY_IDS) END "
             + "and CASE WHEN :PRODUCTITEM_ID = 0 THEN PRODUCTITEM_ID=PRODUCTITEM_ID ELSE PRODUCTITEM_ID IN (:PRODUCTITEM_IDS) END "
+            
 		    + "and ISACTIVE='Y'", nativeQuery = true)
 	List<ProductItemPriceChange> findByAdvancedSearch(
-		    @Param("PRODUCTITEM_ID") Long PRODUCTITEM_ID, @Param("PRODUCTITEM_IDS") List<Integer> PRODUCTITEM_IDS,
-		    @Param("CURRENCY_ID") Long PRICELEVEL_ID, @Param("CURRENCY_IDS") List<Integer> PRICELEVEL_IDS);
-	
+		    @Param("CURRENCY_ID") Long CURRENCY_ID, @Param("CURRENCY_IDS") List<Integer> CURRENCY_IDS,
+		    @Param("PRODUCTITEM_ID") Long PRODUCTITEM_ID, @Param("PRODUCTITEM_IDS") List<Integer> PRODUCTITEM_IDS
+
+         );
+
 	@Query(value = "select * from TBLPRODUCTITEMPRICECHANGE " 
-			+ "where CASE WHEN :CURRENCY_ID = 0 THEN CURRENCY_ID=CURRENCY_ID ELSE CURRENCY_ID IN (:CURRENCY_IDS) END "
+			+ "and CASE WHEN :CURRENCY_ID = 0 THEN CURRENCY_ID=CURRENCY_ID ELSE CURRENCY_ID IN (:CURRENCY_IDS) END "
 			+ "and CASE WHEN :PRODUCTITEM_ID = 0 THEN PRODUCTITEM_ID=PRODUCTITEM_ID ELSE PRODUCTITEM_ID IN (:PRODUCTITEM_IDS) END "
 		    + "", nativeQuery = true)
 	List<ProductItemPriceChange> findAllByAdvancedSearch(
             @Param("PRODUCTITEM_ID") Long PRODUCTITEM_ID, @Param("PRODUCTITEM_IDS") List<Integer> PRODUCTITEM_IDS,
-            @Param("CURRENCY_ID") Long PRICELEVEL_ID, @Param("CURRENCY_IDS") List<Integer> PRICELEVEL_IDS);
+            @Param("CURRENCY_ID") Long CURRENCY_ID, @Param("CURRENCY_IDS") List<Integer> CURRENCY_IDS
 
+		);
 }

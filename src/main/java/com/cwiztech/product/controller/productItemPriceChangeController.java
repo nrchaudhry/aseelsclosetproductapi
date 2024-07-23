@@ -437,13 +437,13 @@ public class productItemPriceChangeController {
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitempricechanges));
+			} else if (productitempricechange != null && isWithDetail == false) {
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitempricechange));
+
+			} else if (productitempricechanges != null && isWithDetail == false) {
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitempricechanges));
+
 			}else if (jsonProductItemPriceChanges != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductItemPriceChanges.toString());
-			
-			} else if (jsonProductItemPriceChange != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductItemPriceChange.toString());
-			}
-			else if (jsonProductItemPriceChanges != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductItemPriceChanges.toString());
 			
 			} else if (jsonProductItemPriceChange != null){

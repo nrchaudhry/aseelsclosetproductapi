@@ -411,27 +411,33 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductItemMovement", message);
 			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		} else {
-			if (productitemmovement != null) {
+			if (productitemmovement != null && isWithDetail == true) {
+				if(productitemmovement.getPRODUCT_ID() != null) {
 				JSONObject product = new JSONObject(ServiceCall.GET("product/"+productitemmovement.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT(), true));
 				productitemmovement.setPRODUCT_DETAIL(product.toString());
+				}
 				if(productitemmovement.getEMPLOYEE_ID() != null) {
-					JSONObject employee = new JSONObject(ServiceCall.GET("employee/"+productitemmovement.getEMPLOYEE_ID(), apiRequest.getREQUEST_OUTPUT(), true));
+				JSONObject employee = new JSONObject(ServiceCall.GET("employee/"+productitemmovement.getEMPLOYEE_ID(), apiRequest.getREQUEST_OUTPUT(), true));
 					productitemmovement.setEMPLOYEE_DETAIL(employee.toString());
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemmovement));
 				productitemmovementID = productitemmovement.getPRODUCTITEMMOVEMENT_ID();
-			} else if(productitemmovements != null){
+				
+			} else if(productitemmovements != null && isWithDetail == true){
 				if (productitemmovements.size()>0) {
 					List<Integer> productList = new ArrayList<Integer>();
 					List<Integer> employeeList = new ArrayList<Integer>();
+					
 					for (int i=0; i<productitemmovements.size(); i++) {
 						if(productitemmovements.get(i).getPRODUCT_ID() != null) 
 						  productList.add(Integer.parseInt(productitemmovements.get(i).getPRODUCT_ID().toString()));
+						
 						if(productitemmovements.get(i).getEMPLOYEE_ID() != null) 
 						  employeeList.add(Integer.parseInt(productitemmovements.get(i).getEMPLOYEE_ID().toString()));
 					}
 					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT(), true));
 					JSONArray employeeObject = new JSONArray(ServiceCall.POST("employee/ids", "{employees: "+employeeList+"}", apiRequest.getREQUEST_OUTPUT(), true));	
+					
 					for (int i=0; i<productitemmovements.size(); i++) {
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
@@ -448,7 +454,13 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemmovements));
-			}else if (jsonProductItemMovements != null){
+			} else if (productitemmovement != null && isWithDetail == false){
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemmovement));
+
+			} else if (productitemmovements != null && isWithDetail == false){
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemmovements)); 
+				
+			}else if (jsonProductItemMovements != null ){
 				apiRequest.setREQUEST_OUTPUT(jsonProductItemMovements.toString());
 			
 			} else if (jsonProductItemMovement != null){
