@@ -439,19 +439,19 @@ public class productAttributeValueController {
 					List<Integer> attributevalueList = new ArrayList<Integer>();
 
 					for (int i=0; i<productattributevalues.size(); i++) {
-						if (productattributevalues.get(i).getPRODUCT_ID()==null) {
+						if (productattributevalues.get(i).getPRODUCT_ID() != null) {
 							productList.add(Integer.parseInt(productattributevalues.get(i).getPRODUCT_ID().toString()));
 						}
 					}
 
 					for (int i=0; i<productattributevalues.size(); i++) {
-						if (productattributevalues.get(i).getPRODUCTATTRIBUTE_ID()==null) {
+						if (productattributevalues.get(i).getPRODUCTATTRIBUTE_ID() != null) {
 							productattributeList.add(Integer.parseInt(productattributevalues.get(i).getPRODUCTATTRIBUTE_ID().toString()));
 						}
 					}
 
 					for (int i=0; i<productattributevalues.size(); i++) {
-						if (productattributevalues.get(i).getATTRIBUTEVALUE_ID()==null) {
+						if (productattributevalues.get(i).getATTRIBUTEVALUE_ID() != null) {
 							attributevalueList.add(Integer.parseInt(productattributevalues.get(i).getATTRIBUTEVALUE_ID().toString()));
 						}
 					}
