@@ -160,19 +160,19 @@ public class productItemInventoryController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity insertupdateAll(JSONArray jsonProductItemInventorys, JSONObject jsonProductItemInventory, APIRequestDataLog apiRequest) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity insertupdateAll(JSONArray jsonProductItemInventories, JSONObject jsonProductItemInventory, APIRequestDataLog apiRequest) throws JsonProcessingException, JSONException, ParseException {
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 
 		List<ProductItemInventory> productiteminventories = new ArrayList<ProductItemInventory>();
 		if (jsonProductItemInventory != null) {
-			jsonProductItemInventorys = new JSONArray();
-			jsonProductItemInventorys.put(jsonProductItemInventory);
+			jsonProductItemInventories = new JSONArray();
+			jsonProductItemInventories.put(jsonProductItemInventory);
 		}
-		log.info(jsonProductItemInventorys.toString());
+		log.info(jsonProductItemInventories.toString());
 
-		for (int a=0; a<jsonProductItemInventorys.length(); a++) {
-			JSONObject jsonObj = jsonProductItemInventorys.getJSONObject(a);
+		for (int a=0; a<jsonProductItemInventories.length(); a++) {
+			JSONObject jsonObj = jsonProductItemInventories.getJSONObject(a);
 			ProductItemInventory productiteminventory = new ProductItemInventory();
 			long productiteminventoryid = 0;
 
@@ -490,7 +490,7 @@ public class productItemInventoryController {
 		return apiRequest;
 	}
 
-	APIRequestDataLog getAPIResponse(List<ProductItemInventory> productiteminventories, ProductItemInventory productiteminventory , JSONArray jsonProductItemInventorys, JSONObject jsonProductItemInventory, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<ProductItemInventory> productiteminventories, ProductItemInventory productiteminventory , JSONArray jsonProductItemInventories, JSONObject jsonProductItemInventory, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -550,14 +550,16 @@ public class productItemInventoryController {
 					}	
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventories));
-			}else if (jsonProductItemInventorys != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventorys.toString());
+			
+			} else if(productiteminventory != null && isWithDetail == false){	
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventory));
 
-			} else if (jsonProductItemInventory != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventory.toString());
-			}
-			else if (jsonProductItemInventorys != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventorys.toString());
+			} else if(productiteminventories != null && isWithDetail == false){	
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventories));
+
+			} else if (jsonProductItemInventories != null){
+				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventories.toString());
+
 			} else if (jsonProductItemInventory != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventory.toString());
 			}
@@ -688,7 +690,18 @@ public class productItemInventoryController {
 
 		for (int i = 0; i < jsonPAV.length(); i++) {
 			JSONObject productitem = jsonPAV.getJSONObject(i);		
-			long productitem_id = productitem.getLong("productitem_ID");
+			long productitem_id = 0;
+			if (productitem.has("productitem_ID"))
+				productitem_id = productitem.getLong("productitem_ID");
+			else if (productitem.has("product_ID")) {
+				JSONObject product = new JSONObject();
+				product.put("product_ID", productitem.getLong("product_ID"));
+				JSONArray productitems = new JSONArray(ServiceCall.POST("productitem/advancedsearch", product.toString(), apiRequest.getREQUEST_OUTPUT(), false));
+				if (productitems.length() > 0) {
+					productitem_id = productitems.getJSONObject(productitems.length()-1).getLong("productitem_ID");
+				}
+			}
+			
 			long quantity_received = productitem.getLong("quantity_RECEIVED");
 			if(quantity_received != 0){
 				ProductItemInventory productiteminventory = productiteminventoryrepository.findByProductItemId(productitem_id);
