@@ -418,10 +418,6 @@ public class productItemController {
 			}
 		}
 
-		if (application_ID == 0) {
-			application_IDS.add(0);
-		}
-
 		if (jsonObj.has("product_ID") && !jsonObj.isNull("product_ID") && jsonObj.getLong("product_ID") != 0) {
 			product_ID = jsonObj.getLong("product_ID");
 			product_IDS.add((int) product_ID);
@@ -438,14 +434,10 @@ public class productItemController {
 			}
 		}
 
-		if (product_ID == 0) {
-			product_IDS.add(0);
-		}
-
 		if (application_ID != 0 || product_ID != 0) {
 			productitems = ((active == true)
-					? productitemrepository.findByAdvancedSearch(product_ID,product_IDS, application_ID, application_IDS)
-							: productitemrepository.findAllByAdvancedSearch(product_ID,product_IDS, application_ID, application_IDS));
+					? productitemrepository.findByAdvancedSearch(product_ID, product_IDS, application_ID, application_IDS)
+							: productitemrepository.findAllByAdvancedSearch(product_ID, product_IDS, application_ID, application_IDS));
 		}
 
 		return new ResponseEntity(getAPIResponse(productitems, null , null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
