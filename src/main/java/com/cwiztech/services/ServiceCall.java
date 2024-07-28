@@ -64,6 +64,8 @@ public class ServiceCall {
 		} else {
 			serviceURI = ServiceCall.servicePath + "/" + parts[0];
 		}
+		log.info("POST: " + serviceURI);
+
 		String servicePath = AccessToken.findServiceDetail(serviceURI, "GET", headers);
 
 		log.info("POST: " + servicePath + URI);
