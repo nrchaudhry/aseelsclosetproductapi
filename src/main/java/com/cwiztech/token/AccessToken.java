@@ -75,6 +75,8 @@ public class AccessToken {
 		
 		RestTemplate restTemplate = new RestTemplate();
 		HttpEntity<String> entityformudel = new HttpEntity<String>(jsonObjmain.toString(), headers);
+		log.info("POST: " + oauthapplicationPath);
+		log.info("POST: " + jsonObjmain.toString());
 		ResponseEntity<String> service = restTemplate.exchange(oauthapplicationPath + "microservice/byuri", HttpMethod.POST, entityformudel, String.class);
 
 		if (service != null) {
