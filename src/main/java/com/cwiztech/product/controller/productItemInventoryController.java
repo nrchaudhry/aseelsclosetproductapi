@@ -399,7 +399,7 @@ public class productItemInventoryController {
 		location_IDS.add((int) 0);
 		inventoryclassification_IDS.add((int) 0);
 
-		long productitem_ID = 0 , location_ID = 0, inventoryclassification_ID;
+		long productitem_ID = 0 , location_ID = 0, inventoryclassification_ID = 0;
 
 		boolean isWithDetail = true;
 		if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
@@ -665,25 +665,8 @@ public class productItemInventoryController {
 	@RequestMapping(value = "/received" ,method = RequestMethod.POST)
 	public ResponseEntity Received(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken)
 			throws JsonProcessingException, JSONException, ParseException {
-		JSONObject checkTokenResponse = AccessToken.checkToken(headToken);
-		String rtn = null, workstation = null;
-		APIRequestDataLog apiRequest;
-
-		log.info("POST: /productiteminventory/received");
-		log.info("Input: " + data);
-
-		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItemInventory.getDatabaseTableID());
-
-		if (checkTokenResponse.has("error")) {
-			apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, (long) 0, "/productiteminventory/received", data, workstation);
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
-			return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-		}
-
-		ObjectMapper mapper = new ObjectMapper();
-		Long requestUser = checkTokenResponse.getLong("user_ID");
-		apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, requestUser, "/productiteminventory/received", data, workstation);
+		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/received", data, null, headToken);
+		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		JSONArray jsonPAV = new JSONArray(data);
 		List<ProductItemInventory> productiteminventorylist = new ArrayList<ProductItemInventory>();
@@ -715,17 +698,8 @@ public class productItemInventoryController {
 					productiteminventorylist.add(productiteminventory);
 				}
 			}
-
 		}
 
-		rtn = mapper.writeValueAsString(productiteminventorylist);
-		apiRequest.setREQUEST_OUTPUT(rtn);
-		apiRequest.setREQUEST_STATUS("Success");
-		apirequestdatalogRepository.saveAndFlush(apiRequest);
-
-		log.info("Output: " + rtn);
-		log.info("--------------------------------------------------------");
-
-		return new ResponseEntity(rtn, HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventorylist, null, null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}	
 }
