@@ -25,11 +25,11 @@ public class ProductItemInventory {
 	@Transient
 	private String PRODUCTITEM_DETAIL;
 	
-	@Column(name = "LOCATION_ID")
-	private Long LOCATION_ID;
+	@Column(name = "PRODUCTLOCATION_ID")
+	private Long PRODUCTLOCATION_ID;
 	
 	@Transient
-	private String LOCATION_DETAIL;
+	private String PRODUCTLOCATION_DETAIL;
 	
 	@Column(name = "QUANTITY_ONHAND")
 	private Double QUANTITY_ONHAND ;
@@ -135,20 +135,20 @@ public class ProductItemInventory {
 		PRODUCTITEMINVENTORY_ID = pRODUCTITEMINVENTORY_ID;
 	}
 
-	public Long getLOCATION_ID() {
-		return LOCATION_ID;
+	public Long getPRODUCTLOCATION_ID() {
+		return PRODUCTLOCATION_ID;
 	}
 
-	public void setLOCATION_ID(Long lOCATION_ID) {
-		LOCATION_ID = lOCATION_ID;
+	public void setPRODUCTLOCATION_ID(Long pRODUCTLOCATION_ID) {
+		PRODUCTLOCATION_ID = pRODUCTLOCATION_ID;
 	}
 
-	public String getLOCATION_DETAIL() {
-		return LOCATION_DETAIL;
+	public String getPRODUCTLOCATION_DETAIL() {
+		return PRODUCTLOCATION_DETAIL;
 	}
 
-	public void setLOCATION_DETAIL(String lOCATION_DETAIL) {
-		LOCATION_DETAIL = lOCATION_DETAIL;
+	public void setPRODUCTLOCATION_DETAIL(String pRODUCTLOCATION_DETAIL) {
+		PRODUCTLOCATION_DETAIL = pRODUCTLOCATION_DETAIL;
 	}
 
 	public Double getQUANTITY_ONHAND() {

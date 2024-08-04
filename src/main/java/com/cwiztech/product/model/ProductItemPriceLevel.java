@@ -17,12 +17,6 @@ public class ProductItemPriceLevel {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long PRODUCTITEMPRICELEVEL_ID;
 	
-	@Column(name = "CURRENCY_ID")
-	private Long CURRENCY_ID;
-	
-	@Transient
-	private String CURRENCY_DETAIL;
-	
 	@Column(name = "PRODUCTITEM_ID")
 	private Long PRODUCTITEM_ID;
 	
@@ -40,6 +34,12 @@ public class ProductItemPriceLevel {
 	
 	@Column(name = "PRODUCTITEM_UNITPRICE")
 	private Double PRODUCTITEM_UNITPRICE;
+	
+	@Column(name = "CURRENCY_ID")
+	private Long CURRENCY_ID;
+	
+	@Transient
+	private String CURRENCY_DETAIL;
 	
 	@Column(name = "ISACTIVE")
 	private String ISACTIVE;
@@ -64,22 +64,6 @@ public class ProductItemPriceLevel {
 		PRODUCTITEMPRICELEVEL_ID = pRODUCTITEMPRICELEVEL_ID;
 	}
 
-	public Long getCURRENCY_ID() {
-		return CURRENCY_ID;
-	}
-
-	public void setCURRENCY_ID(Long cURRENCY_ID) {
-		CURRENCY_ID = cURRENCY_ID;
-	}
-
-	public String getCURRENCY_DETAIL() {
-		return CURRENCY_DETAIL;
-	}
-
-	public void setCURRENCY_DETAIL(String cURRENCY_DETAIL) {
-		CURRENCY_DETAIL = cURRENCY_DETAIL;
-	}
-
 	public Long getPRODUCTITEM_ID() {
 		return PRODUCTITEM_ID;
 	}
@@ -95,7 +79,6 @@ public class ProductItemPriceLevel {
 	public void setPRODUCTITEM_DETAIL(String pRODUCTITEM_DETAIL) {
 		PRODUCTITEM_DETAIL = pRODUCTITEM_DETAIL;
 	}
-
 
 	public Long getPRICELEVEL_ID() {
 		return PRICELEVEL_ID;
@@ -127,6 +110,22 @@ public class ProductItemPriceLevel {
 
 	public void setPRODUCTITEM_UNITPRICE(Double pRODUCTITEM_UNITPRICE) {
 		PRODUCTITEM_UNITPRICE = pRODUCTITEM_UNITPRICE;
+	}
+
+	public Long getCURRENCY_ID() {
+		return CURRENCY_ID;
+	}
+
+	public void setCURRENCY_ID(Long cURRENCY_ID) {
+		CURRENCY_ID = cURRENCY_ID;
+	}
+
+	public String getCURRENCY_DETAIL() {
+		return CURRENCY_DETAIL;
+	}
+
+	public void setCURRENCY_DETAIL(String cURRENCY_DETAIL) {
+		CURRENCY_DETAIL = cURRENCY_DETAIL;
 	}
 
 	public String getISACTIVE() {

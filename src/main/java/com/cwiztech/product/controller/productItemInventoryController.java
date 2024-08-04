@@ -190,15 +190,15 @@ public class productItemInventoryController {
 				if (!jsonObj.has("productitem_ID") || jsonObj.isNull("productitem_ID"))
 					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
-				if (!jsonObj.has("location_ID") || jsonObj.isNull("location_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "location_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+				if (!jsonObj.has("productlocation_ID") || jsonObj.isNull("productlocation_ID"))
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productlocation_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 			}
 			if (jsonObj.has("productitem_ID")  && !jsonObj.isNull("productitem_ID"))
 				productiteminventory.setPRODUCTITEM_ID(jsonObj.getLong("productitem_ID"));
 
-			if (jsonObj.has("location_ID") && !jsonObj.isNull("location_ID"))
-				productiteminventory.setLOCATION_ID(jsonObj.getLong("location_ID"));
+			if (jsonObj.has("productlocation_ID") && !jsonObj.isNull("productlocation_ID"))
+				productiteminventory.setPRODUCTLOCATION_ID(jsonObj.getLong("productlocation_ID"));
 
 			if (jsonObj.has("quantity_ONHAND") && !jsonObj.isNull("quantity_ONHAND"))
 				productiteminventory.setQUANTITY_ONHAND(jsonObj.getDouble("quantity_ONHAND"));
@@ -390,16 +390,10 @@ public class productItemInventoryController {
 		List<ProductItemInventory> productiteminventories = new ArrayList<ProductItemInventory>();
 		JSONObject jsonObj = new JSONObject(data);
 		JSONArray searchObject = new JSONArray();
+	
+		long productitem_ID = 0 , productlocation_ID = 0, inventoryclassification_ID = 0;
 		List<Integer> productitem_IDS = new ArrayList<Integer>(); 
-		List<Integer> location_IDS = new ArrayList<Integer>(); 
-		List<Integer> inventoryclassification_IDS = new ArrayList<Integer>(); 
-
-
 		productitem_IDS.add((int) 0);
-		location_IDS.add((int) 0);
-		inventoryclassification_IDS.add((int) 0);
-
-		long productitem_ID = 0 , location_ID = 0, inventoryclassification_ID = 0;
 
 		boolean isWithDetail = true;
 		if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
@@ -423,41 +417,26 @@ public class productItemInventoryController {
 			}
 		}
 
-		if (jsonObj.has("location_ID") && !jsonObj.isNull("location_ID") && jsonObj.getLong("location_ID") != 0) {
-			location_ID = jsonObj.getLong("location_ID");
-			location_IDS.add((int) location_ID);
-		} else if (jsonObj.has("location") && !jsonObj.isNull("location") && jsonObj.getLong("location") != 0) {
-			if (active == true) {
-				searchObject = new JSONArray(ServiceCall.POST("location/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
-			} else {
-				searchObject = new JSONArray(ServiceCall.POST("location/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
-			}
+		if (jsonObj.has("productlocation_ID") && !jsonObj.isNull("productlocation_ID"))
+			productlocation_ID = jsonObj.getLong("productlocation_ID");
+		else if (jsonObj.has("productlocation_CODE") && !jsonObj.isNull("productlocation_CODE")) {
+			JSONObject productlocation = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'PRODUCTLOCATION', code: "+jsonObj.getString("productlocation_CODE")+"}", apiRequest.getREQUEST_OUTPUT(), true));
+			if (productlocation != null)
+				productlocation_ID = productlocation.getLong("id");
+		} 
 
-			location_ID = searchObject.length();
-			for (int i=0; i<searchObject.length(); i++) {
-				location_IDS.add((int) searchObject.getJSONObject(i).getLong("location_ID"));
-			}
-		}
-		if (jsonObj.has("inventoryclassification_ID") && !jsonObj.isNull("inventoryclassification_ID") && jsonObj.getLong("location_ID") != 0) {
-			location_ID = jsonObj.getLong("location_ID");
-			location_IDS.add((int) location_ID);
-		} else if (jsonObj.has("location") && !jsonObj.isNull("location") && jsonObj.getLong("location") != 0) {
-			if (active == true) {
-				searchObject = new JSONArray(ServiceCall.POST("location/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
-			} else {
-				searchObject = new JSONArray(ServiceCall.POST("location/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
-			}
+		if (jsonObj.has("inventoryclassification_ID") && !jsonObj.isNull("inventoryclassification_ID"))
+			inventoryclassification_ID = jsonObj.getLong("inventoryclassification_ID");
+		else if (jsonObj.has("inventoryclassification_CODE") && !jsonObj.isNull("inventoryclassification_CODE")) {
+			JSONObject inventoryclassification = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'INVENTORYCLASSIFICTION', code: "+jsonObj.getString("inventoryclassification_CODE")+"}", apiRequest.getREQUEST_OUTPUT(), true));
+			if (inventoryclassification != null)
+				inventoryclassification_ID = inventoryclassification.getLong("id");
+		} 
 
-			location_ID = searchObject.length();
-			for (int i=0; i<searchObject.length(); i++) {
-				location_IDS.add((int) searchObject.getJSONObject(i).getLong("location_ID"));
-			}
-		}
-
-		if(productitem_ID != 0 || productitem_ID != 0){
+		if (productitem_ID != 0 || productlocation_ID != 0 || inventoryclassification_ID != 0) {
 			productiteminventories = ((active == true)
-					? productiteminventoryrepository.findByAdvancedSearch(productitem_ID, productitem_IDS, location_ID, location_IDS)
-							: productiteminventoryrepository.findAllByAdvancedSearch(productitem_ID, productitem_IDS, location_ID, location_IDS));
+					? productiteminventoryrepository.findByAdvancedSearch(productitem_ID, productitem_IDS, productlocation_ID, inventoryclassification_ID)
+							: productiteminventoryrepository.findAllByAdvancedSearch(productitem_ID, productitem_IDS, productlocation_ID, inventoryclassification_ID));
 		}
 		return new ResponseEntity(getAPIResponse(productiteminventories, null, null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}       
@@ -505,9 +484,9 @@ public class productItemInventoryController {
 				JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productiteminventory.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 				productiteminventory.setPRODUCTITEM_DETAIL(productitem.toString());
 
-				if(productiteminventory.getLOCATION_ID() != null) {
-					JSONObject location = new JSONObject(ServiceCall.GET("lookup/"+productiteminventory.getLOCATION_ID(), apiRequest.getREQUEST_OUTPUT(), true));
-					productiteminventory.setLOCATION_DETAIL(location.toString());
+				if(productiteminventory.getPRODUCTLOCATION_ID() != null) {
+					JSONObject productlocation = new JSONObject(ServiceCall.GET("lookup/"+productiteminventory.getPRODUCTLOCATION_ID(), apiRequest.getREQUEST_OUTPUT(), true));
+					productiteminventory.setPRODUCTLOCATION_DETAIL(productlocation.toString());
 				}
 				if(productiteminventory.getINVENTORYCLASSIFICTION_ID() != null) {
 					JSONObject inventoryclassification = new JSONObject(ServiceCall.GET("lookup/"+productiteminventory.getINVENTORYCLASSIFICTION_ID(), apiRequest.getREQUEST_OUTPUT(), true));
@@ -522,8 +501,8 @@ public class productItemInventoryController {
 					for (int i=0; i<productiteminventories.size(); i++) {
 						if(productiteminventories.get(i).getPRODUCTITEM_ID() != null)
 							productitemList.add(Integer.parseInt(productiteminventories.get(i).getPRODUCTITEM_ID().toString()));
-						if(productiteminventories.get(i).getLOCATION_ID() != null)
-							lookupList.add(Integer.parseInt(productiteminventories.get(i).getLOCATION_ID().toString()));
+						if(productiteminventories.get(i).getPRODUCTLOCATION_ID() != null)
+							lookupList.add(Integer.parseInt(productiteminventories.get(i).getPRODUCTLOCATION_ID().toString()));
 						if(productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() != null)
 							lookupList.add(Integer.parseInt(productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID().toString()));
 					}
@@ -540,8 +519,8 @@ public class productItemInventoryController {
 
 						for (int j=0; j<lookupObject.length(); j++) {
 							JSONObject lookup = lookupObject.getJSONObject(j);
-							if(productiteminventories.get(i).getLOCATION_ID() != null && productiteminventories.get(i).getLOCATION_ID() == lookup.getLong("id") ) {
-								productiteminventories.get(i).setLOCATION_DETAIL(lookup.toString());
+							if(productiteminventories.get(i).getPRODUCTLOCATION_ID() != null && productiteminventories.get(i).getPRODUCTLOCATION_ID() == lookup.getLong("id") ) {
+								productiteminventories.get(i).setPRODUCTLOCATION_DETAIL(lookup.toString());
 							}
 							if(productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() != null && productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() == lookup.getLong("id") ) {
 								productiteminventories.get(i).setINVENTORYCLASSIFICTION_DETAIL(lookup.toString());

@@ -315,36 +315,16 @@ public class productItemPriceLevelController {
         JSONObject jsonObj = new JSONObject(data);
         List<ProductItemPriceLevel> productitempricelevels = new ArrayList<ProductItemPriceLevel>();
         JSONArray searchObject = new JSONArray();
-        List<Integer> currency_IDS = new ArrayList<Integer>(); 
-        List<Integer> productitem_IDS = new ArrayList<Integer>(); 
-        List<Integer> pricelevel_IDS = new ArrayList<Integer>(); 
 
-        currency_IDS.add((int) 0);
-        productitem_IDS.add((int) 0);
-        pricelevel_IDS.add((int) 0);
         long currency_ID = 0, productitem_ID=0, pricelevel_ID=0;
+        List<Integer> productitem_IDS = new ArrayList<Integer>(); 
+        productitem_IDS.add((int) 0);
 
         boolean isWithDetail = true;
         if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
             isWithDetail = jsonObj.getBoolean("iswithdetail");
         }
         jsonObj.put("iswithdetail", false);
-
-        if (jsonObj.has("currency_ID") && !jsonObj.isNull("currency_ID") && jsonObj.getLong("currency_ID") != 0) {
-            currency_ID = jsonObj.getLong("currency_ID");
-            currency_IDS.add((int) currency_ID);
-        } else if (jsonObj.has("currency") && !jsonObj.isNull("currency") && jsonObj.getLong("currency") != 0) {
-            if (active == true) {
-                searchObject = new JSONArray(ServiceCall.POST("currency/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
-            } else {
-                searchObject = new JSONArray(ServiceCall.POST("currency/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
-            }
-
-            currency_ID = searchObject.length();
-            for (int i=0; i<searchObject.length(); i++) {
-                currency_IDS.add((int) searchObject.getJSONObject(i).getLong("currency_ID"));
-            }
-        }
 
         if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID") && jsonObj.getLong("productitem_ID") != 0) {
             productitem_ID = jsonObj.getLong("productitem_ID");
@@ -361,26 +341,27 @@ public class productItemPriceLevelController {
                 productitem_IDS.add((int) searchObject.getJSONObject(i).getLong("productitem_ID"));
             }
         }
-        if (jsonObj.has("pricelevel_ID") && !jsonObj.isNull("pricelevel_ID") && jsonObj.getLong("pricelevel_ID") != 0) {
-            pricelevel_ID = jsonObj.getLong("pricelevel_ID");
-            pricelevel_IDS.add((int) pricelevel_ID);
-        } else if (jsonObj.has("pricelevel") && !jsonObj.isNull("pricelevel") && jsonObj.getLong("pricelevel") != 0) {
-            if (active == true) {
-                searchObject = new JSONArray(ServiceCall.POST("pricelevel/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
-            } else {
-                searchObject = new JSONArray(ServiceCall.POST("pricelevel/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
-            }
+        
+		if (jsonObj.has("pricelevel_ID") && !jsonObj.isNull("pricelevel_ID"))
+			pricelevel_ID = jsonObj.getLong("pricelevel_ID");
+		else if (jsonObj.has("pricelevel_CODE") && !jsonObj.isNull("pricelevel_CODE")) {
+			JSONObject pricelevel = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'PRICELEVEL', code: "+jsonObj.getString("pricelevel_CODE")+"}", apiRequest.getREQUEST_OUTPUT(), true));
+			if (pricelevel != null)
+				pricelevel_ID = pricelevel.getLong("id");
+		} 
 
-            pricelevel_ID = searchObject.length();
-            for (int i=0; i<searchObject.length(); i++) {
-                pricelevel_IDS.add((int) searchObject.getJSONObject(i).getLong("pricelevel_ID"));
-            }
-        }
+		if (jsonObj.has("currency_ID") && !jsonObj.isNull("currency_ID"))
+			currency_ID = jsonObj.getLong("currency_ID");
+		else if (jsonObj.has("currency_CODE") && !jsonObj.isNull("currency_CODE")) {
+			JSONObject currency = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'CURRENCY', code: "+jsonObj.getString("currency_CODE")+"}", apiRequest.getREQUEST_OUTPUT(), true));
+			if (currency != null)
+				currency_ID = currency.getLong("id");
+		} 
 
-        if(currency_ID != 0 || productitem_ID != 0 || pricelevel_ID != 0){
+        if (productitem_ID != 0 || pricelevel_ID != 0 || currency_ID != 0) {
             productitempricelevels = ((active == true)
-                    ? productitempricelevelrepository.findByAdvancedSearch(currency_ID,currency_IDS,productitem_ID,productitem_IDS,pricelevel_ID,pricelevel_IDS)
-                            : productitempricelevelrepository.findAllByAdvancedSearch(currency_ID,currency_IDS,productitem_ID,productitem_IDS,pricelevel_ID,pricelevel_IDS));
+                    ? productitempricelevelrepository.findByAdvancedSearch(productitem_ID, productitem_IDS, pricelevel_ID, currency_ID)
+                            : productitempricelevelrepository.findAllByAdvancedSearch(productitem_ID, productitem_IDS, pricelevel_ID, currency_ID));
         }
         return new ResponseEntity(getAPIResponse(productitempricelevels, null , null, null, null, apiRequest, false,isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
     }
@@ -647,12 +628,10 @@ public class productItemPriceLevelController {
             long pricelevel_ID = productitem.getLong("pricelevel_ID");
             double productitem_unitprice = productitem.getLong("productitem_UNITPRICE");
             List<Integer> productitem_IDS = new ArrayList<Integer>(); 
-            List<Integer> pricelevel_IDS = new ArrayList<Integer>(); 
 
             productitem_IDS.add((int) 0);
-            pricelevel_IDS.add((int) 0);
 
-            List<ProductItemPriceLevel> productitempricelevel = productitempricelevelrepository.findByAdvancedSearch(productitem_ID, productitem_IDS, pricelevel_ID, pricelevel_IDS, (long) 0, currency_IDS);
+            List<ProductItemPriceLevel> productitempricelevel = productitempricelevelrepository.findByAdvancedSearch(productitem_ID, productitem_IDS, pricelevel_ID, (long) 0);
 
             if(!(productitempricelevel.size() == 0)){
                 for (int k=0; k<productitempricelevel.size(); k++){
