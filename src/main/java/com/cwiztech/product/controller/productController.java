@@ -329,6 +329,11 @@ public class productController {
 			if (jsonObj.has("producticon_URL") && !jsonObj.isNull("producticon_URL"))
 				product.setPRODUCTICON_URL(jsonObj.getString("producticon_URL"));
 
+			if (jsonObj.has("taxcode_ID") && !jsonObj.isNull("taxcode_ID"))
+				product.setTAXCODE_ID(jsonObj.getLong("taxcode_ID"));
+			else if(productid == 0)
+				product.setTAXCODE_ID((long) 2);
+
 			if (jsonObj.has("purchase_PRICE") && !jsonObj.isNull("purchase_PRICE"))
 				product.setPURCHASE_PRICE(jsonObj.getDouble("purchase_PRICE"));
 			else if (productid == 0)

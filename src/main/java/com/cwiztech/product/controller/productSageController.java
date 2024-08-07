@@ -187,6 +187,14 @@ public class productSageController {
 					objProductItem.put("productitem_NAME","AAA");
 				}
 
+				if (responseProduct.has("sales_tax_rate") && !responseProduct.isNull("sales_tax_rate")) {
+					if (responseProduct.getJSONObject("sales_tax_rate").getString("id").compareTo("GB_STANDARD") == 0) {
+						objProduct.put("taxcode_ID", 1);
+					} else {
+						objProduct.put("taxcode_ID", 2);
+					}
+				}
+
 				if (responseProduct.has("cost_price") && !responseProduct.isNull("cost_price")) {
 					objProduct.put("purchase_PRICE", responseProduct.getDouble("cost_price"));
 				}

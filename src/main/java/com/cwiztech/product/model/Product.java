@@ -44,6 +44,12 @@ public class Product {
     @Column(name = "PRODUCTICON_URL")
     private String PRODUCTICON_URL;
     
+    @Column(name = "TAXCODE_ID")
+    private Long TAXCODE_ID;
+    
+	@Transient
+	private String TAXCODE_DETAIL;
+	
     @Column(name = "PURCHASE_PRICE")
     private Double PURCHASE_PRICE;
     
@@ -145,7 +151,23 @@ public class Product {
         PRODUCTICON_URL = pRODUCTICON_URL;
     }
 
-    public Double getPURCHASE_PRICE() {
+    public Long getTAXCODE_ID() {
+		return TAXCODE_ID;
+	}
+
+	public void setTAXCODE_ID(Long tAXCODE_ID) {
+		TAXCODE_ID = tAXCODE_ID;
+	}
+
+	public String getTAXCODE_DETAIL() {
+		return TAXCODE_DETAIL;
+	}
+
+	public void setTAXCODE_DETAIL(String tAXCODE_DETAIL) {
+		TAXCODE_DETAIL = tAXCODE_DETAIL;
+	}
+
+	public Double getPURCHASE_PRICE() {
 		return PURCHASE_PRICE;
 	}
 
