@@ -33,23 +33,23 @@ public class Product {
 	private String PRODUCTCATEGORY_DETAIL;
 	
 	@Column(name = "PRODUCT_CODE")
-	private String PRODUCT_CODE ;
-	
-	@Column(name = "PRODUCT_NEWCODE")
-	private String PRODUCT_NEWCODE ;
+	private String PRODUCT_CODE;
 	
 	@Column(name = "PRODUCT_NAME")
-	private String PRODUCT_NAME ;
+	private String PRODUCT_NAME;
 	
 	@Column(name = "PRODUCT_DESC")
-	private String PRODUCT_DESC ;
+	private String PRODUCT_DESC;
 	
     @Column(name = "PRODUCTICON_URL")
-    private String PRODUCTICON_URL ;
+    private String PRODUCTICON_URL;
     
     @Column(name = "PURCHASE_PRICE")
-    private Double PURCHASE_PRICE ;
+    private Double PURCHASE_PRICE;
     
+	@Column(name = "PRODUCT_WEIGHT")
+	private Double PRODUCT_WEIGHT;
+	
 	@Column(name = "ISACTIVE")
 	private String ISACTIVE;
 
@@ -105,14 +105,6 @@ public class Product {
 		PRODUCT_CODE = pRODUCT_CODE;
 	}
 
-	public String getPRODUCT_NEWCODE() {
-		return PRODUCT_NEWCODE;
-	}
-
-	public void setPRODUCT_NEWCODE(String pRODUCT_NEWCODE) {
-		PRODUCT_NEWCODE = pRODUCT_NEWCODE;
-	}
-
 	public Long getPRODUCTCATEGORY_ID() {
 		return PRODUCTCATEGORY_ID;
 	}
@@ -159,6 +151,14 @@ public class Product {
 
 	public void setPURCHASE_PRICE(Double pURCHASE_PRICE) {
 		PURCHASE_PRICE = pURCHASE_PRICE;
+	}
+
+	public Double getPRODUCT_WEIGHT() {
+		return PRODUCT_WEIGHT;
+	}
+
+	public void setPRODUCT_WEIGHT(Double pRODUCT_WEIGHT) {
+		PRODUCT_WEIGHT = pRODUCT_WEIGHT;
 	}
 
     public String getISACTIVE() {

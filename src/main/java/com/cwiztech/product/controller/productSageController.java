@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -130,6 +131,106 @@ public class productSageController {
         }
 		
 		return new ResponseEntity(getAPIResponse(null, null , objProducts, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/getfromsage/{page}", method = RequestMethod.GET)
+	public ResponseEntity GetFromSage(@PathVariable Long page, @RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
+		APIRequestDataLog apiRequest = checkToken("GET", "/product/getfromsage", null, null, headToken);
+		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+
+		boolean lastPage = false;
+
+		JSONObject response = new JSONObject(new JSONObject(SageService.GET("stock_items?page=" + (page-1) + "&items_per_page=100", headToken, apiRequest.getDATABASETABLE_ID())).getString("REQUEST_OUTPUT"));
+
+		log.info("response sage: "+response);
+		
+		while (lastPage == false) {
+			JSONArray jsonProducts = response.getJSONArray("$items");
+
+			for (int i=0; i<jsonProducts.length(); i++) {
+				JSONObject jsonProduct = jsonProducts.getJSONObject(i);
+				long productitem_id = 0;
+
+				Product product = productrepository.findBySageID(jsonProduct.getString("id"));
+//				Product product = productrepository.findBySageID("186b84b02cf5444b979cac29b585451a");
+				JSONObject objProduct = new JSONObject();
+				JSONObject objProductItem = new JSONObject();
+				JSONObject objProductItemPrice = new JSONObject();
+				JSONObject objProductItemInventory = new JSONObject();
+				if (product != null) {
+					objProduct.put("product_ID", product.getPRODUCT_ID());
+					JSONArray productitems = new JSONArray(ServiceCall.POST("productitem/advancedsearch", objProduct.toString(), apiRequest.getREQUEST_OUTPUT(), false));
+					if (productitems.length() > 0) {
+						productitem_id = productitems.getJSONObject(productitems.length()-1).getLong("productitem_ID");
+						objProductItem.put("productitem_ID", productitem_id);
+
+						JSONArray productitemprices = new JSONArray(ServiceCall.POST("productitempricelevel/advancedsearch", objProductItem.toString(), apiRequest.getREQUEST_OUTPUT(), false));
+						JSONArray productiteminventory = new JSONArray(ServiceCall.POST("productiteminventory/advancedsearch", objProductItem.toString(), apiRequest.getREQUEST_OUTPUT(), false));
+					}
+				}
+				JSONObject responseProduct = new JSONObject(new JSONObject(SageService.GET("stock_items/" + jsonProduct.getString("id"), headToken, apiRequest.getDATABASETABLE_ID())).getString("REQUEST_OUTPUT"));
+//				JSONObject responseProduct = new JSONObject(SageService.GET("contacts/186b84b02cf5444b979cac29b585451a?show_balance=true&show_overdue_balance=true", headToken));
+
+				objProduct.put("sage_ID", responseProduct.getString("id"));
+				objProduct.put("productcategory_ID", 1);
+				if (responseProduct.has("item_code") && !responseProduct.isNull("item_code")) {
+					objProduct.put("product_CODE", responseProduct.getString("item_code"));
+				} else {
+					responseProduct.put("product_CODE", "AAA");
+				}
+				if (responseProduct.has("description") && !responseProduct.isNull("description")) {
+					objProduct.put("product_NAME", responseProduct.getString("description"));
+					objProductItem.put("productitem_NAME", responseProduct.getString("description"));
+				} else {
+					objProduct.put("product_NAME","AAA");
+					objProductItem.put("productitem_NAME","AAA");
+				}
+
+				if (responseProduct.has("cost_price") && !responseProduct.isNull("cost_price")) {
+					objProduct.put("purchase_PRICE", responseProduct.getDouble("cost_price"));
+				}
+
+				if (responseProduct.has("weight") && !responseProduct.isNull("weight")) {
+					objProduct.put("product_WEIGHT", responseProduct.getString("weight"));
+				}
+
+				if (responseProduct.has("notes") && !responseProduct.isNull("notes")) {
+					objProduct.put("product_DESC", responseProduct.getString("notes"));
+					objProductItem.put("productitem_DESC", responseProduct.getString("notes"));
+				}
+
+				log.info("objProduct: "+objProduct);
+				log.info("page: "+page);
+
+				JSONObject products = new JSONObject(ServiceCall.POST("product", objProduct.toString(), apiRequest.getREQUEST_OUTPUT(), false));
+
+				objProductItem.put("product_ID", products.getLong("product_ID"));
+				JSONObject productitems = new JSONObject(ServiceCall.POST("productitem", objProductItem.toString(), apiRequest.getREQUEST_OUTPUT(), false));
+
+				JSONArray salesprices = responseProduct.getJSONArray("sales_prices");
+				objProductItemPrice.put("productitem_ID", productitems.getLong("productitem_ID"));
+				objProductItemPrice.put("pricelevel_CODE", "2");
+				objProductItemPrice.put("currency_CODE", "GB");
+				objProductItemPrice.put("productitem_QUANTITY", 1);
+				objProductItemPrice.put("productitem_UNITPRICE", salesprices.getJSONObject(0).getString("price"));
+				ServiceCall.POST("productitempricelevel", objProductItemPrice.toString(), apiRequest.getREQUEST_OUTPUT(), false);
+
+				objProductItemInventory.put("productitem_ID", productitems.getLong("productitem_ID"));
+				objProductItemInventory.put("productlocation_CODE", "1");
+				objProductItemPrice.put("quantity_ONHAND", responseProduct.getDouble("quantity_in_stock"));
+				objProductItemPrice.put("quantity_AVAILABLE", responseProduct.getDouble("quantity_in_stock"));
+				ServiceCall.POST("productiteminventory", objProductItemInventory.toString(), apiRequest.getREQUEST_OUTPUT(), false);
+			}
+
+
+			if (response.isNull("$next"))
+				lastPage = true;
+			response = new JSONObject(new JSONObject(SageService.GET("stock_items?page=" + page + "&items_per_page=100", headToken, apiRequest.getDATABASETABLE_ID())).getString("REQUEST_OUTPUT"));
+			page = page + 1;
+		}
+
+		return new ResponseEntity(getAPIResponse(null, null , null, null, "Product Updated", apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {

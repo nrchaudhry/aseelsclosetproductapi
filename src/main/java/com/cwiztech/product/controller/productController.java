@@ -334,6 +334,11 @@ public class productController {
 			else if (productid == 0)
 				product.setPURCHASE_PRICE(0.0);
 
+			if (jsonObj.has("product_WEIGHT")  && !jsonObj.isNull("product_WEIGHT"))
+				product.setPRODUCT_WEIGHT(jsonObj.getDouble("product_WEIGHT"));
+			else if (productid == 0)
+				product.setPRODUCT_WEIGHT(0.0);
+
 			if (productid == 0)
 				product.setISACTIVE("Y");
 			else if (jsonObj.has("isactive"))

@@ -11,9 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "TBLPRODUCTITEM")
-
 public class ProductItem {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long PRODUCTITEM_ID;

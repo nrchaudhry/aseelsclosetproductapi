@@ -37,7 +37,6 @@ import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 @RestController
 @CrossOrigin
 @RequestMapping("/productitempricelevel")
