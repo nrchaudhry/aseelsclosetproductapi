@@ -207,6 +207,7 @@ public class productSageController {
 					objProduct.put("product_DESC", responseProduct.getString("notes"));
 					objProductItem.put("productitem_DESC", responseProduct.getString("notes"));
 				}
+				objProductItem.put("application_ID", 1);
 
 				log.info("objProduct: "+objProduct);
 				log.info("page: "+page);
