@@ -192,13 +192,18 @@ public class productItemInventoryController {
 
 				if ((!jsonObj.has("productlocation_ID") || jsonObj.isNull("productlocation_ID")) && (!jsonObj.has("productlocation_CODE") || jsonObj.isNull("productlocation_CODE"))) 
 					return new ResponseEntity(getAPIResponse(null, null , null, null, "productlocation_ID/productlocation_CODE is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
-
 			}
+
 			if (jsonObj.has("productitem_ID")  && !jsonObj.isNull("productitem_ID"))
 				productiteminventory.setPRODUCTITEM_ID(jsonObj.getLong("productitem_ID"));
 
 			if (jsonObj.has("productlocation_ID") && !jsonObj.isNull("productlocation_ID"))
 				productiteminventory.setPRODUCTLOCATION_ID(jsonObj.getLong("productlocation_ID"));
+			else if (jsonObj.has("productlocation_CODE") && !jsonObj.isNull("productlocation_CODE")) {
+				JSONObject productlocation = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'PRODUCTLOCATION', code: "+jsonObj.getString("productlocation_CODE")+"}", apiRequest.getREQUEST_OUTPUT(), true));
+				if (productlocation != null)
+					productiteminventory.setPRODUCTLOCATION_ID(productlocation.getLong("id"));
+			}
 
 			if (jsonObj.has("quantity_ONHAND") && !jsonObj.isNull("quantity_ONHAND"))
 				productiteminventory.setQUANTITY_ONHAND(jsonObj.getDouble("quantity_ONHAND"));
