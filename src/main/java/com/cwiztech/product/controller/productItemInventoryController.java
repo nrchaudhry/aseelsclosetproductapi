@@ -190,8 +190,8 @@ public class productItemInventoryController {
 				if (!jsonObj.has("productitem_ID") || jsonObj.isNull("productitem_ID"))
 					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
-				if (!jsonObj.has("productlocation_ID") || jsonObj.isNull("productlocation_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productlocation_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+				if (!jsonObj.has("productlocation_ID") || jsonObj.isNull("productlocation_ID") || !jsonObj.has("productlocation_CODE") || jsonObj.isNull("productlocation_CODE")) 
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productlocation_ID/productlocation_CODE is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 			}
 			if (jsonObj.has("productitem_ID")  && !jsonObj.isNull("productitem_ID"))
