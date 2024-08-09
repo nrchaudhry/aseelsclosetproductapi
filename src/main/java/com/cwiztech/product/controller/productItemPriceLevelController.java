@@ -201,16 +201,26 @@ public class productItemPriceLevelController {
             }
             if (jsonObj.has("currency_ID") && !jsonObj.isNull("currency_ID")) 			
                 productitempricelevel.setCURRENCY_ID(jsonObj.getLong("currency_ID"));
-            else
-                productitempricelevel.setCURRENCY_ID((long) 91);
+			else if (jsonObj.has("currency_CODE") && !jsonObj.isNull("currency_CODE")) {
+				JSONObject currency = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'CURRENCY', code: "+jsonObj.getString("currency_CODE")+"}", apiRequest.getREQUEST_OUTPUT(), true));
+				if (currency != null)
+					productitempricelevel.setCURRENCY_ID(currency.getLong("id"));
+			} else if (productitempricelevelid == 0) {
+				JSONObject currency = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'CURRENCY', code: 'GB'}", apiRequest.getREQUEST_OUTPUT(), true));
+				if (currency != null)
+					productitempricelevel.setCURRENCY_ID(currency.getLong("id"));
+			} 
 
             if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID")) 
                 productitempricelevel.setPRODUCTITEM_ID(jsonObj.getLong("productitem_ID"));
 
             if (jsonObj.has("pricelevel_ID") && !jsonObj.isNull("pricelevel_ID")) 
                 productitempricelevel.setPRICELEVEL_ID(jsonObj.getLong("pricelevel_ID"));
-            else
-                productitempricelevel.setPRICELEVEL_ID((long) 148);
+			else if (jsonObj.has("pricelevel_CODE") && !jsonObj.isNull("pricelevel_CODE")) {
+				JSONObject pricelevel = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'PRICELEVEL', code: "+jsonObj.getString("pricelevel_CODE")+"}", apiRequest.getREQUEST_OUTPUT(), true));
+				if (pricelevel != null)
+					productitempricelevel.setPRICELEVEL_ID(pricelevel.getLong("id"));
+			}
 
             if (jsonObj.has("productitem_QUANTITY")  && !jsonObj.isNull("productitem_QUANTITY"))
                 productitempricelevel.setPRODUCTITEM_QUANTITY(jsonObj.getLong("productitem_QUANTITY"));
