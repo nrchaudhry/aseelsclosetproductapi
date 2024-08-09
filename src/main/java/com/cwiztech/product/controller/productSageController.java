@@ -200,7 +200,7 @@ public class productSageController {
 				}
 
 				if (responseProduct.has("weight") && !responseProduct.isNull("weight")) {
-					objProduct.put("product_WEIGHT", responseProduct.getString("weight"));
+					objProduct.put("product_WEIGHT", responseProduct.getDouble("weight"));
 				}
 
 				if (responseProduct.has("notes") && !responseProduct.isNull("notes")) {
