@@ -227,8 +227,8 @@ public class productSageController {
 
 				objProductItemInventory.put("productitem_ID", productitems.getLong("productitem_ID"));
 				objProductItemInventory.put("productlocation_CODE", "1");
-				objProductItemPrice.put("quantity_ONHAND", responseProduct.getDouble("quantity_in_stock"));
-				objProductItemPrice.put("quantity_AVAILABLE", responseProduct.getDouble("quantity_in_stock"));
+				objProductItemInventory.put("quantity_ONHAND", responseProduct.getDouble("quantity_in_stock"));
+				objProductItemInventory.put("quantity_AVAILABLE", responseProduct.getDouble("quantity_in_stock"));
 				ServiceCall.POST("productiteminventory", objProductItemInventory.toString(), apiRequest.getREQUEST_OUTPUT(), false);
 			}
 
