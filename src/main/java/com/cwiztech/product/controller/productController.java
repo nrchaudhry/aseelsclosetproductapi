@@ -548,7 +548,7 @@ public class productController {
 					}
 
 					JSONArray productcategoryObject = new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getREQUEST_OUTPUT(), false));
-					JSONArray taxcodeObject = new JSONArray(ServiceCall.POST("taxcode/ids", "{productcategories: "+taxcodeList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+					JSONArray taxcodeObject = new JSONArray(ServiceCall.POST("taxcode/ids", "{taxcodes: "+taxcodeList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 
 					for (int i=0; i<products.size(); i++) {
 						for (int j=0; j<productcategoryObject.length(); j++) {
