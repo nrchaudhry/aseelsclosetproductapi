@@ -525,26 +525,42 @@ public class productController {
 					product.setPRODUCTCATEGORY_DETAIL(productcategory.toString());
 				}
 
+				if(product.getTAXCODE_ID() != null) {
+					JSONObject taxcode = new JSONObject(ServiceCall.GET("taxcode/"+product.getTAXCODE_ID(), apiRequest.getREQUEST_OUTPUT(), false));
+					product.setTAXCODE_DETAIL(taxcode.toString());
+				}
+
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(product));
-				productID = product.getPRODUCTCATEGORY_ID();
+				productID = product.getPRODUCT_ID();
 
 			}else if (products != null && isWithDetail == true){
 				if (products.size()>0) {
 					List<Integer> productcategoryList = new ArrayList<Integer>();
+					List<Integer> taxcodeList = new ArrayList<Integer>();
 
 					for (int i=0; i<products.size(); i++) {
 						if(products.get(i).getPRODUCTCATEGORY_ID() != null) {
 							productcategoryList.add(Integer.parseInt(products.get(i).getPRODUCTCATEGORY_ID().toString()));
 						}
+						if(products.get(i).getTAXCODE_ID() != null) {
+							taxcodeList.add(Integer.parseInt(products.get(i).getTAXCODE_ID().toString()));
+						}
 					}
 
 					JSONArray productcategoryObject = new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+					JSONArray taxcodeObject = new JSONArray(ServiceCall.POST("taxcode/ids", "{productcategories: "+taxcodeList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 
 					for (int i=0; i<products.size(); i++) {
 						for (int j=0; j<productcategoryObject.length(); j++) {
 							JSONObject productcategory = productcategoryObject.getJSONObject(j);
 							if(products.get(i).getPRODUCTCATEGORY_ID() != null && products.get(i).getPRODUCTCATEGORY_ID() == productcategory.getLong("productcategory_ID")) {
 								products.get(i).setPRODUCTCATEGORY_DETAIL(productcategory.toString());
+							}
+						}
+						for (int j=0; j<taxcodeObject.length(); j++) {
+							JSONObject taxcode = taxcodeObject.getJSONObject(j);
+							if(products.get(i).getTAXCODE_ID() != null && products.get(i).getTAXCODE_ID() == taxcode.getLong("taxcode_ID")) {
+								products.get(i).setTAXCODE_DETAIL(taxcode.toString());
 							}
 						}
 					}
