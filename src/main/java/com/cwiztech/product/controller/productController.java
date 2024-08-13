@@ -87,6 +87,7 @@ public class productController {
 		for (int i=0; i<jsonProducts.length(); i++) {
 			jsonProducts.getJSONObject(i).put("unitprice", jsonProducts.getJSONObject(i).getDouble("purchase_PRICE"));
             JSONObject taxcode = new JSONObject(jsonProducts.getJSONObject(i).getString("taxcode_DETAIL"));
+            jsonProducts.getJSONObject(i).put("taxcode_ID", taxcode.getLong("taxcode_ID"));
             jsonProducts.getJSONObject(i).put("taxcode", taxcode.getString("taxcode_TITLE"));
             jsonProducts.getJSONObject(i).put("vat", taxcode.getLong("taxcode_PERCENTAGE"));
 			for (int j=0; j<productattributevalues.length(); j++) {
