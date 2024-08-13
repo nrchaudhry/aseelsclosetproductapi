@@ -81,14 +81,14 @@ public class productController {
 		APIRequestDataLog apiRequest = checkToken("GET", "/product/detail", null, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
-		ObjectMapper mapper = new ObjectMapper();
-		List<Product> products = productrepository.findActive();
-		JSONArray jsonProducts = new JSONArray(mapper.writeValueAsString(products));
-
+		JSONArray jsonProducts = new JSONArray(ServiceCall.GET("product", headToken, false));
 		JSONArray productattributevalues = new JSONArray(ServiceCall.GET("productattributevalue", headToken, false));
 
 		for (int i=0; i<jsonProducts.length(); i++) {
 			jsonProducts.getJSONObject(i).put("unitprice", jsonProducts.getJSONObject(i).getDouble("purchase_PRICE"));
+            JSONObject taxcode = new JSONObject(jsonProducts.getJSONObject(i).getString("taxcode_DETAIL"));
+            jsonProducts.getJSONObject(i).put("taxcode", taxcode.getString("taxcode_TITLE"));
+            jsonProducts.getJSONObject(i).put("vat", taxcode.getLong("taxcode_PERCENTAGE"));
 			for (int j=0; j<productattributevalues.length(); j++) {
 				JSONObject productattributevalue = productattributevalues.getJSONObject(j);
 				JSONObject productattribute = new JSONObject(productattributevalue.getString("productattribute_DETAIL"));
