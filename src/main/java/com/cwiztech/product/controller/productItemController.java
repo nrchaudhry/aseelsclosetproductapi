@@ -124,11 +124,11 @@ public class productItemController {
 			productitems = productitemrepository.findByIDs(productitem_IDS);
 
 		if (productitems.size()>0) {
-			List<Integer> applicationList = new ArrayList<Integer>();
-			for (int i=0; i<productitems.size(); i++) {
-				applicationList.add(Integer.parseInt(productitems.get(i).getAPPLICATION_ID().toString()));
-			}
-			JSONArray logisticsObject = new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+//			List<Integer> applicationList = new ArrayList<Integer>();
+//			for (int i=0; i<productitems.size(); i++) {
+//				applicationList.add(Integer.parseInt(productitems.get(i).getAPPLICATION_ID().toString()));
+//			}
+//			JSONArray logisticsObject = new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 
 			List<Integer> productList = new ArrayList<Integer>();
 			for (int i=0; i<productitems.size(); i++) {
@@ -137,12 +137,12 @@ public class productItemController {
 			JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT(), false));
 
 			for (int i=0; i<productitems.size(); i++) {
-				for (int j=0; j<logisticsObject.length(); j++) {
-					JSONObject application = logisticsObject.getJSONObject(j);
-					if(productitems.get(i).getAPPLICATION_ID() == application.getLong("application_ID") ) {
-						productitems.get(i).setAPPLICATION_DETAIL(application.toString());
-					}
-				}
+//				for (int j=0; j<logisticsObject.length(); j++) {
+//					JSONObject application = logisticsObject.getJSONObject(j);
+//					if(productitems.get(i).getAPPLICATION_ID() == application.getLong("application_ID") ) {
+//						productitems.get(i).setAPPLICATION_DETAIL(application.toString());
+//					}
+//				}
 
 				for (int j=0; j<productObject.length(); j++) {
 					JSONObject product = productObject.getJSONObject(j);
@@ -157,7 +157,14 @@ public class productItemController {
 		JSONArray productitemattributevalues = new JSONArray(ServiceCall.POST("productitemattributevalue/productitem/ids", jsonObj.toString().replace("//", ""), apiRequest.getREQUEST_OUTPUT(), false));
 		for (int i=0; i<productitems.size(); i++) {
 			JSONObject objProductItem = new JSONObject(mapper.writeValueAsString(productitems.get(i)));
-			for (int j=0; j<productitemattributevalues.length(); j++) {
+			
+            JSONObject product = new JSONObject(productitems.get(i).getPRODUCT_DETAIL());
+            objProductItem.put("purchase_PRICE", product.getLong("purchase_PRICE"));
+            JSONObject taxcode = new JSONObject(product.getString("taxcode_DETAIL"));
+            objProductItem.put("taxcode", taxcode.getString("taxcode_TITLE"));
+            objProductItem.put("vat", taxcode.getLong("taxcode_PERCENTAGE"));
+
+            for (int j=0; j<productitemattributevalues.length(); j++) {
 				if (productitems.get(i).getPRODUCTITEM_ID()==productitemattributevalues.getJSONObject(j).getLong("productitem_ID")) {
 					JSONObject jsonproductattribute = new JSONObject(productitemattributevalues.getJSONObject(j).getString("productattribute_DETAIL"));
 					JSONObject jsonattribute = new JSONObject(jsonproductattribute.getString("attribute_DETAIL"));
