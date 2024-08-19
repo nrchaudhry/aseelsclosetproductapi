@@ -558,6 +558,7 @@ public class productItemPriceLevelController {
             JSONObject product = new JSONObject(productitems.getJSONObject(i).getString("product_DETAIL"));
             objProductItem.put("purchase_PRICE", product.getLong("purchase_PRICE"));
             JSONObject taxcode = new JSONObject(product.getString("taxcode_DETAIL"));
+            objProductItem.put("taxcode_ID", taxcode.getLong("taxcode_ID"));
             objProductItem.put("taxcode", taxcode.getString("taxcode_TITLE"));
             objProductItem.put("vat", taxcode.getLong("taxcode_PERCENTAGE"));
             for (int j=0; j<productitemiventory.size(); j++) {
