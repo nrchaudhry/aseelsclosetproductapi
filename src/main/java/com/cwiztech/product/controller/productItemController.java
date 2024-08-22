@@ -160,6 +160,7 @@ public class productItemController {
 			
             JSONObject product = new JSONObject(productitems.get(i).getPRODUCT_DETAIL());
             objProductItem.put("purchase_PRICE", product.getLong("purchase_PRICE"));
+            objProductItem.put("weight", product.getDouble("product_WEIGHT"));
             JSONObject taxcode = new JSONObject(product.getString("taxcode_DETAIL"));
             objProductItem.put("taxcode_ID", taxcode.getLong("taxcode_ID"));
             objProductItem.put("taxcode", taxcode.getString("taxcode_TITLE"));
