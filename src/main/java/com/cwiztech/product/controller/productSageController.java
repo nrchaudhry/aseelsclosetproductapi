@@ -141,7 +141,7 @@ public class productSageController {
 
 		boolean lastPage = false;
 
-		JSONObject response = new JSONObject(new JSONObject(SageService.GET("stock_items?page=" + (page-1) + "&items_per_page=100", headToken, apiRequest.getDATABASETABLE_ID())).getString("REQUEST_OUTPUT"));
+		JSONObject response = new JSONObject(new JSONObject(SageService.GET("products?page=" + (page-1) + "&items_per_page=100", headToken, apiRequest.getDATABASETABLE_ID())).getString("REQUEST_OUTPUT"));
 
 		log.info("response sage: "+response);
 		
