@@ -69,9 +69,16 @@ public class productSageController {
 
     		objProductDetail.put("catalog_item_type_id", "STOCK_ITEM");	
     		objProductDetail.put("item_code", products.get(i).getPRODUCT_CODE());
-    		objProductDetail.put("description", products.get(i).getPRODUCT_DESC());	
+    		objProductDetail.put("description", products.get(i).getPRODUCT_NAME());	
     		objProductDetail.put("sales_ledger_account_id", "819fd52d842f11ed84fa0252b90cda0d");
     		objProductDetail.put("purchase_ledger_account_id", "81a0cf2c842f11ed84fa0252b90cda0d");
+			if (products.get(i).getTAXCODE_ID() == 1) {
+	    		objProductDetail.put("sales_tax_rate_id", "GB_STANDARD");
+	    		objProductDetail.put("purchase_tax_rate_id", "GB_STANDARD");
+			} else {
+	    		objProductDetail.put("sales_tax_rate_id", "GB_ZERO");
+	    		objProductDetail.put("purchase_tax_rate_id", "GB_ZERO");
+			}
 
     		JSONArray productitems = new JSONArray(ServiceCall.POST("productitem/advancedsearch", "{product_ID: "+products.get(i).getPRODUCT_ID()+"}", apiRequest.getREQUEST_OUTPUT(), false));
 	        if (productitems.length()>0) {
