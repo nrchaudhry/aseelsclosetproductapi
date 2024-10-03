@@ -126,8 +126,9 @@ public class productSageController {
 
 
 			objProduct.put("stock_item", objProductDetail);
-			JSONObject response = new JSONObject(SageService.POST("stock_items", objProduct.toString(), headToken, apiRequest.getDATABASETABLE_ID()));
-			
+			APIRequestDataLog apiRequestResponse = SageService.POST("stock_items", objProduct.toString(), headToken, apiRequest.getDATABASETABLE_ID());
+			JSONObject response = new JSONObject(apiRequestResponse.getREQUEST_OUTPUT());
+
 			JSONObject product = new JSONObject();
 			product.put("product_ID", products.get(i).getPRODUCT_ID());
 			product.put("sage_ID", response.getString("id"));
