@@ -451,6 +451,8 @@ public class productCategoryController {
 				objproductcategory.put("productcategoryorder_NO", productcategory.get(i).getPRODUCTCATEGORYORDER_NO());
 				objproductcategory.put("productcategory_NAME", productcategory.get(i).getPRODUCTCATEGORY_NAME());
 				objproductcategory.put("productcategory_DESC", productcategory.get(i).getPRODUCTCATEGORY_DESC());
+				objproductcategory.put("productcategoryimage_URL", productcategory.get(i).getPRODUCTCATEGORYIMAGE_URL());
+				objproductcategory.put("productcategoryicon_URL", productcategory.get(i).getPRODUCTCATEGORYICON_URL());
 				objproductcategory.put("sublist", getProductcategoriesubList(productcategory.get(i).getPRODUCTCATEGORY_ID()));
 
 				productcategories.put(objproductcategory);
