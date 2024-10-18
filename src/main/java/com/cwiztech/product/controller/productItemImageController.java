@@ -302,7 +302,7 @@ public class productItemImageController {
     }
 
 		if(productitem_ID != 0){
-			List<ProductItemImage> productitemimage = ((active == true)
+			productitemimages = ((active == true)
 				? productitemimagerepository.findByAdvancedSearch(productitem_ID,productitem_IDS)
 				: productitemimagerepository.findAllByAdvancedSearch(productitem_ID,productitem_IDS));
 
