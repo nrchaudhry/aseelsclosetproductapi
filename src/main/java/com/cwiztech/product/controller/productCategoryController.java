@@ -461,7 +461,7 @@ public class productCategoryController {
 
 		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductCategory.getDatabaseTableID());
 		APIRequestDataLog apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, requestUser,
-				"/productcategory", null, workstation);
+				"/productcategory/web", null, workstation);
 
 		rtn = productcategories.toString();
 
