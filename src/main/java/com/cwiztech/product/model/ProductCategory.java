@@ -42,6 +42,9 @@ public class ProductCategory {
 	@Column(name = "PRODUCTCATEGORY_DESC")
 	private String PRODUCTCATEGORY_DESC ;
 	
+    @Column(name = "PRODUCTCATEGORYIMAGE_URL")
+    private String PRODUCTCATEGORYIMAGE_URL ;
+    
     @Column(name = "PRODUCTCATEGORYICON_URL")
     private String PRODUCTCATEGORYICON_URL ;
     
@@ -123,6 +126,14 @@ public class ProductCategory {
 
 	public void setPRODUCTCATEGORY_DESC(String pRODUCTCATEGORY_DESC) {
 		PRODUCTCATEGORY_DESC = pRODUCTCATEGORY_DESC;
+	}
+
+	public String getPRODUCTCATEGORYIMAGE_URL() {
+		return PRODUCTCATEGORYIMAGE_URL;
+	}
+
+	public void setPRODUCTCATEGORYIMAGE_URL(String pRODUCTCATEGORYIMAGE_URL) {
+		PRODUCTCATEGORYIMAGE_URL = pRODUCTCATEGORYIMAGE_URL;
 	}
 
 	public String getPRODUCTCATEGORYICON_URL() {

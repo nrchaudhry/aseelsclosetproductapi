@@ -214,6 +214,9 @@ public class productCategoryController {
 			if (jsonObj.has("productcategory_DESC") && !jsonObj.isNull("productcategory_DESC"))
 				productcategory.setPRODUCTCATEGORY_DESC(jsonObj.getString("productcategory_DESC"));
 
+			if (jsonObj.has("productcategoryimage_URL") && !jsonObj.isNull("productcategoryimage_URL"))
+				productcategory.setPRODUCTCATEGORYIMAGE_URL(jsonObj.getString("productcategoryimage_URL"));
+
 			if (jsonObj.has("productcategoryicon_URL") && !jsonObj.isNull("productcategoryicon_URL"))
 				productcategory.setPRODUCTCATEGORYICON_URL(jsonObj.getString("productcategoryicon_URL"));
 
