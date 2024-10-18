@@ -451,8 +451,16 @@ public class productCategoryController {
 				objproductcategory.put("productcategoryorder_NO", productcategory.get(i).getPRODUCTCATEGORYORDER_NO());
 				objproductcategory.put("productcategory_NAME", productcategory.get(i).getPRODUCTCATEGORY_NAME());
 				objproductcategory.put("productcategory_DESC", productcategory.get(i).getPRODUCTCATEGORY_DESC());
-				objproductcategory.put("productcategoryimage_URL", productcategory.get(i).getPRODUCTCATEGORYIMAGE_URL());
-				objproductcategory.put("productcategoryicon_URL", productcategory.get(i).getPRODUCTCATEGORYICON_URL());
+				if (productcategory.get(i).getPRODUCTCATEGORYIMAGE_URL() == null) {
+					objproductcategory.put("productcategoryimage_URL", "");
+				} else {
+					objproductcategory.put("productcategoryimage_URL", productcategory.get(i).getPRODUCTCATEGORYIMAGE_URL());
+				}
+				if (productcategory.get(i).getPRODUCTCATEGORYICON_URL() == null) {
+					objproductcategory.put("productcategoryicon_URL", "");
+				} else {
+					objproductcategory.put("productcategoryicon_URL", productcategory.get(i).getPRODUCTCATEGORYICON_URL());
+				}
 				objproductcategory.put("sublist", getProductcategoriesubList(productcategory.get(i).getPRODUCTCATEGORY_ID()));
 
 				productcategories.put(objproductcategory);
@@ -487,8 +495,16 @@ public class productCategoryController {
 				objproductcategory.put("productcategoryorder_NO", productcategory.get(i).getPRODUCTCATEGORYORDER_NO());
 				objproductcategory.put("productcategory_NAME", productcategory.get(i).getPRODUCTCATEGORY_NAME());
 				objproductcategory.put("productcategory_DESC", productcategory.get(i).getPRODUCTCATEGORY_DESC());
-				objproductcategory.put("productcategoryimage_URL", productcategory.get(i).getPRODUCTCATEGORYIMAGE_URL());
-				objproductcategory.put("productcategoryicon_URL", productcategory.get(i).getPRODUCTCATEGORYICON_URL());
+				if (productcategory.get(i).getPRODUCTCATEGORYIMAGE_URL() == null) {
+					objproductcategory.put("productcategoryimage_URL", "");
+				} else {
+					objproductcategory.put("productcategoryimage_URL", productcategory.get(i).getPRODUCTCATEGORYIMAGE_URL());
+				}
+				if (productcategory.get(i).getPRODUCTCATEGORYICON_URL() == null) {
+					objproductcategory.put("productcategoryicon_URL", "");
+				} else {
+					objproductcategory.put("productcategoryicon_URL", productcategory.get(i).getPRODUCTCATEGORYICON_URL());
+				}
 				objproductcategory.put("sublist", getProductcategoriesubList(productcategory.get(i).getPRODUCTCATEGORY_ID()));
 
 				objSubList.put(objproductcategory);
