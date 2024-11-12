@@ -10,7 +10,7 @@ import com.cwiztech.product.model.ProductCategory;
 
 public interface productCategoryRepository extends JpaRepository<ProductCategory, Long>{
 	
-	@Query(value = "select * from TBLPRODUCTCATEGORY where ISACTIVE='Y'", nativeQuery = true)
+	@Query(value = "select * from TBLPRODUCTCATEGORY where ISACTIVE='Y' order by PRODUCTCATEGORYORDER_NO", nativeQuery = true)
 	public List<ProductCategory> findActive();
 	
 	@Query(value = "select * from TBLPRODUCTCATEGORY where NETSUITE_ID=?1 and PRODUCTCATEGORYPARENT_ID<>0", nativeQuery = true)

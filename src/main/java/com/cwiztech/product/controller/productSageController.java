@@ -55,7 +55,7 @@ public class productSageController {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/sendtosage", method = RequestMethod.GET)
-	public ResponseEntity SendToSage(@RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
+	public ResponseEntity SendToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
 		APIRequestDataLog apiRequest = checkToken("GET", "/product/sendtosage", null, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
@@ -69,9 +69,16 @@ public class productSageController {
 
     		objProductDetail.put("catalog_item_type_id", "STOCK_ITEM");	
     		objProductDetail.put("item_code", products.get(i).getPRODUCT_CODE());
-    		objProductDetail.put("description", products.get(i).getPRODUCT_DESC());	
+    		objProductDetail.put("description", products.get(i).getPRODUCT_NAME());	
     		objProductDetail.put("sales_ledger_account_id", "819fd52d842f11ed84fa0252b90cda0d");
     		objProductDetail.put("purchase_ledger_account_id", "81a0cf2c842f11ed84fa0252b90cda0d");
+			if (products.get(i).getTAXCODE_ID() == 1) {
+	    		objProductDetail.put("sales_tax_rate_id", "GB_STANDARD");
+	    		objProductDetail.put("purchase_tax_rate_id", "GB_STANDARD");
+			} else {
+	    		objProductDetail.put("sales_tax_rate_id", "GB_ZERO");
+	    		objProductDetail.put("purchase_tax_rate_id", "GB_ZERO");
+			}
 
     		JSONArray productitems = new JSONArray(ServiceCall.POST("productitem/advancedsearch", "{product_ID: "+products.get(i).getPRODUCT_ID()+"}", apiRequest.getREQUEST_OUTPUT(), false));
 	        if (productitems.length()>0) {
@@ -119,8 +126,9 @@ public class productSageController {
 
 
 			objProduct.put("stock_item", objProductDetail);
-			JSONObject response = new JSONObject(SageService.POST("stock_items", objProduct.toString(), headToken, apiRequest.getDATABASETABLE_ID()));
-			
+			APIRequestDataLog apiRequestResponse = SageService.POST("stock_items", objProduct.toString(), headToken, apiRequest.getDATABASETABLE_ID());
+			JSONObject response = new JSONObject(apiRequestResponse.getREQUEST_OUTPUT());
+
 			JSONObject product = new JSONObject();
 			product.put("product_ID", products.get(i).getPRODUCT_ID());
 			product.put("sage_ID", response.getString("id"));
@@ -135,13 +143,13 @@ public class productSageController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/getfromsage/{page}", method = RequestMethod.GET)
-	public ResponseEntity GetFromSage(@PathVariable Long page, @RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
+	public ResponseEntity GetFromSage(@PathVariable Long page, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
 		APIRequestDataLog apiRequest = checkToken("GET", "/product/getfromsage", null, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
 		boolean lastPage = false;
 
-		JSONObject response = new JSONObject(new JSONObject(SageService.GET("stock_items?page=" + (page-1) + "&items_per_page=100", headToken, apiRequest.getDATABASETABLE_ID())).getString("REQUEST_OUTPUT"));
+		JSONObject response = new JSONObject(new JSONObject(SageService.GET("products?page=" + (page-1) + "&items_per_page=100", headToken, apiRequest.getDATABASETABLE_ID())).getString("REQUEST_OUTPUT"));
 
 		log.info("response sage: "+response);
 		

@@ -54,7 +54,7 @@ public class productItemInventorySageController {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/sendtosage", method = RequestMethod.GET)
-	public ResponseEntity SendToSage(@RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
+	public ResponseEntity SendToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
 		APIRequestDataLog apiRequest = checkToken("GET", "/productiteminventory/sendtosage", null, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
@@ -134,7 +134,7 @@ public class productItemInventorySageController {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(value = "/updatestock", method = RequestMethod.GET)
-    public ResponseEntity UpdateStock(@RequestHeader(value = "Authorization") String headToken) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
+    public ResponseEntity UpdateStock(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
         APIRequestDataLog apiRequest = checkToken("GET", "/productiteminventory/updatestock", null, null, headToken);
         if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
