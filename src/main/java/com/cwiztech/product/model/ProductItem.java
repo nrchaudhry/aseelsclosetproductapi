@@ -34,8 +34,11 @@ public class ProductItem {
 	@Column(name = "PRODUCTITEM_DESC")
 	private String  PRODUCTITEM_DESC;
 
-	@Column(name = "PRODUCTITEM_IMAGE")
-	private String  PRODUCTITEM_IMAGE;
+	@Column(name = "PRODUCTITEMIMAGE_URL")
+	private String  PRODUCTITEMIMAGE_URL;
+
+	@Column(name = "PRODUCTITEMICON_URL")
+	private String  PRODUCTITEMICON_URL;
 
 	@Column(name = "DEACTIVE_AUTO")
 	private String DEACTIVE_AUTO;
@@ -112,12 +115,20 @@ public class ProductItem {
 		PRODUCTITEM_DESC = pRODUCTITEM_DESC;
 	}
 
-	public String getPRODUCTITEM_IMAGE() {
-		return PRODUCTITEM_IMAGE;
+	public String getPRODUCTITEMIMAGE_URL() {
+		return PRODUCTITEMIMAGE_URL;
 	}
 
-	public void setPRODUCTITEM_IMAGE(String pRODUCTITEM_IMAGE) {
-		PRODUCTITEM_IMAGE = pRODUCTITEM_IMAGE;
+	public void setPRODUCTITEMIMAGE_URL(String pRODUCTITEMIMAGE_URL) {
+		PRODUCTITEMIMAGE_URL = pRODUCTITEMIMAGE_URL;
+	}
+
+	public String getPRODUCTITEMICON_URL() {
+		return PRODUCTITEMICON_URL;
+	}
+
+	public void setPRODUCTITEMICON_URL(String pRODUCTITEMICON_URL) {
+		PRODUCTITEMICON_URL = pRODUCTITEMICON_URL;
 	}
 
 	public String getDEACTIVE_AUTO() {

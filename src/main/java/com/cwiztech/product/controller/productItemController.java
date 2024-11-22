@@ -294,8 +294,11 @@ public class productItemController {
 			if (jsonObj.has("productitem_DESC") && !jsonObj.isNull("productitem_DESC"))
 				productitem.setPRODUCTITEM_DESC(jsonObj.getString("productitem_DESC"));
 
-			if (jsonObj.has("productitem_IMAGE") && !jsonObj.isNull("productitem_IMAGE"))
-				productitem.setPRODUCTITEM_IMAGE(jsonObj.getString("productitem_IMAGE"));
+			if (jsonObj.has("productitemimage_URL") && !jsonObj.isNull("productitemimage_URL"))
+				productitem.setPRODUCTITEMIMAGE_URL(jsonObj.getString("productitemimage_URL"));
+
+			if (jsonObj.has("productitemicon_URL") && !jsonObj.isNull("productitemicon_URL"))
+				productitem.setPRODUCTITEMICON_URL(jsonObj.getString("productitemicon_URL"));
 
 			if (jsonObj.has("deactive_AUTO"))
 				productitem.setDEACTIVE_AUTO(jsonObj.getString("deactive_AUTO"));

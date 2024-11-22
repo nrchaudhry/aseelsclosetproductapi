@@ -41,6 +41,9 @@ public class Product {
 	@Column(name = "PRODUCT_DESC")
 	private String PRODUCT_DESC;
 	
+    @Column(name = "PRODUCTIMAGE_URL")
+    private String PRODUCTIMAGE_URL;
+    
     @Column(name = "PRODUCTICON_URL")
     private String PRODUCTICON_URL;
     
@@ -141,6 +144,14 @@ public class Product {
 
 	public void setPRODUCT_DESC(String pRODUCT_DESC) {
 		PRODUCT_DESC = pRODUCT_DESC;
+	}
+
+	public String getPRODUCTIMAGE_URL() {
+		return PRODUCTIMAGE_URL;
+	}
+
+	public void setPRODUCTIMAGE_URL(String pRODUCTIMAGE_URL) {
+		PRODUCTIMAGE_URL = pRODUCTIMAGE_URL;
 	}
 
 	public String getPRODUCTICON_URL() {
