@@ -86,6 +86,61 @@ public class productItemController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/{id}/detail", method = RequestMethod.GET)
+	public ResponseEntity getOneDetail(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+		APIRequestDataLog apiRequest = checkToken("GET", "/productitem/"+id, null, null, headToken);
+		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+
+		ProductItem productitem = productitemrepository.findOne(id);
+		if (productitem != null) {
+			JSONObject product = new JSONObject(ServiceCall.GET("product/"+productitem.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT(), false));
+			productitem.setPRODUCT_DETAIL(product.toString());
+
+			ObjectMapper mapper = new ObjectMapper();
+			JSONArray jsonproductitems = new JSONArray();
+
+			JSONObject objProductItem = new JSONObject(mapper.writeValueAsString(productitem));
+            objProductItem.put("purchase_PRICE", product.getLong("purchase_PRICE"));
+            objProductItem.put("weight", product.getDouble("product_WEIGHT"));
+
+            JSONObject taxcode = new JSONObject(product.getString("taxcode_DETAIL"));
+            objProductItem.put("taxcode_ID", taxcode.getLong("taxcode_ID"));
+            objProductItem.put("taxcode", taxcode.getString("taxcode_TITLE"));
+            objProductItem.put("vat", taxcode.getLong("taxcode_PERCENTAGE"));
+
+
+			JSONArray productiteminventory = new JSONArray(ServiceCall.POST("productiteminventory/advancedsearch", "{product_ID: "+ productitem.getPRODUCTITEM_ID() + "}", apiRequest.getREQUEST_OUTPUT(), false));
+			JSONArray productitempricelevel = new JSONArray(ServiceCall.POST("productitempricelevel/advancedsearch", "{product_ID: "+ productitem.getPRODUCTITEM_ID() + "}", apiRequest.getREQUEST_OUTPUT(), false));
+            objProductItem.put("productiteminventory", productiteminventory.toString());
+            objProductItem.put("productitempricelevel", productitempricelevel.toString());
+				
+			JSONArray productitemattributevalues = new JSONArray(ServiceCall.POST("productitemattributevalue/advancedsearch", "{product_ID: "+ productitem.getPRODUCTITEM_ID() + "}", apiRequest.getREQUEST_OUTPUT(), false));
+            for (int j=0; j<productitemattributevalues.length(); j++) {
+				if (productitem.getPRODUCTITEM_ID()==productitemattributevalues.getJSONObject(j).getLong("productitem_ID")) {
+					JSONObject jsonproductattribute = new JSONObject(productitemattributevalues.getJSONObject(j).getString("productattribute_DETAIL"));
+					JSONObject jsonattribute = new JSONObject(jsonproductattribute.getString("attribute_DETAIL"));
+					if (!productitemattributevalues.getJSONObject(j).isNull("productattributeitem_ID"))
+						objProductItem.put(jsonattribute.getString("attribute_KEY"), productitemattributevalues.getJSONObject(j).getLong("productattributevalue_ID"));
+					else if (!productitemattributevalues.getJSONObject(j).isNull("productattributeitem_VALUE"))
+						objProductItem.put(jsonattribute.getString("attribute_KEY"), productitemattributevalues.getJSONObject(j).getString("productattributeitem_VALUE"));
+					if (jsonattribute.getString("attribute_KEY").equals("taxcode")) {
+						if (productitemattributevalues.getJSONObject(j).getLong("productattributevalue_ID")==1) {
+							objProductItem.put("taxcode", "VAT:S");
+							objProductItem.put("vat", 20);
+						} else {
+							objProductItem.put("taxcode", "VAT:Z");
+							objProductItem.put("vat", 0);
+						}
+					}
+				}
+			}
+			jsonproductitems.put(objProductItem);
+		}
+		
+		return new ResponseEntity(getAPIResponse(null, productitem , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/ids", method = RequestMethod.POST)
 	public ResponseEntity getByIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
