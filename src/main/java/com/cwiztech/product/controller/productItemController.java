@@ -91,15 +91,15 @@ public class productItemController {
 		APIRequestDataLog apiRequest = checkToken("GET", "/productitem/"+id, null, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
 
+		JSONObject objProductItem = new JSONObject();
 		ProductItem productitem = productitemrepository.findOne(id);
 		if (productitem != null) {
 			JSONObject product = new JSONObject(ServiceCall.GET("product/"+productitem.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT(), false));
 			productitem.setPRODUCT_DETAIL(product.toString());
 
 			ObjectMapper mapper = new ObjectMapper();
-			JSONArray jsonproductitems = new JSONArray();
 
-			JSONObject objProductItem = new JSONObject(mapper.writeValueAsString(productitem));
+			objProductItem = new JSONObject(mapper.writeValueAsString(productitem));
             objProductItem.put("purchase_PRICE", product.getLong("purchase_PRICE"));
             objProductItem.put("weight", product.getDouble("product_WEIGHT"));
 
@@ -134,10 +134,9 @@ public class productItemController {
 					}
 				}
 			}
-			jsonproductitems.put(objProductItem);
 		}
 		
-		return new ResponseEntity(getAPIResponse(null, productitem , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, null, null, objProductItem, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
