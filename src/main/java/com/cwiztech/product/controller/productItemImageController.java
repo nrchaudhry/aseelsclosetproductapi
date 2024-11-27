@@ -371,11 +371,11 @@ public class productItemImageController {
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemimages));
-			}else if (jsonProductItemImages != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductItemImages.toString());
+			}else if (productitemimage != null && isWithDetail == false){
+				apiRequest.setREQUEST_OUTPUT(productitemimage.toString());
 			
-			} else if (jsonProductItemImage != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductItemImage.toString());
+			} else if (productitemimages != null && isWithDetail == false){
+				apiRequest.setREQUEST_OUTPUT(productitemimages.toString());
 			}
 			else if (jsonProductItemImages != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductItemImages.toString());
