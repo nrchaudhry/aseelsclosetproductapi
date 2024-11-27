@@ -109,12 +109,12 @@ public class productItemController {
             objProductItem.put("vat", taxcode.getLong("taxcode_PERCENTAGE"));
 
 
-			JSONArray productiteminventory = new JSONArray(ServiceCall.POST("productiteminventory/advancedsearch", "{product_ID: "+ productitem.getPRODUCTITEM_ID() + "}", apiRequest.getREQUEST_OUTPUT(), false));
-			JSONArray productitempricelevel = new JSONArray(ServiceCall.POST("productitempricelevel/advancedsearch", "{product_ID: "+ productitem.getPRODUCTITEM_ID() + "}", apiRequest.getREQUEST_OUTPUT(), false));
+			JSONArray productiteminventory = new JSONArray(ServiceCall.POST("productiteminventory/advancedsearch", "{productitem_ID: "+ productitem.getPRODUCTITEM_ID() + "}", apiRequest.getREQUEST_OUTPUT(), false));
+			JSONArray productitempricelevel = new JSONArray(ServiceCall.POST("productitempricelevel/advancedsearch", "{productitem_ID: "+ productitem.getPRODUCTITEM_ID() + "}", apiRequest.getREQUEST_OUTPUT(), false));
             objProductItem.put("productiteminventory", productiteminventory.toString());
             objProductItem.put("productitempricelevel", productitempricelevel.toString());
 				
-			JSONArray productitemattributevalues = new JSONArray(ServiceCall.POST("productitemattributevalue/advancedsearch", "{product_ID: "+ productitem.getPRODUCTITEM_ID() + "}", apiRequest.getREQUEST_OUTPUT(), false));
+			JSONArray productitemattributevalues = new JSONArray(ServiceCall.POST("productitemattributevalue/advancedsearch", "{productitem_ID: "+ productitem.getPRODUCTITEM_ID() + "}", apiRequest.getREQUEST_OUTPUT(), false));
             for (int j=0; j<productitemattributevalues.length(); j++) {
 				if (productitem.getPRODUCTITEM_ID()==productitemattributevalues.getJSONObject(j).getLong("productitem_ID")) {
 					JSONObject jsonproductattribute = new JSONObject(productitemattributevalues.getJSONObject(j).getString("productattribute_DETAIL"));
