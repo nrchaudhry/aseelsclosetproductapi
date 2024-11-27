@@ -537,7 +537,7 @@ public class productController {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(product));
 				productID = product.getPRODUCT_ID();
 
-			}else if (products != null && isWithDetail == true){
+			} else if (products != null && isWithDetail == true){
 				if (products.size()>0) {
 					List<Integer> productcategoryList = new ArrayList<Integer>();
 					List<Integer> taxcodeList = new ArrayList<Integer>();
@@ -574,7 +574,7 @@ public class productController {
 			} else if (product != null && isWithDetail == false) {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(product));
 
-			} else if (products != null && isWithDetail == false){
+			} else if (products != null && isWithDetail == false) {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(products));
 
 			} else if (jsonProducts != null){

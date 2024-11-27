@@ -560,11 +560,11 @@ public class productAttributeController {
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributes));
-			}else if (jsonProductAttributes != null && isWithDetail == false){
-				apiRequest.setREQUEST_OUTPUT(jsonProductAttributes.toString());
+			} else if (jsonProductAttributes != null && isWithDetail == false) {
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattribute));
 			
-			} else if (jsonProductAttribute != null && isWithDetail == false){
-				apiRequest.setREQUEST_OUTPUT(jsonProductAttribute.toString());
+			} else if (jsonProductAttribute != null && isWithDetail == false) {
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributes));
 			
 		} else if (jsonProductAttributes != null){
 			apiRequest.setREQUEST_OUTPUT(jsonProductAttributes.toString());

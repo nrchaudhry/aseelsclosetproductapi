@@ -535,10 +535,10 @@ public class productItemInventoryController {
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventories));
 			
-			} else if(productiteminventory != null && isWithDetail == false){	
+			} else if(productiteminventory != null && isWithDetail == false) {	
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventory));
 
-			} else if(productiteminventories != null && isWithDetail == false){	
+			} else if(productiteminventories != null && isWithDetail == false) {	
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventories));
 
 			} else if (jsonProductItemInventories != null){

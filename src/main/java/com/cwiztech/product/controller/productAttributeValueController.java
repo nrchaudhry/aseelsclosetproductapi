@@ -484,10 +484,10 @@ public class productAttributeValueController {
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributevalues));
 
-			} else if (productattributevalue != null && isWithDetail == false){
+			} else if (productattributevalue != null && isWithDetail == false) {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributevalue));
 
-			} else if (productattributevalues != null && isWithDetail == false){
+			} else if (productattributevalues != null && isWithDetail == false) {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributevalues));
 
 			} else if (jsonProductAttributeValues != null){

@@ -430,7 +430,7 @@ public class productAttributeApplicationController {
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productattributeapplications));
-			}else if (jsonProductAttributeApplications != null){
+			} else if (jsonProductAttributeApplications != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductAttributeApplications.toString());
 			
 			} else if (jsonProductAttributeApplication != null){

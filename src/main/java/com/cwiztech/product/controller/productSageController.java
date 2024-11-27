@@ -311,7 +311,7 @@ public class productSageController {
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(products));
-			}else if (jsonProducts != null){
+			} else if (jsonProducts != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProducts.toString());
 			
 			} else if (jsonProduct != null){

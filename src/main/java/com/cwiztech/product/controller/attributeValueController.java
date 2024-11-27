@@ -414,7 +414,7 @@ public class attributeValueController {
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(attributevalues));
-			}else if (jsonAttributeValues != null){
+			} else if (jsonAttributeValues != null){
 				apiRequest.setREQUEST_OUTPUT(jsonAttributeValues.toString());
 			
 			} else if (jsonAttributeValue != null){

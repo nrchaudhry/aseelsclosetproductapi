@@ -443,7 +443,7 @@ public class productItemPriceChangeController {
 			} else if (productitempricechanges != null && isWithDetail == false) {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitempricechanges));
 
-			}else if (jsonProductItemPriceChanges != null){
+			} else if (jsonProductItemPriceChanges != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductItemPriceChanges.toString());
 			
 			} else if (jsonProductItemPriceChange != null){

@@ -460,11 +460,11 @@ public class productPriceLevelController {
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productpricelevels));
 				
-			}else if (productpricelevel != null && isWithDetail == false){
-				apiRequest.setREQUEST_OUTPUT(productpricelevel.toString());
+			} else if (productpricelevel != null && isWithDetail == false) {
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productpricelevel));
 
-			} else if (productpricelevels != null && isWithDetail == false){
-				apiRequest.setREQUEST_OUTPUT(productpricelevels.toString());
+			} else if (productpricelevels != null && isWithDetail == false) {
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productpricelevels));
 				
 			} else if (jsonProductPriceLevels != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductPriceLevels.toString());

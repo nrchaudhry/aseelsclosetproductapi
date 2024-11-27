@@ -273,7 +273,7 @@ public class productItemInventorySageController {
 //					}
 //				}
 //				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventories));
-//			}else if (jsonProductItemInventorys != null){
+//			} else if (jsonProductItemInventorys != null){
 //				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventorys.toString());
 //			
 //			} else if (jsonProductItemInventory != null){

@@ -405,13 +405,13 @@ public class productCategoryController {
 			} else if (productcategories != null && isWithDetail == true){
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productcategories));
 
-			} else if (productcategory != null && isWithDetail == false){
+			} else if (productcategory != null && isWithDetail == false) {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productcategory));
 
-			} else if (productcategories != null && isWithDetail == false){
+			} else if (productcategories != null && isWithDetail == false) {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productcategories));
 
-			}else if (jsonProductcategories != null){
+			} else if (jsonProductcategories != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductcategories.toString());
 
 			} else if (jsonProductCategory  != null){

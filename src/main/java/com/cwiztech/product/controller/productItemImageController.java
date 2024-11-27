@@ -371,10 +371,10 @@ public class productItemImageController {
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemimages));
-			}else if (productitemimage != null && isWithDetail == false){
+			} else if (productitemimage != null && isWithDetail == false) {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemimage));
 			
-			} else if (productitemimages != null && isWithDetail == false){
+			} else if (productitemimages != null && isWithDetail == false) {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemimages));
 			}
 			else if (jsonProductItemImages != null){

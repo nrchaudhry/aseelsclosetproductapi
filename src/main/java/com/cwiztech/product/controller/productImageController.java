@@ -370,7 +370,7 @@ public class productImageController {
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productimages));
-			}else if (jsonProductImages != null  && isWithDetail == true){
+			} else if (jsonProductImages != null  && isWithDetail == true){
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productimages));
 			
 			} else if (jsonProductImage != null  && isWithDetail == true){

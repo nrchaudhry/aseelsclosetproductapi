@@ -454,13 +454,13 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemmovements));
-			} else if (productitemmovement != null && isWithDetail == false){
+			} else if (productitemmovement != null && isWithDetail == false) {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemmovement));
 
-			} else if (productitemmovements != null && isWithDetail == false){
+			} else if (productitemmovements != null && isWithDetail == false) {
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemmovements)); 
 				
-			}else if (jsonProductItemMovements != null ){
+			} else if (jsonProductItemMovements != null ){
 				apiRequest.setREQUEST_OUTPUT(jsonProductItemMovements.toString());
 			
 			} else if (jsonProductItemMovement != null){

@@ -385,7 +385,7 @@ public class productApplicationController {
 				productapplicationID = productapplication.getPRODUCTAPPLICATION_ID();
 
 
-			}else if (productapplications != null && isWithDetail == true){
+			} else if (productapplications != null && isWithDetail == true){
 				if (productapplications.size()>0) {
 					List<Integer> applicationList = new ArrayList<Integer>();
 					List<Integer> productList = new ArrayList<Integer>();

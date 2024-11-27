@@ -428,7 +428,7 @@ public class customerExclutionProductItemController {
 					}
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(customerexclutionproductitems));
-			}else if (jsonCustomerExclutionProductItems != null){
+			} else if (jsonCustomerExclutionProductItems != null){
 				apiRequest.setREQUEST_OUTPUT(jsonCustomerExclutionProductItems.toString());
 			
 			} else if (jsonCustomerExclutionProductItem != null){

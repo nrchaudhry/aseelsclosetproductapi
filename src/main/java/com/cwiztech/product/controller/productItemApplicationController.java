@@ -410,7 +410,7 @@ public class productItemApplicationController {
 						}
 					}
 					apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemapplications));
-				}else if (jsonProductItemApplications != null && isWithDetail == true){
+				} else if (jsonProductItemApplications != null && isWithDetail == true){
 					apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemapplications));
 
 				} else if (jsonProductItemApplication != null && isWithDetail == true){

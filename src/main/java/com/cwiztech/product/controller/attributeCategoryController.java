@@ -384,7 +384,7 @@ public class attributeCategoryController {
                 attributecategoryID = attributecategory.getATTRIBUTECATEGORY_ID();
             } else if(attributecategories != null ){
                 apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(attributecategories));
-            }else if (jsonAttributecategories != null){
+            } else if (jsonAttributecategories != null){
                 apiRequest.setREQUEST_OUTPUT(jsonAttributecategories.toString());
 
             } else if (jsonAttributeCategory != null){
