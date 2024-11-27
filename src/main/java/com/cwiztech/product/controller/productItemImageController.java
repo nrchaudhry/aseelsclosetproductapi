@@ -338,7 +338,7 @@ public class productItemImageController {
 		return apiRequest;
 	}
 	
-	APIRequestDataLog getAPIResponse(List<ProductItemImage> productitemimages, ProductItemImage productitemimage , JSONArray jsonProductItemImages, JSONObject jsonProductItemImage, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
+	APIRequestDataLog getAPIResponse(List<ProductItemImage> productitemimages, ProductItemImage productitemimage, JSONArray jsonProductItemImages, JSONObject jsonProductItemImage, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -372,10 +372,10 @@ public class productItemImageController {
 				}
 				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemimages));
 			}else if (productitemimage != null && isWithDetail == false){
-				apiRequest.setREQUEST_OUTPUT(productitemimage.toString());
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemimage));
 			
 			} else if (productitemimages != null && isWithDetail == false){
-				apiRequest.setREQUEST_OUTPUT(productitemimages.toString());
+				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemimages));
 			}
 			else if (jsonProductItemImages != null){
 				apiRequest.setREQUEST_OUTPUT(jsonProductItemImages.toString());
