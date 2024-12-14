@@ -483,6 +483,51 @@ public class productCategoryController {
 		return rtn;
 	}
 
+	@RequestMapping(value = "/web/{id}", method = RequestMethod.GET)
+	public String getOneWeb(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+		Long requestUser = (long) 0;
+		JSONObject objproductcategory = new JSONObject();
+
+		log.info("GET: /productcategory/web");
+
+		ProductCategory  productcategory = productcategoryrepository.findOne(id);
+		String rtn, workstation = null;
+
+
+		if (productcategory.getPRODUCTCATEGORYPARENT_ID() == null) {
+			objproductcategory.put("productcategory_ID", productcategory.getPRODUCTCATEGORY_ID());
+			objproductcategory.put("productcategoryorder_NO", productcategory.getPRODUCTCATEGORYORDER_NO());
+			objproductcategory.put("productcategory_NAME", productcategory.getPRODUCTCATEGORY_NAME());
+			objproductcategory.put("productcategory_DESC", productcategory.getPRODUCTCATEGORY_DESC());
+			if (productcategory.getPRODUCTCATEGORYIMAGE_URL() == null) {
+				objproductcategory.put("productcategoryimage_URL", "");
+			} else {
+				objproductcategory.put("productcategoryimage_URL", productcategory.getPRODUCTCATEGORYIMAGE_URL());
+			}
+			if (productcategory.getPRODUCTCATEGORYICON_URL() == null) {
+				objproductcategory.put("productcategoryicon_URL", "");
+			} else {
+				objproductcategory.put("productcategoryicon_URL", productcategory.getPRODUCTCATEGORYICON_URL());
+			}
+			objproductcategory.put("sublist", getProductcategoriesubList(productcategory.getPRODUCTCATEGORY_ID()));
+		}        	
+
+		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductCategory.getDatabaseTableID());
+		APIRequestDataLog apiRequest = tableDataLogs.apiRequestDataLog("GET", databaseTableID, requestUser,
+				"/productcategory/web", null, workstation);
+
+		rtn = objproductcategory.toString();
+
+		apiRequest.setREQUEST_OUTPUT(rtn);
+		apiRequest.setREQUEST_STATUS("Success");
+		apirequestdatalogRepository.saveAndFlush(apiRequest);
+
+		log.info("Output: " + rtn);
+		log.info("--------------------------------------------------------");
+
+		return rtn;
+	}
+
 	public JSONArray getProductcategoriesubList(Long productcategory_ID) {
 		JSONArray objSubList = new JSONArray();
 		List<ProductCategory >  productcategory = productcategoryrepository.findActiveByParent(productcategory_ID);
