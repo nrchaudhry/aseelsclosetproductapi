@@ -567,6 +567,8 @@ public class productItemInventoryController {
 			throws JsonProcessingException, JSONException, ParseException {
 		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/commitment", data, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date date = new Date();
 
 		long saleorderdetailstatusID1 = 0, saleorderdetailstatusID2 = 0;
 		JSONArray saleorderdetailstatus = new JSONArray(ServiceCall.POST("lookup/entity", "{entityname: 'SALEORDERDETAILSTATUS'}", headToken, true));
@@ -596,6 +598,9 @@ public class productItemInventoryController {
 
 			productiteminventory.setQUANTITY_AVAILABLE(productiteminventory.getQUANTITY_AVAILABLE() -  quantity);
 			productiteminventory.setQUANTITY_COMMITTED(productiteminventory.getQUANTITY_COMMITTED() +  quantity);
+			productiteminventory.setMODIFIED_BY(apiRequest.getREQUEST_ID());
+			productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getLOG_WORKSTATION());
+			productiteminventory.setMODIFIED_WHEN(dateFormat1.format(date));
 			productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
 
 			rtnobj.put("saleorder_ID", orderdetail.getLong("saleorder_ID"));
@@ -618,6 +623,8 @@ public class productItemInventoryController {
 			throws JsonProcessingException, JSONException, ParseException {
 		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/fulfillment", data, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date date = new Date();
 
 		JSONArray jsonPAV = new JSONArray(data);
 		JSONArray rtnArray = new JSONArray();
@@ -634,6 +641,9 @@ public class productItemInventoryController {
 			productiteminventory.setQUANTITY_ONHAND(productiteminventory.getQUANTITY_ONHAND() - commitment + backordered);
 			productiteminventory.setQUANTITY_AVAILABLE(productiteminventory.getQUANTITY_AVAILABLE() +  backordered);
 			productiteminventory.setQUANTITY_COMMITTED(productiteminventory.getQUANTITY_COMMITTED() - commitment - backordered);
+			productiteminventory.setMODIFIED_BY(apiRequest.getREQUEST_ID());
+			productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getLOG_WORKSTATION());
+			productiteminventory.setMODIFIED_WHEN(dateFormat1.format(date));
 			productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
 
 			rtnobj.put("saleorderdetail_ID", orderdetail.getLong("saleorderdetail_ID"));
@@ -651,6 +661,8 @@ public class productItemInventoryController {
 			throws JsonProcessingException, JSONException, ParseException {
 		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/received", data, null, headToken);
 		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date date = new Date();
 
 		JSONArray jsonPAV = new JSONArray(data);
 		List<ProductItemInventory> productiteminventorylist = new ArrayList<ProductItemInventory>();
@@ -678,6 +690,9 @@ public class productItemInventoryController {
 					productiteminventory.setQUANTITY_ONHAND(quantity_onhand);
 					double quantity_available = productiteminventory.getQUANTITY_AVAILABLE() + (double) quantity_received;
 					productiteminventory.setQUANTITY_AVAILABLE(quantity_available);
+					productiteminventory.setMODIFIED_BY(apiRequest.getREQUEST_ID());
+					productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getLOG_WORKSTATION());
+					productiteminventory.setMODIFIED_WHEN(dateFormat1.format(date));
 					productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
 					productiteminventorylist.add(productiteminventory);
 				}
