@@ -60,4 +60,8 @@ public interface productItemPriceLevelRepository  extends JpaRepository<ProductI
             @Param("PRICELEVEL_ID") Long PRICELEVEL_ID,
             @Param("CURRENCY_ID") Long CURRENCY_ID);
 
+	@Query(value = "update TBLPRODUCTITEMPRICELEVEL set ISACTIVE=:active "
+			+ "where PRODUCTITEM_ID=:itemid "
+			+ "", nativeQuery = true)
+	public Long update(@Param("itemid") long itemid, @Param("active") String active);	
 }

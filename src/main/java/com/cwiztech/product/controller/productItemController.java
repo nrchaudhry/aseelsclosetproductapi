@@ -29,6 +29,8 @@ import com.cwiztech.datalogs.repository.apiRequestDataLogRepository;
 import com.cwiztech.datalogs.repository.databaseTablesRepository;
 import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductItem;
+import com.cwiztech.product.repository.productItemInventoryRepository;
+import com.cwiztech.product.repository.productItemPriceLevelRepository;
 import com.cwiztech.product.repository.productItemRepository;
 import com.cwiztech.services.ServiceCall;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,6 +45,12 @@ public class productItemController {
 
 	@Autowired
 	private productItemRepository productitemrepository;
+
+	@Autowired
+	private productItemInventoryRepository productiteminventoryrepository;
+
+    @Autowired
+    private productItemPriceLevelRepository productitempricelevelrepository;
 
 	@Autowired
 	private apiRequestDataLogRepository apirequestdatalogRepository;
@@ -376,6 +384,9 @@ public class productItemController {
 			ProductItem productitem = productitems.get(a);
 			productitem = productitemrepository.saveAndFlush(productitem);
 			productitems.get(a).setPRODUCTITEM_ID(productitem.getPRODUCTITEM_ID());
+
+			productiteminventoryrepository.update(productitem.getPRODUCTITEM_ID(), productitem.getISACTIVE());
+			productitempricelevelrepository.update(productitem.getPRODUCTITEM_ID(), productitem.getISACTIVE());
 		}
 
 		ResponseEntity responseentity;

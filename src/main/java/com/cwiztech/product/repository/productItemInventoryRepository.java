@@ -56,5 +56,9 @@ public interface productItemInventoryRepository extends JpaRepository<ProductIte
 			+ "", nativeQuery = true)
 	public List<ProductItemInventory> findByNotInIDs(@Param("ids") List<Integer> ids);	
 
+	@Query(value = "update TBLPRODUCTITEMINVENTORY set ISACTIVE=:active "
+			+ "where PRODUCTITEM_ID=:itemid "
+			+ "", nativeQuery = true)
+	public Long update(@Param("itemid") long itemid, @Param("active") String active);	
 }
 

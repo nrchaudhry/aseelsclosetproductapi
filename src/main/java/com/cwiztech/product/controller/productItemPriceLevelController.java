@@ -42,6 +42,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RequestMapping("/productitempricelevel")
 public class productItemPriceLevelController {
     private static final Logger log = LoggerFactory.getLogger(productItemPriceLevelController.class);
+
     @Autowired
     private productItemPriceLevelRepository productitempricelevelrepository;
 
