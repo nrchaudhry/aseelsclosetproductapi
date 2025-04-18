@@ -198,6 +198,8 @@ public class productCategoryController {
 
 			if (jsonObj.has("productcategoryparent_ID") && !jsonObj.isNull("productcategoryparent_ID"))
 				productcategory.setPRODUCTCATEGORYPARENT_ID(productcategoryrepository.findOne(jsonObj.getLong("productcategoryparent_ID")));
+			else if (jsonObj.has("productcategoryparent_ID") && jsonObj.isNull("productcategoryparent_ID"))
+				productcategory.setPRODUCTCATEGORYPARENT_ID(null);
 
 			if (jsonObj.has("productcategory_CODE")  && !jsonObj.isNull("productcategory_CODE"))
 				productcategory.setPRODUCTCATEGORY_CODE(jsonObj.getString("productcategory_CODE"));
