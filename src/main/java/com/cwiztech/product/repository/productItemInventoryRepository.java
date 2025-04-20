@@ -2,7 +2,10 @@ package com.cwiztech.product.repository;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -56,9 +59,11 @@ public interface productItemInventoryRepository extends JpaRepository<ProductIte
 			+ "", nativeQuery = true)
 	public List<ProductItemInventory> findByNotInIDs(@Param("ids") List<Integer> ids);	
 
+	@Modifying
+	@Transactional
 	@Query(value = "update TBLPRODUCTITEMINVENTORY set ISACTIVE=:active "
 			+ "where PRODUCTITEM_ID=:itemid "
 			+ "", nativeQuery = true)
-	public Long update(@Param("itemid") long itemid, @Param("active") String active);	
+	public void update(@Param("itemid") long itemid, @Param("active") String active);	
 }
 

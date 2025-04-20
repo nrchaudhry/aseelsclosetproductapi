@@ -2,7 +2,10 @@ package com.cwiztech.product.repository;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -60,8 +63,10 @@ public interface productItemPriceLevelRepository  extends JpaRepository<ProductI
             @Param("PRICELEVEL_ID") Long PRICELEVEL_ID,
             @Param("CURRENCY_ID") Long CURRENCY_ID);
 
+	@Modifying
+	@Transactional
 	@Query(value = "update TBLPRODUCTITEMPRICELEVEL set ISACTIVE=:active "
 			+ "where PRODUCTITEM_ID=:itemid "
 			+ "", nativeQuery = true)
-	public Long update(@Param("itemid") long itemid, @Param("active") String active);	
+	public void update(@Param("itemid") long itemid, @Param("active") String active);	
 }
