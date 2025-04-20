@@ -407,7 +407,7 @@ public class productAttributeController {
            }
        }
 	
-		List<ProductAttribute> productattribute = ((active == true)
+		productattributes = ((active == true)
 				? productattributerepository.findByAdvancedSearch(productcategory_ID,productcategory_IDS, product_ID,product_IDS, attributecategory_ID,attributecategory_IDS, attribute_ID, attribute_IDS)
 				: productattributerepository.findAllByAdvancedSearch(productcategory_ID,productcategory_IDS, product_ID,product_IDS, attributecategory_ID,attributecategory_IDS, attribute_ID, attribute_IDS));		
 		
