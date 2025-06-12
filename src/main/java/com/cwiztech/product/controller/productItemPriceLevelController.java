@@ -557,7 +557,7 @@ public class productItemPriceLevelController {
             objProductItem.put("productcategory_NAME", jsonproductcategory.getString("productcategory_NAME").replace("\"", ""));
             objProductItem.put("productcategoryorder_NO", jsonproductcategory.getLong("productcategoryorder_NO"));
             JSONObject product = new JSONObject(productitems.getJSONObject(i).getString("product_DETAIL"));
-            objProductItem.put("purchase_PRICE", product.getLong("purchase_PRICE"));
+            objProductItem.put("purchase_PRICE", product.getDouble("purchase_PRICE"));
             JSONObject taxcode = new JSONObject(product.getString("taxcode_DETAIL"));
             objProductItem.put("taxcode_ID", taxcode.getLong("taxcode_ID"));
             objProductItem.put("taxcode", taxcode.getString("taxcode_TITLE"));
