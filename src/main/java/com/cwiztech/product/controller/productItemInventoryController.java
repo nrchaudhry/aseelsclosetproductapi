@@ -22,14 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cwiztech.datalogs.model.APIRequestDataLog;
-import com.cwiztech.datalogs.model.DatabaseTables;
-import com.cwiztech.datalogs.model.tableDataLogs;
-import com.cwiztech.datalogs.repository.apiRequestDataLogRepository;
-import com.cwiztech.datalogs.repository.databaseTablesRepository;
-import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductItemInventory;
 import com.cwiztech.product.repository.productItemInventoryRepository;
+import com.cwiztech.log.apiRequestLog;
 import com.cwiztech.services.ServiceCall;
 import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,53 +40,44 @@ public class productItemInventoryController {
 	@Autowired
 	private productItemInventoryRepository productiteminventoryrepository;
 
-	@Autowired
-	private apiRequestDataLogRepository apirequestdatalogRepository;
-
-	@Autowired
-	private tableDataLogRepository tbldatalogrepository;
-
-	@Autowired
-	private databaseTablesRepository databasetablesrepository;
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productiteminventory", null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productiteminventory", null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<ProductItemInventory> productiteminventories = productiteminventoryrepository.findActive();
-		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public ResponseEntity getAll(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productiteminventory/all", null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productiteminventory/all", null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<ProductItemInventory> productiteminventories = productiteminventoryrepository.findAll();
 
-		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity getOne(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productiteminventory/"+id, null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productiteminventory/"+id, null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		ProductItemInventory productiteminventory = productiteminventoryrepository.findOne(id);
 
-		return new ResponseEntity(getAPIResponse(null, productiteminventory , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productiteminventory , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/ids", method = RequestMethod.POST)
 	public ResponseEntity getByIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/ids", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productiteminventory/ids", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<Integer> productiteminventory_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -103,15 +89,15 @@ public class productItemInventoryController {
 		if (jsonproductiteminventories.length()>0)
 			productiteminventories = productiteminventoryrepository.findByIDs(productiteminventory_IDS);
 
-		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/notin/ids", method = RequestMethod.POST)
 	public ResponseEntity getByNotInIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/notin/ids", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productiteminventory/notin/ids", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<Integer> productiteminventory_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -123,15 +109,15 @@ public class productItemInventoryController {
 		if (jsonproductiteminventories.length()>0)
 			productiteminventories = productiteminventoryrepository.findByNotInIDs(productiteminventory_IDS);
 
-		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity insert(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productiteminventory", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		return insertupdateAll(null, new JSONObject(data), apiRequest);
 	}
@@ -141,8 +127,8 @@ public class productItemInventoryController {
 	public ResponseEntity update(@PathVariable Long id, @RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 
-		APIRequestDataLog apiRequest = checkToken("PUT", "/productiteminventory/"+id, data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productiteminventory/"+id, data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 		JSONObject jsonObj = new JSONObject(data);
 		jsonObj.put("id", id);
 
@@ -153,14 +139,14 @@ public class productItemInventoryController {
 	@RequestMapping(method = RequestMethod.PUT)
 	public ResponseEntity insertupdate(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("PUT", "/productiteminventory", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productiteminventory", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		return insertupdateAll(new JSONArray(data), null, apiRequest);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity insertupdateAll(JSONArray jsonProductItemInventories, JSONObject jsonProductItemInventory, APIRequestDataLog apiRequest) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity insertupdateAll(JSONArray jsonProductItemInventories, JSONObject jsonProductItemInventory, JSONObject apiRequest) throws JsonProcessingException, JSONException, ParseException {
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 
@@ -182,16 +168,16 @@ public class productItemInventoryController {
 					productiteminventory = productiteminventoryrepository.findOne(productiteminventoryid);
 
 					if (productiteminventory == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemInventory Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemInventory Data!", apiRequest, true), HttpStatus.BAD_REQUEST);
 				}
 			}
 
 			if (productiteminventoryid == 0) {
 				if (!jsonObj.has("productitem_ID") || jsonObj.isNull("productitem_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
 
 				if ((!jsonObj.has("productlocation_ID") || jsonObj.isNull("productlocation_ID")) && (!jsonObj.has("productlocation_CODE") || jsonObj.isNull("productlocation_CODE"))) 
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productlocation_ID/productlocation_CODE is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productlocation_ID/productlocation_CODE is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
 			}
 
 			if (jsonObj.has("productitem_ID")  && !jsonObj.isNull("productitem_ID"))
@@ -200,7 +186,7 @@ public class productItemInventoryController {
 			if (jsonObj.has("productlocation_ID") && !jsonObj.isNull("productlocation_ID"))
 				productiteminventory.setPRODUCTLOCATION_ID(jsonObj.getLong("productlocation_ID"));
 			else if (jsonObj.has("productlocation_CODE") && !jsonObj.isNull("productlocation_CODE")) {
-				JSONObject productlocation = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'PRODUCTLOCATION', code: "+jsonObj.getString("productlocation_CODE")+"}", apiRequest.getREQUEST_OUTPUT(), true));
+				JSONObject productlocation = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'PRODUCTLOCATION', code: "+jsonObj.getString("productlocation_CODE")+"}", apiRequest.getString("access_TOKEN"), true));
 				if (productlocation != null)
 					productiteminventory.setPRODUCTLOCATION_ID(productlocation.getLong("id"));
 			}
@@ -304,8 +290,8 @@ public class productItemInventoryController {
 			else if (jsonObj.has("isactive"))
 				productiteminventory.setISACTIVE(jsonObj.getString("isactive"));
 
-			productiteminventory.setMODIFIED_BY(apiRequest.getREQUEST_ID());
-			productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getLOG_WORKSTATION());
+			productiteminventory.setMODIFIED_BY(apiRequest.getLong("request_ID"));
+			productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getString("log_WORKSTATION"));
 			productiteminventory.setMODIFIED_WHEN(dateFormat1.format(date));
 			productiteminventories.add(productiteminventory);
 		}
@@ -318,29 +304,29 @@ public class productItemInventoryController {
 
 		ResponseEntity responseentity;
 		if (jsonProductItemInventory != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productiteminventories.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productiteminventories.get(0) , null, null, null, apiRequest, true), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, true), HttpStatus.OK);
 		return responseentity;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity delete(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productiteminventory/"+id, null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productiteminventory/"+id, null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		ProductItemInventory productiteminventory = productiteminventoryrepository.findOne(id);
 		productiteminventoryrepository.delete(productiteminventory);
 
-		return new ResponseEntity(getAPIResponse(null, productiteminventory , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productiteminventory , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
 	public ResponseEntity remove(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productiteminventory/"+id, null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productiteminventory/"+id, null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		JSONObject productiteminventory = new JSONObject();
 		productiteminventory.put("id", id);
@@ -363,8 +349,8 @@ public class productItemInventoryController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity BySearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/search" + ((active == true) ? "" : "/all"), data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productiteminventory/search" + ((active == true) ? "" : "/all"), data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		JSONObject jsonObj = new JSONObject(data);
 
@@ -372,7 +358,7 @@ public class productItemInventoryController {
 				? productiteminventoryrepository.findBySearch("%" + jsonObj.getString("search") + "%")
 						: productiteminventoryrepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 
-		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -389,8 +375,8 @@ public class productItemInventoryController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productiteminventory/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<ProductItemInventory> productiteminventories = new ArrayList<ProductItemInventory>();
 		JSONObject jsonObj = new JSONObject(data);
@@ -425,7 +411,7 @@ public class productItemInventoryController {
 		if (jsonObj.has("productlocation_ID") && !jsonObj.isNull("productlocation_ID"))
 			productlocation_ID = jsonObj.getLong("productlocation_ID");
 		else if (jsonObj.has("productlocation_CODE") && !jsonObj.isNull("productlocation_CODE")) {
-			JSONObject productlocation = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'PRODUCTLOCATION', code: "+jsonObj.getString("productlocation_CODE")+"}", apiRequest.getREQUEST_OUTPUT(), true));
+			JSONObject productlocation = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'PRODUCTLOCATION', code: "+jsonObj.getString("productlocation_CODE")+"}", apiRequest.getString("access_TOKEN"), true));
 			if (productlocation != null)
 				productlocation_ID = productlocation.getLong("id");
 		} 
@@ -433,7 +419,7 @@ public class productItemInventoryController {
 		if (jsonObj.has("inventoryclassification_ID") && !jsonObj.isNull("inventoryclassification_ID"))
 			inventoryclassification_ID = jsonObj.getLong("inventoryclassification_ID");
 		else if (jsonObj.has("inventoryclassification_CODE") && !jsonObj.isNull("inventoryclassification_CODE")) {
-			JSONObject inventoryclassification = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'INVENTORYCLASSIFICTION', code: "+jsonObj.getString("inventoryclassification_CODE")+"}", apiRequest.getREQUEST_OUTPUT(), true));
+			JSONObject inventoryclassification = new JSONObject(ServiceCall.POST("lookup/bycode", "{entityname: 'INVENTORYCLASSIFICTION', code: "+jsonObj.getString("inventoryclassification_CODE")+"}", apiRequest.getString("access_TOKEN"), true));
 			if (inventoryclassification != null)
 				inventoryclassification_ID = inventoryclassification.getLong("id");
 		} 
@@ -443,130 +429,97 @@ public class productItemInventoryController {
 					? productiteminventoryrepository.findByAdvancedSearch(productitem_ID, productitem_IDS, productlocation_ID, inventoryclassification_ID)
 							: productiteminventoryrepository.findAllByAdvancedSearch(productitem_ID, productitem_IDS, productlocation_ID, inventoryclassification_ID));
 		}
-		return new ResponseEntity(getAPIResponse(productiteminventories, null, null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventories, null, null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 	}       
 
-	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
-		JSONObject checkTokenResponse = AccessToken.checkToken(accessToken);
-		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItemInventory.getDatabaseTableID());
-		APIRequestDataLog apiRequest;
-
-		log.info(requestType + ": " + requestURI);
-		if (requestBody != null)
-			log.info("Input: " + requestBody);
-
-		if (checkTokenResponse.has("error")) {
-			apiRequest = tableDataLogs.apiRequestDataLog(requestType, databaseTableID, (long) 0, requestURI, requestBody, workstation);
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
-			return apiRequest;
-		}
-
-		Long requestUser = (long) 0;
-		if (accessToken != null && accessToken != "")
-			requestUser = checkTokenResponse.getLong("user_ID");
-		apiRequest = tableDataLogs.apiRequestDataLog(requestType, databaseTableID, requestUser, requestURI, requestBody, workstation);
-		apiRequest.setREQUEST_OUTPUT(accessToken);
-
-		if (checkTokenResponse.has("employee_ID") && !checkTokenResponse.isNull("employee_ID"))
-			apiRequest.setRESPONSE_DATETIME(""+checkTokenResponse.getLong("employee_ID"));
-
-		return apiRequest;
-	}
-
-	APIRequestDataLog getAPIResponse(List<ProductItemInventory> productiteminventories, ProductItemInventory productiteminventory , JSONArray jsonProductItemInventories, JSONObject jsonProductItemInventory, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
+	String getAPIResponse(List<ProductItemInventory> productiteminventories, ProductItemInventory productiteminventory , JSONArray jsonProductItemInventories, JSONObject jsonProductItemInventory, String message, JSONObject apiRequest, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
-		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date date = new Date();
-		long productiteminventoryID = 0;
+		String rtnAPIResponse="Invalid Resonse";
 
 		if (message != null) {
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductItemInventory", message);
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
+			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductItemInventory", message).toString();
 		} else {
 			if (productiteminventory != null && isWithDetail == true) {
 
-				JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productiteminventory.getPRODUCTITEM_ID(), apiRequest.getREQUEST_OUTPUT(), false));
+				JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productiteminventory.getPRODUCTITEM_ID(), apiRequest.getString("access_TOKEN"), false));
 				productiteminventory.setPRODUCTITEM_DETAIL(productitem.toString());
 
-				if(productiteminventory.getPRODUCTLOCATION_ID() != null) {
-					JSONObject productlocation = new JSONObject(ServiceCall.GET("lookup/"+productiteminventory.getPRODUCTLOCATION_ID(), apiRequest.getREQUEST_OUTPUT(), true));
+				if (productiteminventory.getPRODUCTLOCATION_ID() != null) {
+					JSONObject productlocation = new JSONObject(ServiceCall.GET("lookup/"+productiteminventory.getPRODUCTLOCATION_ID(), apiRequest.getString("access_TOKEN"), true));
 					productiteminventory.setPRODUCTLOCATION_DETAIL(productlocation.toString());
 				}
-				if(productiteminventory.getINVENTORYCLASSIFICTION_ID() != null) {
-					JSONObject inventoryclassification = new JSONObject(ServiceCall.GET("lookup/"+productiteminventory.getINVENTORYCLASSIFICTION_ID(), apiRequest.getREQUEST_OUTPUT(), true));
+				if (productiteminventory.getINVENTORYCLASSIFICTION_ID() != null) {
+					JSONObject inventoryclassification = new JSONObject(ServiceCall.GET("lookup/"+productiteminventory.getINVENTORYCLASSIFICTION_ID(), apiRequest.getString("access_TOKEN"), true));
 					productiteminventory.setINVENTORYCLASSIFICTION_DETAIL(inventoryclassification.toString());
 				}
-				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventory));
-				productiteminventoryID = productiteminventory.getPRODUCTITEMINVENTORY_ID();
-			} else if(productiteminventories != null && isWithDetail == true){	
+				rtnAPIResponse = mapper.writeValueAsString(productiteminventory);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+			} else if (productiteminventories != null && isWithDetail == true) {	
 				if (productiteminventories.size()>0) {
 					List<Integer> productitemList = new ArrayList<Integer>();
 					List<Integer> lookupList = new ArrayList<Integer>();
 					for (int i=0; i<productiteminventories.size(); i++) {
-						if(productiteminventories.get(i).getPRODUCTITEM_ID() != null)
+						if (productiteminventories.get(i).getPRODUCTITEM_ID() != null)
 							productitemList.add(Integer.parseInt(productiteminventories.get(i).getPRODUCTITEM_ID().toString()));
-						if(productiteminventories.get(i).getPRODUCTLOCATION_ID() != null)
+						if (productiteminventories.get(i).getPRODUCTLOCATION_ID() != null)
 							lookupList.add(Integer.parseInt(productiteminventories.get(i).getPRODUCTLOCATION_ID().toString()));
-						if(productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() != null)
+						if (productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() != null)
 							lookupList.add(Integer.parseInt(productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID().toString()));
 					}
-					JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getREQUEST_OUTPUT(), false));
-					JSONArray lookupObject = new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+ lookupList+"}", apiRequest.getREQUEST_OUTPUT(), true));
+					JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getString("access_TOKEN"), false));
+					JSONArray lookupObject = new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+ lookupList+"}", apiRequest.getString("access_TOKEN"), true));
 
 					for (int i=0; i<productiteminventories.size(); i++) {
 						for (int j=0; j<productitemObject.length(); j++) {
 							JSONObject productitem = productitemObject.getJSONObject(j);
-							if(productiteminventories.get(i).getPRODUCTITEM_ID() == productitem.getLong("productitem_ID") ) {
+							if (productiteminventories.get(i).getPRODUCTITEM_ID() == productitem.getLong("productitem_ID") ) {
 								productiteminventories.get(i).setPRODUCTITEM_DETAIL(productitem.toString());
 							}
 						}
 
 						for (int j=0; j<lookupObject.length(); j++) {
 							JSONObject lookup = lookupObject.getJSONObject(j);
-							if(productiteminventories.get(i).getPRODUCTLOCATION_ID() != null && productiteminventories.get(i).getPRODUCTLOCATION_ID() == lookup.getLong("id") ) {
+							if (productiteminventories.get(i).getPRODUCTLOCATION_ID() != null && productiteminventories.get(i).getPRODUCTLOCATION_ID() == lookup.getLong("id") ) {
 								productiteminventories.get(i).setPRODUCTLOCATION_DETAIL(lookup.toString());
 							}
-							if(productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() != null && productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() == lookup.getLong("id") ) {
+							if (productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() != null && productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() == lookup.getLong("id") ) {
 								productiteminventories.get(i).setINVENTORYCLASSIFICTION_DETAIL(lookup.toString());
 							}
 						}
 					}	
 				}
-				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventories));
+
+				rtnAPIResponse = mapper.writeValueAsString(productiteminventories);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			
-			} else if(productiteminventory != null && isWithDetail == false) {	
-				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventory));
+			} else if (productiteminventory != null && isWithDetail == false) {	
+				rtnAPIResponse = mapper.writeValueAsString(productiteminventory);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
-			} else if(productiteminventories != null && isWithDetail == false) {	
-				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventories));
+			} else if (productiteminventories != null && isWithDetail == false) {	
+				rtnAPIResponse = mapper.writeValueAsString(productiteminventories);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
-			} else if (jsonProductItemInventories != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventories.toString());
+			} else if (jsonProductItemInventories != null) {
+				rtnAPIResponse = jsonProductItemInventories.toString();
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
-			} else if (jsonProductItemInventory != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventory.toString());
+			} else if (jsonProductItemInventory != null) {
+				rtnAPIResponse = jsonProductItemInventory.toString();
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
-			apiRequest.setRESPONSE_DATETIME(dateFormat1.format(date));
-			apiRequest.setREQUEST_STATUS("Success");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		}
 
-		if (isTableLog)
-			tbldatalogrepository.saveAndFlush(tableDataLogs.TableSaveDataLog(productiteminventoryID, apiRequest.getDATABASETABLE_ID(), apiRequest.getREQUEST_ID(), apiRequest.getREQUEST_OUTPUT()));
-
-		if (apiRequest.getREQUEST_OUTPUT().contains("bearer"))
-			apiRequest.setREQUEST_OUTPUT(null);
-
-		return apiRequest;
+		return rtnAPIResponse;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/commitment" ,method = RequestMethod.POST)
 	public ResponseEntity Commitment(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/commitment", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productiteminventory/commitment", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 
@@ -590,7 +543,7 @@ public class productItemInventoryController {
 
 			ProductItemInventory productiteminventory = productiteminventoryrepository.findByProductItemId(orderdetail.getLong("productitem_ID"));
 
-			if(quantity > 0 && productiteminventory.getQUANTITY_AVAILABLE() > 0 && productiteminventory.getQUANTITY_AVAILABLE() < (double) quantity) {
+			if (quantity > 0 && productiteminventory.getQUANTITY_AVAILABLE() > 0 && productiteminventory.getQUANTITY_AVAILABLE() < (double) quantity) {
 				quantity = (long) (productiteminventory.getQUANTITY_AVAILABLE() - 0);
 			} else if (quantity > 0 && productiteminventory.getQUANTITY_AVAILABLE() <= 0) {
 				quantity = 0;
@@ -598,8 +551,8 @@ public class productItemInventoryController {
 
 			productiteminventory.setQUANTITY_AVAILABLE(productiteminventory.getQUANTITY_AVAILABLE() -  quantity);
 			productiteminventory.setQUANTITY_COMMITTED(productiteminventory.getQUANTITY_COMMITTED() +  quantity);
-			productiteminventory.setMODIFIED_BY(apiRequest.getREQUEST_ID());
-			productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getLOG_WORKSTATION());
+			productiteminventory.setMODIFIED_BY(apiRequest.getLong("request_ID"));
+			productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getString("log_WORKSTATION"));
 			productiteminventory.setMODIFIED_WHEN(dateFormat1.format(date));
 			productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
 
@@ -614,15 +567,15 @@ public class productItemInventoryController {
 			rtnArray.put(rtnobj);
 		}
 
-		return new ResponseEntity(getAPIResponse(null, null, rtnArray, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, null, rtnArray, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/fulfillment" ,method = RequestMethod.POST)
 	public ResponseEntity Fulfillment(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/fulfillment", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productiteminventory/fulfillment", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 
@@ -641,8 +594,8 @@ public class productItemInventoryController {
 			productiteminventory.setQUANTITY_ONHAND(productiteminventory.getQUANTITY_ONHAND() - commitment + backordered);
 			productiteminventory.setQUANTITY_AVAILABLE(productiteminventory.getQUANTITY_AVAILABLE() +  backordered);
 			productiteminventory.setQUANTITY_COMMITTED(productiteminventory.getQUANTITY_COMMITTED() - commitment - backordered);
-			productiteminventory.setMODIFIED_BY(apiRequest.getREQUEST_ID());
-			productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getLOG_WORKSTATION());
+			productiteminventory.setMODIFIED_BY(apiRequest.getLong("request_ID"));
+			productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getString("log_WORKSTATION"));
 			productiteminventory.setMODIFIED_WHEN(dateFormat1.format(date));
 			productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
 
@@ -652,15 +605,15 @@ public class productItemInventoryController {
 			rtnArray.put(rtnobj);
 		}
 
-		return new ResponseEntity(getAPIResponse(null, null, rtnArray, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, null, rtnArray, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/received" ,method = RequestMethod.POST)
 	public ResponseEntity Received(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productiteminventory/received", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productiteminventory/received", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 
@@ -675,23 +628,23 @@ public class productItemInventoryController {
 			else if (productitem.has("product_ID")) {
 				JSONObject product = new JSONObject();
 				product.put("product_ID", productitem.getLong("product_ID"));
-				JSONArray productitems = new JSONArray(ServiceCall.POST("productitem/advancedsearch", product.toString(), apiRequest.getREQUEST_OUTPUT(), false));
+				JSONArray productitems = new JSONArray(ServiceCall.POST("productitem/advancedsearch", product.toString(), apiRequest.getString("access_TOKEN"), false));
 				if (productitems.length() > 0) {
 					productitem_id = productitems.getJSONObject(productitems.length()-1).getLong("productitem_ID");
 				}
 			}
 			
 			long quantity_received = productitem.getLong("quantity_RECEIVED");
-			if(quantity_received != 0){
+			if (quantity_received != 0) {
 				ProductItemInventory productiteminventory = productiteminventoryrepository.findByProductItemId(productitem_id);
-				if(productiteminventory != null)
+				if (productiteminventory != null)
 				{
 					double quantity_onhand = productiteminventory.getQUANTITY_ONHAND() + (double) quantity_received;
 					productiteminventory.setQUANTITY_ONHAND(quantity_onhand);
 					double quantity_available = productiteminventory.getQUANTITY_AVAILABLE() + (double) quantity_received;
 					productiteminventory.setQUANTITY_AVAILABLE(quantity_available);
-					productiteminventory.setMODIFIED_BY(apiRequest.getREQUEST_ID());
-					productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getLOG_WORKSTATION());
+					productiteminventory.setMODIFIED_BY(apiRequest.getLong("request_ID"));
+					productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getString("log_WORKSTATION"));
 					productiteminventory.setMODIFIED_WHEN(dateFormat1.format(date));
 					productiteminventory = productiteminventoryrepository.saveAndFlush(productiteminventory);
 					productiteminventorylist.add(productiteminventory);
@@ -699,6 +652,6 @@ public class productItemInventoryController {
 			}
 		}
 
-		return new ResponseEntity(getAPIResponse(productiteminventorylist, null, null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productiteminventorylist, null, null, null, null, apiRequest, true), HttpStatus.OK);
 	}	
 }

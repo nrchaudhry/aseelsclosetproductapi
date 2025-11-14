@@ -22,12 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cwiztech.datalogs.model.APIRequestDataLog;
-import com.cwiztech.datalogs.model.DatabaseTables;
-import com.cwiztech.datalogs.model.tableDataLogs;
-import com.cwiztech.datalogs.repository.apiRequestDataLogRepository;
-import com.cwiztech.datalogs.repository.databaseTablesRepository;
-import com.cwiztech.datalogs.repository.tableDataLogRepository;
+import com.cwiztech.log.apiRequestLog;
 import com.cwiztech.product.model.ProductApplication;
 import com.cwiztech.product.repository.productApplicationRepository;
 import com.cwiztech.services.ServiceCall;
@@ -46,45 +41,36 @@ public class productApplicationController {
 	@Autowired
 	private productApplicationRepository productapplicationrepository;
 
-	@Autowired
-	private apiRequestDataLogRepository apirequestdatalogRepository;
-
-	@Autowired
-	private tableDataLogRepository tbldatalogrepository;
-
-	@Autowired
-	private databaseTablesRepository databasetablesrepository;
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productapplication", null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productapplication", null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<ProductApplication> productapplications = productapplicationrepository.findActive();
-		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public ResponseEntity getAll(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productapplication/all", null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productapplication/all", null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<ProductApplication> productapplications = productapplicationrepository.findAll();
 
-		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity getOne(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productapplication/"+id, null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productapplication/"+id, null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		ProductApplication productapplication = productapplicationrepository.findOne(id);
 
-		return new ResponseEntity(getAPIResponse(null, productapplication , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productapplication , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 
@@ -92,8 +78,8 @@ public class productApplicationController {
 	@RequestMapping(value = "/ids", method = RequestMethod.POST)
 	public ResponseEntity getByIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productapplication/ids", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productapplication/ids", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<Integer> productapplication_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -105,15 +91,15 @@ public class productApplicationController {
 		if (jsonproductapplications.length()>0)
 			productapplications = productapplicationrepository.findByIDs(productapplication_IDS);
 
-		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/notin/ids", method = RequestMethod.POST)
 	public ResponseEntity getByNotInIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productapplication/notin/ids", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productapplication/notin/ids", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<Integer> productapplication_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -125,14 +111,14 @@ public class productApplicationController {
 		if (jsonproductapplications.length()>0)
 			productapplications = productapplicationrepository.findByNotInIDs(productapplication_IDS);
 
-		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity insert(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productapplication", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productapplication", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		return insertupdateAll(null, new JSONObject(data), apiRequest);
 	}
@@ -141,8 +127,8 @@ public class productApplicationController {
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public ResponseEntity update(@PathVariable Long id, @RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("PUT", "/productapplication/"+id, data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productapplication/"+id, data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		JSONObject jsonObj = new JSONObject(data);
 		jsonObj.put("id", id);
@@ -154,15 +140,15 @@ public class productApplicationController {
 	@RequestMapping(method = RequestMethod.PUT)
 	public ResponseEntity insertupdate(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("PUT", "/productapplication", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productapplication", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		return insertupdateAll(new JSONArray(data), null, apiRequest);
 	}
 
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity insertupdateAll(JSONArray jsonProductApplications, JSONObject jsonProductApplication, APIRequestDataLog apiRequest) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity insertupdateAll(JSONArray jsonProductApplications, JSONObject jsonProductApplication, JSONObject apiRequest) throws JsonProcessingException, JSONException, ParseException {
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 
@@ -184,17 +170,17 @@ public class productApplicationController {
 					productapplication = productapplicationrepository.findOne(productapplicationid);
 
 					if (productapplication == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductApplication Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductApplication Data!", apiRequest, true), HttpStatus.BAD_REQUEST);
 				}
 			}
 
 
 			if (productapplicationid == 0) {
 				if (!jsonObj.has("application_ID") || jsonObj.isNull("application_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "application_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "application_ID is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
 
 				if (!jsonObj.has("product_ID") || jsonObj.isNull("product_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
 
 			}
 			if (jsonObj.has("application_ID") && !jsonObj.isNull("application_ID"))
@@ -208,8 +194,8 @@ public class productApplicationController {
 			else if (jsonObj.has("isactive"))
 				productapplication.setISACTIVE(jsonObj.getString("isactive"));
 
-			productapplication.setMODIFIED_BY(apiRequest.getREQUEST_ID());
-			productapplication.setMODIFIED_WORKSTATION(apiRequest.getLOG_WORKSTATION());
+			productapplication.setMODIFIED_BY(apiRequest.getLong("request_ID"));
+			productapplication.setMODIFIED_WORKSTATION(apiRequest.getString("log_WORKSTATION"));
 			productapplication.setMODIFIED_WHEN(dateFormat1.format(date));
 			productapplications.add(productapplication);
 		}
@@ -222,9 +208,9 @@ public class productApplicationController {
 
 		ResponseEntity responseentity;
 		if (jsonProductApplication != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productapplications.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productapplications.get(0) , null, null, null, apiRequest, true), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productapplications, null , null, null, null, apiRequest, true), HttpStatus.OK);
 		return responseentity;
 	}
 
@@ -233,20 +219,20 @@ public class productApplicationController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity delete(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productapplication/"+id, null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productapplication/"+id, null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		ProductApplication productapplication = productapplicationrepository.findOne(id);
 		productapplicationrepository.delete(productapplication);
 
-		return new ResponseEntity(getAPIResponse(null, productapplication , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productapplication , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
 	public ResponseEntity remove(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productapplication/"+id, null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productapplication/"+id, null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		JSONObject productapplication = new JSONObject();
 		productapplication.put("id", id);
@@ -272,8 +258,8 @@ public class productApplicationController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productapplication/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productapplication/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<ProductApplication> productapplications = new ArrayList<ProductApplication>();
 		JSONObject jsonObj = new JSONObject(data);
@@ -324,109 +310,70 @@ public class productApplicationController {
 			}
 		}
 
-		if(product_ID != 0 || product_ID != 0){
+		if (product_ID != 0 || product_ID != 0) {
 			productapplications = ((active == true)
 					? productapplicationrepository.findByAdvancedSearch(product_ID, product_IDS, application_ID, application_IDS)
 							: productapplicationrepository.findAllByAdvancedSearch(product_ID, product_IDS, application_ID, application_IDS));
 		}
 
-		return new ResponseEntity(getAPIResponse(productapplications, null, null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productapplications, null, null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 	}
 
-
-	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
-		JSONObject checkTokenResponse = AccessToken.checkToken(accessToken);
-		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductApplication.getDatabaseTableID());
-		APIRequestDataLog apiRequest;
-
-		log.info(requestType + ": " + requestURI);
-		if (requestBody != null)
-			log.info("Input: " + requestBody);
-
-		if (checkTokenResponse.has("error")) {
-			apiRequest = tableDataLogs.apiRequestDataLog(requestType, databaseTableID, (long) 0, requestURI, requestBody, workstation);
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
-			return apiRequest;
-		}
-
-
-		Long requestUser = (long) 0;
-		if (accessToken != null && accessToken != "")
-			requestUser = checkTokenResponse.getLong("user_ID");
-		apiRequest = tableDataLogs.apiRequestDataLog(requestType, databaseTableID, requestUser, requestURI, requestBody, workstation);
-		apiRequest.setREQUEST_OUTPUT(accessToken);
-
-		if (checkTokenResponse.has("employee_ID") && !checkTokenResponse.isNull("employee_ID"))
-			apiRequest.setRESPONSE_DATETIME(""+checkTokenResponse.getLong("employee_ID"));
-
-		return apiRequest;
-	}
-
-	APIRequestDataLog getAPIResponse(List<ProductApplication> productapplications, ProductApplication productapplication , JSONArray jsonProductApplications, JSONObject jsonProductApplication, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
+	String getAPIResponse(List<ProductApplication> productapplications, ProductApplication productapplication , JSONArray jsonProductApplications, JSONObject jsonProductApplication, String message, JSONObject apiRequest, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
-		long productapplicationID = 0;
+		String rtnAPIResponse="Invalid Resonse";
 
 		if (message != null) {
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductApplication", message);
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
+			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductApplication", message).toString();
 		} else {
 			if (productapplication != null && isWithDetail == true) {
-				if(productapplication.getAPPLICATION_ID() != null) {
-					JSONObject application = new JSONObject(ServiceCall.GET("application/"+productapplication.getAPPLICATION_ID(), apiRequest.getREQUEST_OUTPUT(), true));
+				if (productapplication.getAPPLICATION_ID() != null) {
+					JSONObject application = new JSONObject(ServiceCall.GET("application/"+productapplication.getAPPLICATION_ID(), apiRequest.getString("access_TOKEN"), true));
 					productapplication.setAPPLICATION_DETAIL(application.toString());
 				}
-				if(productapplication.getPRODUCT_ID() != null) {
-					JSONObject product = new JSONObject(ServiceCall.GET("product/"+productapplication.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT(), false));
+				if (productapplication.getPRODUCT_ID() != null) {
+					JSONObject product = new JSONObject(ServiceCall.GET("product/"+productapplication.getPRODUCT_ID(), apiRequest.getString("access_TOKEN"), false));
 					productapplication.setPRODUCT_DETAIL(product.toString());
 				}
 
-				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productapplication));
-				productapplicationID = productapplication.getPRODUCTAPPLICATION_ID();
+				rtnAPIResponse = mapper.writeValueAsString(productapplication);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
-
-			} else if (productapplications != null && isWithDetail == true){
+			} else if (productapplications != null && isWithDetail == true) {
 				if (productapplications.size()>0) {
 					List<Integer> applicationList = new ArrayList<Integer>();
 					List<Integer> productList = new ArrayList<Integer>();
 
 					for (int i=0; i<productapplications.size(); i++) {
-						if(productapplications.get(i).getAPPLICATION_ID() != null) {
+						if (productapplications.get(i).getAPPLICATION_ID() != null) {
 							applicationList.add(Integer.parseInt(productapplications.get(i).getAPPLICATION_ID().toString()));
 						}
-						if(productapplications.get(i).getPRODUCT_ID() != null) {
+						if (productapplications.get(i).getPRODUCT_ID() != null) {
 							productList.add(Integer.parseInt(productapplications.get(i).getPRODUCT_ID().toString()));
 						}
 					}
 
-					JSONArray applicationObject = new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getREQUEST_OUTPUT(), true));
-					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT(), false));
+					JSONArray applicationObject = new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getString("access_TOKEN"), true));
+					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), false));
 
 					for (int i=0; i<productapplications.size(); i++) {
 						for (int j=0; j<applicationObject.length(); j++) {
 							JSONObject application = applicationObject.getJSONObject(j);
-							if(productapplications.get(i).getAPPLICATION_ID() != null && productapplications.get(i).getAPPLICATION_ID() == application.getLong("application_ID")) {
+							if (productapplications.get(i).getAPPLICATION_ID() != null && productapplications.get(i).getAPPLICATION_ID() == application.getLong("application_ID")) {
 								productapplications.get(i).setAPPLICATION_DETAIL(application.toString());
 							}
 						}
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
-							if(productapplications.get(i).getPRODUCT_ID() != null && productapplications.get(i).getPRODUCT_ID() == product.getLong("product_ID")) {
+							if (productapplications.get(i).getPRODUCT_ID() != null && productapplications.get(i).getPRODUCT_ID() == product.getLong("product_ID")) {
 								productapplications.get(i).setPRODUCT_DETAIL(product.toString());
 							}
 						}
 
 					}
 				}
-
-				if (isTableLog)
-					tbldatalogrepository.saveAndFlush(tableDataLogs.TableSaveDataLog(productapplicationID, apiRequest.getDATABASETABLE_ID(), apiRequest.getREQUEST_ID(), apiRequest.getREQUEST_OUTPUT()));
-
-				if (apiRequest.getREQUEST_OUTPUT().contains("bearer"))
-					apiRequest.setREQUEST_OUTPUT(null);
-
 			}
 		}
-		return apiRequest;
+		return rtnAPIResponse;
 	}
 }

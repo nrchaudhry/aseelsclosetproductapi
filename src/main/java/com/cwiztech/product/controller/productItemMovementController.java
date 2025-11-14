@@ -23,14 +23,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.cwiztech.datalogs.model.APIRequestDataLog;
-import com.cwiztech.datalogs.model.DatabaseTables;
-import com.cwiztech.datalogs.model.tableDataLogs;
-import com.cwiztech.datalogs.repository.apiRequestDataLogRepository;
-import com.cwiztech.datalogs.repository.databaseTablesRepository;
-import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductItemMovement;
 import com.cwiztech.product.repository.productItemMovementRepository;
+import com.cwiztech.log.apiRequestLog;
 import com.cwiztech.services.ServiceCall;
 import com.cwiztech.token.AccessToken;
 
@@ -43,53 +38,44 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 	@Autowired
 	private productItemMovementRepository productitemmovementrepository;
 	
-	@Autowired
-	private apiRequestDataLogRepository apirequestdatalogRepository;
-
-	@Autowired
-	private tableDataLogRepository tbldatalogrepository;
-
-	@Autowired
-	private databaseTablesRepository databasetablesrepository;
-	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productitemmovement", null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemmovement", null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<ProductItemMovement> productitemmovements = productitemmovementrepository.findActive();
-		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public ResponseEntity getAll(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productitemmovement/all", null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemmovement/all", null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<ProductItemMovement> productitemmovements = productitemmovementrepository.findAll();
 		
-		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity getOne(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productitemmovement/"+id, null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemmovement/"+id, null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		ProductItemMovement productitemmovement = productitemmovementrepository.findOne(id);
 		
-		return new ResponseEntity(getAPIResponse(null, productitemmovement , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productitemmovement , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/ids", method = RequestMethod.POST)
 	public ResponseEntity getByIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productitemmovement/ids", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemmovement/ids", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<Integer> productitemmovement_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -101,15 +87,15 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		if (jsonproductitemmovements.length()>0)
 			productitemmovements = productitemmovementrepository.findByIDs(productitemmovement_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/notin/ids", method = RequestMethod.POST)
 	public ResponseEntity getByNotInIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productitemmovement/notin/ids", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemmovement/notin/ids", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		List<Integer> productitemmovement_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -121,15 +107,15 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		if (jsonproductitemmovements.length()>0)
 			productitemmovements = productitemmovementrepository.findByNotInIDs(productitemmovement_IDS);
 		
-		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity insert(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productitemmovement", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemmovement", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 		
 		return insertupdateAll(null, new JSONObject(data), apiRequest);
 	}
@@ -139,8 +125,8 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 	public ResponseEntity update(@PathVariable Long id, @RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		
-		APIRequestDataLog apiRequest = checkToken("PUT", "/productitemmovement/"+id, data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productitemmovement/"+id, data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 		JSONObject jsonObj = new JSONObject(data);
 		jsonObj.put("id", id);
 		
@@ -151,14 +137,14 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 	@RequestMapping(method = RequestMethod.PUT)
 	public ResponseEntity insertupdate(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("PUT", "/productitemmovement", data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productitemmovement", data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 		
 		return insertupdateAll(new JSONArray(data), null, apiRequest);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity insertupdateAll(JSONArray jsonProductItemMovements, JSONObject jsonProductItemMovement, APIRequestDataLog apiRequest) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity insertupdateAll(JSONArray jsonProductItemMovements, JSONObject jsonProductItemMovement, JSONObject apiRequest) throws JsonProcessingException, JSONException, ParseException {
 	    SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 
@@ -180,22 +166,22 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 					productitemmovement = productitemmovementrepository.findOne(productitemmovementid);
 					
 					if (productitemmovement == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemMovement Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemMovement Data!", apiRequest, true), HttpStatus.BAD_REQUEST);
 				}
 			}
 			
 			if (productitemmovementid == 0) {
 				if (!jsonObj.has("product_ID") || jsonObj.isNull("product_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_ID is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
 				
 				if (!jsonObj.has("productitemmovement_DATE") || jsonObj.isNull("productitemmovement_DATE"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitemmovement_DATE is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitemmovement_DATE is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
 					
 				if (!jsonObj.has("productitem_QUANTITY") || jsonObj.isNull("productitem_QUANTITY"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_QUANTITY is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_QUANTITY is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
 				
 				if (!jsonObj.has("productitemmovement_QUANTITY") || jsonObj.isNull("productitemmovement_QUANTITY"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitemmovement_QUANTITY is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitemmovement_QUANTITY is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
 			}
 			
 			if (jsonObj.has("productitemmovement_DATE") && !jsonObj.isNull("productitemmovement_DATE")) 
@@ -227,8 +213,8 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		    else if (jsonObj.has("isactive"))
 				productitemmovement.setISACTIVE(jsonObj.getString("isactive"));
 
-			productitemmovement.setMODIFIED_BY(apiRequest.getREQUEST_ID());
-			productitemmovement.setMODIFIED_WORKSTATION(apiRequest.getLOG_WORKSTATION());
+			productitemmovement.setMODIFIED_BY(apiRequest.getLong("request_ID"));
+			productitemmovement.setMODIFIED_WORKSTATION(apiRequest.getString("log_WORKSTATION"));
 			productitemmovement.setMODIFIED_WHEN(dateFormat1.format(date));
 			productitemmovements.add(productitemmovement);
 		}
@@ -241,29 +227,29 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		
 		ResponseEntity responseentity;
 		if (jsonProductItemMovement != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productitemmovements.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productitemmovements.get(0) , null, null, null, apiRequest, true), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, true), HttpStatus.OK);
 		return responseentity;
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity delete(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productitemmovement/"+id, null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemmovement/"+id, null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		ProductItemMovement productitemmovement = productitemmovementrepository.findOne(id);
 		productitemmovementrepository.delete(productitemmovement);
 		
-		return new ResponseEntity(getAPIResponse(null, productitemmovement , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productitemmovement , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
 	public ResponseEntity remove(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productitemmovement/"+id, null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemmovement/"+id, null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 		
 		JSONObject productitemmovement = new JSONObject();
 		productitemmovement.put("id", id);
@@ -286,8 +272,8 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity BySearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productitemmovement/search" + ((active == true) ? "" : "/all"), data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemmovement/search" + ((active == true) ? "" : "/all"), data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		JSONObject jsonObj = new JSONObject(data);
 
@@ -295,7 +281,7 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 				? productitemmovementrepository.findBySearch("%" + jsonObj.getString("search") + "%")
 				: productitemmovementrepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 		
-		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -312,8 +298,8 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-		APIRequestDataLog apiRequest = checkToken("POST", "/productitemmovement/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemmovement/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 		
 		List<ProductItemMovement> productitemmovements = new ArrayList<ProductItemMovement>();
 		JSONObject jsonObj = new JSONObject(data);
@@ -364,120 +350,87 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
            }
        }
        
-	if(product_ID != 0 || employee_ID != 0 ){
+	if (product_ID != 0 || employee_ID != 0 ) {
 		List<ProductItemMovement> productitemmovement = ((active == true)
 				? productitemmovementrepository.findByAdvancedSearch(product_ID,product_IDS,employee_ID,employee_IDS)
 				: productitemmovementrepository.findAllByAdvancedSearch(product_ID,product_IDS,employee_ID,employee_IDS));
 
 	}
-		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemmovements, null , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 	}
 
-	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
-		JSONObject checkTokenResponse = AccessToken.checkToken(accessToken);
-		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItemMovement.getDatabaseTableID());
-		APIRequestDataLog apiRequest;
-		
-		log.info(requestType + ": " + requestURI);
-		if (requestBody != null)
-			log.info("Input: " + requestBody);
-
-		if (checkTokenResponse.has("error")) {
-			apiRequest = tableDataLogs.apiRequestDataLog(requestType, databaseTableID, (long) 0, requestURI, requestBody, workstation);
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
-			return apiRequest;
-		}
-		
-		Long requestUser = (long) 0;
-		if (accessToken != null && accessToken != "")
-			requestUser = checkTokenResponse.getLong("user_ID");
-		apiRequest = tableDataLogs.apiRequestDataLog(requestType, databaseTableID, requestUser, requestURI, requestBody, workstation);
-		apiRequest.setREQUEST_OUTPUT(accessToken);
-
-		if (checkTokenResponse.has("employee_ID") && !checkTokenResponse.isNull("employee_ID"))
-			apiRequest.setRESPONSE_DATETIME(""+checkTokenResponse.getLong("employee_ID"));
-
-		return apiRequest;
-	}
-	
-	APIRequestDataLog getAPIResponse(List<ProductItemMovement> productitemmovements, ProductItemMovement productitemmovement , JSONArray jsonProductItemMovements, JSONObject jsonProductItemMovement, String message, APIRequestDataLog apiRequest, boolean isTableLog,boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
+	String getAPIResponse(List<ProductItemMovement> productitemmovements, ProductItemMovement productitemmovement , JSONArray jsonProductItemMovements, JSONObject jsonProductItemMovement, String message, JSONObject apiRequest, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
-		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date date = new Date();
-		long productitemmovementID = 0;
+		String rtnAPIResponse="Invalid Resonse";
 		
 		if (message != null) {
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductItemMovement", message);
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
+			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductItemMovement", message).toString();
 		} else {
 			if (productitemmovement != null && isWithDetail == true) {
-				if(productitemmovement.getPRODUCT_ID() != null) {
-				JSONObject product = new JSONObject(ServiceCall.GET("product/"+productitemmovement.getPRODUCT_ID(), apiRequest.getREQUEST_OUTPUT(), true));
+				if (productitemmovement.getPRODUCT_ID() != null) {
+				JSONObject product = new JSONObject(ServiceCall.GET("product/"+productitemmovement.getPRODUCT_ID(), apiRequest.getString("access_TOKEN"), true));
 				productitemmovement.setPRODUCT_DETAIL(product.toString());
 				}
-				if(productitemmovement.getEMPLOYEE_ID() != null) {
-				JSONObject employee = new JSONObject(ServiceCall.GET("employee/"+productitemmovement.getEMPLOYEE_ID(), apiRequest.getREQUEST_OUTPUT(), true));
+				if (productitemmovement.getEMPLOYEE_ID() != null) {
+				JSONObject employee = new JSONObject(ServiceCall.GET("employee/"+productitemmovement.getEMPLOYEE_ID(), apiRequest.getString("access_TOKEN"), true));
 					productitemmovement.setEMPLOYEE_DETAIL(employee.toString());
 				}
-				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemmovement));
-				productitemmovementID = productitemmovement.getPRODUCTITEMMOVEMENT_ID();
+				rtnAPIResponse = mapper.writeValueAsString(productitemmovement);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 				
-			} else if(productitemmovements != null && isWithDetail == true){
+			} else if (productitemmovements != null && isWithDetail == true) {
 				if (productitemmovements.size()>0) {
 					List<Integer> productList = new ArrayList<Integer>();
 					List<Integer> employeeList = new ArrayList<Integer>();
 					
 					for (int i=0; i<productitemmovements.size(); i++) {
-						if(productitemmovements.get(i).getPRODUCT_ID() != null) 
+						if (productitemmovements.get(i).getPRODUCT_ID() != null) 
 						  productList.add(Integer.parseInt(productitemmovements.get(i).getPRODUCT_ID().toString()));
 						
-						if(productitemmovements.get(i).getEMPLOYEE_ID() != null) 
+						if (productitemmovements.get(i).getEMPLOYEE_ID() != null) 
 						  employeeList.add(Integer.parseInt(productitemmovements.get(i).getEMPLOYEE_ID().toString()));
 					}
-					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getREQUEST_OUTPUT(), true));
-					JSONArray employeeObject = new JSONArray(ServiceCall.POST("employee/ids", "{employees: "+employeeList+"}", apiRequest.getREQUEST_OUTPUT(), true));	
+					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), true));
+					JSONArray employeeObject = new JSONArray(ServiceCall.POST("employee/ids", "{employees: "+employeeList+"}", apiRequest.getString("access_TOKEN"), true));	
 					
 					for (int i=0; i<productitemmovements.size(); i++) {
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
-							if(productitemmovements.get(i).getPRODUCT_ID() == product.getLong("product_ID") ) {
+							if (productitemmovements.get(i).getPRODUCT_ID() == product.getLong("product_ID") ) {
 								productitemmovements.get(i).setPRODUCT_DETAIL(product.toString());
 							}
 						}
 						for (int j=0; j<employeeObject.length(); j++) {
 							JSONObject employee = employeeObject.getJSONObject(j);
-							if(productitemmovements.get(i).getEMPLOYEE_ID() == employee.getLong("employee_ID") ) {
+							if (productitemmovements.get(i).getEMPLOYEE_ID() == employee.getLong("employee_ID") ) {
 								productitemmovements.get(i).setEMPLOYEE_DETAIL(employee.toString());
 							}
 						}
 					}
 				}
-				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemmovements));
+				
+				rtnAPIResponse = mapper.writeValueAsString(productitemmovements);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
 			} else if (productitemmovement != null && isWithDetail == false) {
-				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemmovement));
+				rtnAPIResponse = mapper.writeValueAsString(productitemmovement);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (productitemmovements != null && isWithDetail == false) {
-				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productitemmovements)); 
+				rtnAPIResponse = mapper.writeValueAsString(productitemmovements);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 				
-			} else if (jsonProductItemMovements != null ){
-				apiRequest.setREQUEST_OUTPUT(jsonProductItemMovements.toString());
+			} else if (jsonProductItemMovements != null ) {
+				rtnAPIResponse = jsonProductItemMovements.toString();
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			
-			} else if (jsonProductItemMovement != null){
-				apiRequest.setREQUEST_OUTPUT(jsonProductItemMovement.toString());
+			} else if (jsonProductItemMovement != null) {
+				rtnAPIResponse = jsonProductItemMovement.toString();
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
-			apiRequest.setRESPONSE_DATETIME(dateFormat1.format(date));
-			apiRequest.setREQUEST_STATUS("Success");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
 		}
 		
-		if (isTableLog)
-			tbldatalogrepository.saveAndFlush(tableDataLogs.TableSaveDataLog(productitemmovementID, apiRequest.getDATABASETABLE_ID(), apiRequest.getREQUEST_ID(), apiRequest.getREQUEST_OUTPUT()));
-		
-		if (apiRequest.getREQUEST_OUTPUT().contains("bearer"))
-			apiRequest.setREQUEST_OUTPUT(null);
-		
-		return apiRequest;
+		return rtnAPIResponse;
 	}
 
 }

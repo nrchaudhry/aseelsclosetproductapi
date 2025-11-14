@@ -22,14 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cwiztech.datalogs.model.APIRequestDataLog;
-import com.cwiztech.datalogs.model.DatabaseTables;
-import com.cwiztech.datalogs.model.tableDataLogs;
-import com.cwiztech.datalogs.repository.apiRequestDataLogRepository;
-import com.cwiztech.datalogs.repository.databaseTablesRepository;
-import com.cwiztech.datalogs.repository.tableDataLogRepository;
-
-
+import com.cwiztech.log.apiRequestLog;
 import com.cwiztech.product.model.AttributeCategory;
 import com.cwiztech.product.repository.attributeCategoryRepository;
 import com.cwiztech.services.ServiceCall;
@@ -48,53 +41,44 @@ public class attributeCategoryController {
     @Autowired
     private attributeCategoryRepository attributecategoryrepository;
 
-    @Autowired
-    private apiRequestDataLogRepository apirequestdatalogRepository;
-
-    @Autowired
-    private tableDataLogRepository tbldatalogrepository;
-
-    @Autowired
-    private databaseTablesRepository databasetablesrepository;
-
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-        APIRequestDataLog apiRequest = checkToken("GET", "/attributecategory", null, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("GET", "/attributecategory", null, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
         List<AttributeCategory> attributecategories = attributecategoryrepository.findActive();
-        return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+        return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, true), HttpStatus.OK);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public ResponseEntity getAll(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-        APIRequestDataLog apiRequest = checkToken("GET", "/attributecategory/all", null, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("GET", "/attributecategory/all", null, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
         List<AttributeCategory> attributecategories = attributecategoryrepository.findAll();
 
-        return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+        return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, true), HttpStatus.OK);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity getOne(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-        APIRequestDataLog apiRequest = checkToken("GET", "/attributecategory/"+id, null, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("GET", "/attributecategory/"+id, null, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
         AttributeCategory attributecategory = attributecategoryrepository.findOne(id);
 
-        return new ResponseEntity(getAPIResponse(null, attributecategory , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+        return new ResponseEntity(getAPIResponse(null, attributecategory , null, null, null, apiRequest, true), HttpStatus.OK);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(value = "/ids", method = RequestMethod.POST)
     public ResponseEntity getByIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
             throws JsonProcessingException, JSONException, ParseException {
-        APIRequestDataLog apiRequest = checkToken("POST", "/attributecategory/ids", data, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("POST", "/attributecategory/ids", data, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
         List<Integer> attributecategory_IDS = new ArrayList<Integer>(); 
         JSONObject jsonObj = new JSONObject(data);
@@ -106,15 +90,15 @@ public class attributeCategoryController {
         if (jsonattributecategories.length()>0)
             attributecategories = attributecategoryrepository.findByIDs(attributecategory_IDS);
 
-        return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+        return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, true), HttpStatus.OK);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(value = "/notin/ids", method = RequestMethod.POST)
     public ResponseEntity getByNotInIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
             throws JsonProcessingException, JSONException, ParseException {
-        APIRequestDataLog apiRequest = checkToken("POST", "/attributecategory/notin/ids", data, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("POST", "/attributecategory/notin/ids", data, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
         List<Integer> attributecategory_IDS = new ArrayList<Integer>(); 
         JSONObject jsonObj = new JSONObject(data);
@@ -126,15 +110,15 @@ public class attributeCategoryController {
         if (jsonattributecategories.length()>0)
             attributecategories = attributecategoryrepository.findByNotInIDs(attributecategory_IDS);
 
-        return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+        return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, true), HttpStatus.OK);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity insert(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
             throws JsonProcessingException, JSONException, ParseException {
-        APIRequestDataLog apiRequest = checkToken("POST", "/attributecategory", data, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("POST", "/attributecategory", data, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
         return insertupdateAll(null, new JSONObject(data), apiRequest);
     }
@@ -144,8 +128,8 @@ public class attributeCategoryController {
     public ResponseEntity update(@PathVariable Long id, @RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
             throws JsonProcessingException, JSONException, ParseException {
 
-        APIRequestDataLog apiRequest = checkToken("PUT", "/attributecategory/"+id, data, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("PUT", "/attributecategory/"+id, data, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
         JSONObject jsonObj = new JSONObject(data);
         jsonObj.put("id", id);
 
@@ -156,14 +140,14 @@ public class attributeCategoryController {
     @RequestMapping(method = RequestMethod.PUT)
     public ResponseEntity insertupdate(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
             throws JsonProcessingException, JSONException, ParseException {
-        APIRequestDataLog apiRequest = checkToken("PUT", "/attributecategory", data, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("PUT", "/attributecategory", data, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
         return insertupdateAll(new JSONArray(data), null, apiRequest);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public ResponseEntity insertupdateAll(JSONArray jsonAttributecategories, JSONObject jsonAttributeCategory, APIRequestDataLog apiRequest) throws JsonProcessingException, JSONException, ParseException {
+    public ResponseEntity insertupdateAll(JSONArray jsonAttributecategories, JSONObject jsonAttributeCategory, JSONObject apiRequest) throws JsonProcessingException, JSONException, ParseException {
         SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
 
@@ -185,16 +169,16 @@ public class attributeCategoryController {
                     attributecategory = attributecategoryrepository.findOne(attributecategoryid);
 
                     if (attributecategory == null)
-                        return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid AttributeCategory Data!", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid AttributeCategory Data!", apiRequest, true), HttpStatus.BAD_REQUEST);
                 }
             }
 
             if (attributecategoryid == 0) {
                 if (!jsonObj.has("attributecategory_NAME") || jsonObj.isNull("attributecategory_NAME"))
-                    return new ResponseEntity(getAPIResponse(null, null , null, null, "attributecategory_NAME is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity(getAPIResponse(null, null , null, null, "attributecategory_NAME is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
 
                 if (!jsonObj.has("attributecategoryorder_NO") || jsonObj.isNull("attributecategoryorder_NO"))
-                    return new ResponseEntity(getAPIResponse(null, null , null, null, "attributecategoryorder_NO is missing", apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity(getAPIResponse(null, null , null, null, "attributecategoryorder_NO is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
             }
 
             if (jsonObj.has("attributecategoryparent_ID") && !jsonObj.isNull("attributecategoryparent_ID"))
@@ -214,8 +198,8 @@ public class attributeCategoryController {
             else if (jsonObj.has("isactive"))
                 attributecategory.setISACTIVE(jsonObj.getString("isactive"));
 
-            attributecategory.setMODIFIED_BY(apiRequest.getREQUEST_ID());
-            attributecategory.setMODIFIED_WORKSTATION(apiRequest.getLOG_WORKSTATION());
+            attributecategory.setMODIFIED_BY(apiRequest.getLong("request_ID"));
+            attributecategory.setMODIFIED_WORKSTATION(apiRequest.getString("log_WORKSTATION"));
             attributecategory.setMODIFIED_WHEN(dateFormat1.format(date));
             attributecategories.add(attributecategory);
         }
@@ -228,29 +212,29 @@ public class attributeCategoryController {
 
         ResponseEntity responseentity;
         if (jsonAttributeCategory != null)
-            responseentity = new ResponseEntity(getAPIResponse(null, attributecategories.get(0) , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+            responseentity = new ResponseEntity(getAPIResponse(null, attributecategories.get(0) , null, null, null, apiRequest, true), HttpStatus.OK);
         else
-            responseentity = new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+            responseentity = new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, true), HttpStatus.OK);
         return responseentity;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity delete(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-        APIRequestDataLog apiRequest = checkToken("GET", "/attributecategory/"+id, null, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("GET", "/attributecategory/"+id, null, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
         AttributeCategory attributecategory = attributecategoryrepository.findOne(id);
         attributecategoryrepository.delete(attributecategory);
 
-        return new ResponseEntity(getAPIResponse(null, attributecategory , null, null, null, apiRequest, true, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+        return new ResponseEntity(getAPIResponse(null, attributecategory , null, null, null, apiRequest, true), HttpStatus.OK);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
     public ResponseEntity remove(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-        APIRequestDataLog apiRequest = checkToken("GET", "/attributecategory/"+id, null, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("GET", "/attributecategory/"+id, null, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
         JSONObject attributecategory = new JSONObject();
         attributecategory.put("id", id);
@@ -273,8 +257,8 @@ public class attributeCategoryController {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public ResponseEntity BySearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-        APIRequestDataLog apiRequest = checkToken("POST", "/attributecategory/search" + ((active == true) ? "" : "/all"), data, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("POST", "/attributecategory/search" + ((active == true) ? "" : "/all"), data, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
         JSONObject jsonObj = new JSONObject(data);
 
@@ -282,7 +266,7 @@ public class attributeCategoryController {
                 ? attributecategoryrepository.findBySearch("%" + jsonObj.getString("search") + "%")
                         : attributecategoryrepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 
-        return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, false, true).getREQUEST_OUTPUT(), HttpStatus.OK);
+        return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, true), HttpStatus.OK);
     }
 
     @SuppressWarnings({ "rawtypes" })
@@ -299,8 +283,8 @@ public class attributeCategoryController {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
-        APIRequestDataLog apiRequest = checkToken("POST", "/attributecategory/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("POST", "/attributecategory/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
         List<AttributeCategory> attributecategories = new ArrayList<AttributeCategory>();
         JSONObject jsonObj = new JSONObject(data);
@@ -334,77 +318,42 @@ public class attributeCategoryController {
             }
         }
 
-        if(attributecategoryparent_ID != 0 ){
+        if (attributecategoryparent_ID != 0 ) {
             attributecategories = ((active == true)
                     ? attributecategoryrepository.findByAdvancedSearch(attributecategoryparent_ID, attributecategoryparent_IDS)
                             : attributecategoryrepository.findAllByAdvancedSearch(attributecategoryparent_ID, attributecategoryparent_IDS));
 
         }
-        return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, false, isWithDetail).getREQUEST_OUTPUT(), HttpStatus.OK);
+        return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 
     }
 
-    public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
-        JSONObject checkTokenResponse = AccessToken.checkToken(accessToken);
-        DatabaseTables databaseTableID = databasetablesrepository.findOne(AttributeCategory.getDatabaseTableID());
-        APIRequestDataLog apiRequest;
-
-        log.info(requestType + ": " + requestURI);
-        if (requestBody != null)
-            log.info("Input: " + requestBody);
-
-        if (checkTokenResponse.has("error")) {
-            apiRequest = tableDataLogs.apiRequestDataLog(requestType, databaseTableID, (long) 0, requestURI, requestBody, workstation);
-            apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-            apirequestdatalogRepository.saveAndFlush(apiRequest);
-            return apiRequest;
-        }
-
-        Long requestUser = (long) 0;
-        if (accessToken != null && accessToken != "")
-            requestUser = checkTokenResponse.getLong("user_ID");
-        apiRequest = tableDataLogs.apiRequestDataLog(requestType, databaseTableID, requestUser, requestURI, requestBody, workstation);
-        apiRequest.setREQUEST_OUTPUT(accessToken);
-
-        return apiRequest;
-    }
-
-    APIRequestDataLog getAPIResponse(List<AttributeCategory> attributecategories, AttributeCategory attributecategory , JSONArray jsonAttributecategories, JSONObject jsonAttributeCategory, String message, APIRequestDataLog apiRequest, boolean isTableLog, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
-        ObjectMapper mapper = new ObjectMapper();
-        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date();
-        long attributecategoryID = 0;
+    String getAPIResponse(List<AttributeCategory> attributecategories, AttributeCategory attributecategory , JSONArray jsonAttributecategories, JSONObject jsonAttributeCategory, String message, JSONObject apiRequest, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
+		ObjectMapper mapper = new ObjectMapper();
+		String rtnAPIResponse="Invalid Resonse";
 
         if (message != null) {
-            apiRequest = tableDataLogs.errorDataLog(apiRequest, "AttributeCategory", message);
-            apirequestdatalogRepository.saveAndFlush(apiRequest);
+			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "AttributeCategory", message).toString();
         } else {
             if (attributecategory != null) {
-                apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(attributecategory));
-                attributecategoryID = attributecategory.getATTRIBUTECATEGORY_ID();
-            } else if(attributecategories != null ){
-                apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(attributecategories));
-            } else if (jsonAttributecategories != null){
-                apiRequest.setREQUEST_OUTPUT(jsonAttributecategories.toString());
+				rtnAPIResponse = mapper.writeValueAsString(attributecategory);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
-            } else if (jsonAttributeCategory != null){
-                apiRequest.setREQUEST_OUTPUT(jsonAttributeCategory.toString());
+            } else if (attributecategories != null ) {
+                				rtnAPIResponse = mapper.writeValueAsString(attributecategory);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+            } else if (jsonAttributecategories != null) {
+                rtnAPIResponse = jsonAttributecategories.toString();
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+            } else if (jsonAttributeCategory != null) {
+                rtnAPIResponse = jsonAttributeCategory.toString();
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
             }
-            apiRequest.setRESPONSE_DATETIME(dateFormat1.format(date));
-            apiRequest.setREQUEST_STATUS("Success");
-            apirequestdatalogRepository.saveAndFlush(apiRequest);
         }
 
-        if (isTableLog)
-            tbldatalogrepository.saveAndFlush(tableDataLogs.TableSaveDataLog(attributecategoryID, apiRequest.getDATABASETABLE_ID(), apiRequest.getREQUEST_ID(), apiRequest.getREQUEST_OUTPUT()));
-
-        if (apiRequest.getREQUEST_OUTPUT().contains("bearer"))
-            apiRequest.setREQUEST_OUTPUT(null);
-
-        log.info("Output: " + apiRequest.getREQUEST_OUTPUT());
-        log.info("--------------------------------------------------------");
-
-        return apiRequest;
+        return rtnAPIResponse;
     }
 
 }

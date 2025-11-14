@@ -20,14 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cwiztech.datalogs.model.APIRequestDataLog;
-import com.cwiztech.datalogs.model.DatabaseTables;
-import com.cwiztech.datalogs.model.tableDataLogs;
-import com.cwiztech.datalogs.repository.apiRequestDataLogRepository;
-import com.cwiztech.datalogs.repository.databaseTablesRepository;
-import com.cwiztech.datalogs.repository.tableDataLogRepository;
 import com.cwiztech.product.model.ProductItemInventory;
 import com.cwiztech.product.repository.productItemInventoryRepository;
+import com.cwiztech.log.apiRequestLog;
 import com.cwiztech.services.ServiceCall;
 import com.cwiztech.services.SageService;
 import com.cwiztech.token.AccessToken;
@@ -43,20 +38,11 @@ public class productItemInventorySageController {
 	@Autowired
 	private productItemInventoryRepository productiteminventoryrepository;
 
-	@Autowired
-	private apiRequestDataLogRepository apirequestdatalogRepository;
-
-	@Autowired
-	private tableDataLogRepository tbldatalogrepository;
-
-	@Autowired
-	private databaseTablesRepository databasetablesrepository;
-	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/sendtosage", method = RequestMethod.GET)
 	public ResponseEntity SendToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
-		APIRequestDataLog apiRequest = checkToken("GET", "/productiteminventory/sendtosage", null, null, headToken);
-		if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productiteminventory/sendtosage", null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 
 		JSONArray objProductItemInventorys = new JSONArray();
@@ -129,14 +115,14 @@ public class productItemInventorySageController {
 //			
 //        }
 		
-		return new ResponseEntity(getAPIResponse(null, null , objProductItemInventorys, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, null , objProductItemInventorys, null, null, apiRequest, false), HttpStatus.OK);
 	}
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(value = "/updatestock", method = RequestMethod.GET)
     public ResponseEntity UpdateStock(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
-        APIRequestDataLog apiRequest = checkToken("GET", "/productiteminventory/updatestock", null, null, headToken);
-        if (apiRequest.getREQUEST_STATUS() != null) return new ResponseEntity(apiRequest.getREQUEST_OUTPUT(), HttpStatus.BAD_REQUEST);
+        JSONObject apiRequest = AccessToken.checkToken("GET", "/productiteminventory/updatestock", null, null, headToken);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 
         JSONArray objProductItemInventorys = new JSONArray();
@@ -209,53 +195,24 @@ public class productItemInventorySageController {
 //            
 //        }
         
-        return new ResponseEntity(getAPIResponse(null, null , objProductItemInventorys, null, null, apiRequest, false).getREQUEST_OUTPUT(), HttpStatus.OK);
+        return new ResponseEntity(getAPIResponse(null, null , objProductItemInventorys, null, null, apiRequest, false), HttpStatus.OK);
     }
 
-	public APIRequestDataLog checkToken(String requestType, String requestURI, String requestBody, String workstation, String accessToken) throws JsonProcessingException {
-		JSONObject checkTokenResponse = AccessToken.checkToken(accessToken);
-		DatabaseTables databaseTableID = databasetablesrepository.findOne(ProductItemInventory.getDatabaseTableID());
-		APIRequestDataLog apiRequest;
-		
-		log.info(requestType + ": " + requestURI);
-		if (requestBody != null)
-			log.info("Input: " + requestBody);
-
-		if (checkTokenResponse.has("error")) {
-			apiRequest = tableDataLogs.apiRequestDataLog(requestType, databaseTableID, (long) 0, requestURI, requestBody, workstation);
-			apiRequest = tableDataLogs.errorDataLog(apiRequest, "invalid_token", "Token was not recognised");
-			apirequestdatalogRepository.saveAndFlush(apiRequest);
-			return apiRequest;
-		}
-		
-		Long requestUser = (long) 0;
-		if (accessToken != null && accessToken != "")
-			requestUser = checkTokenResponse.getLong("user_ID");
-		apiRequest = tableDataLogs.apiRequestDataLog(requestType, databaseTableID, requestUser, requestURI, requestBody, workstation);
-		apiRequest.setREQUEST_OUTPUT(accessToken);
-
-		if (checkTokenResponse.has("employee_ID") && !checkTokenResponse.isNull("employee_ID"))
-			apiRequest.setRESPONSE_DATETIME(""+checkTokenResponse.getLong("employee_ID"));
-
-		return apiRequest;
-	}
-	
-	APIRequestDataLog getAPIResponse(List<ProductItemInventory> productiteminventories, ProductItemInventory productiteminventory , JSONArray jsonProductItemInventorys, JSONObject jsonProductItemInventory, String message, APIRequestDataLog apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	String getAPIResponse(List<ProductItemInventory> productiteminventories, ProductItemInventory productiteminventory , JSONArray jsonProductItemInventorys, JSONObject jsonProductItemInventory, String message, JSONObject apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
-		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date date = new Date();
-		long productiteminventoryID = 0;
+		String rtnAPIResponse="Invalid Resonse";
+
 		
 //		if (message != null) {
 //			apiRequest = tableDataLogs.errorDataLog(apiRequest, "ProductItemInventory", message);
-//			apirequestdatalogRepository.saveAndFlush(apiRequest);
+//			JSONObjectRepository.saveAndFlush(apiRequest);
 //		} else {
 //			if (productiteminventory != null) {
 //				JSONObject productiteminventorycategory = new JSONObject(ServiceCall.GET("productiteminventorycategory/"+productiteminventory.getPRODUCTCATEGORY_ID(), apiRequest.getREQUEST_OUTPUT()));
 //				productiteminventory.setPRODUCTCATEGORY_DETAIL(productiteminventorycategory.toString());
-//				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventory));
-//				productiteminventoryID = productiteminventory.getPRODUCT_ID();
-//			} else if(productiteminventories != null){
+//				rtnAPIResponse = mapper.writeValueAsString(customer);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+//			} else if (productiteminventories != null) {
 //				if (productiteminventories.size()>0) {
 //					List<Integer> productiteminventorycategoryList = new ArrayList<Integer>();
 //					for (int i=0; i<productiteminventories.size(); i++) {
@@ -266,28 +223,33 @@ public class productItemInventorySageController {
 //					for (int i=0; i<productiteminventories.size(); i++) {
 //						for (int j=0; j<productiteminventorycategoryObject.length(); j++) {
 //							JSONObject productiteminventorycategory = productiteminventorycategoryObject.getJSONObject(j);
-//							if(productiteminventories.get(i).getPRODUCTCATEGORY_ID() == productiteminventorycategory.getLong("productiteminventorycategory_ID") ) {
+//							if (productiteminventories.get(i).getPRODUCTCATEGORY_ID() == productiteminventorycategory.getLong("productiteminventorycategory_ID") ) {
 //								productiteminventories.get(i).setPRODUCTCATEGORY_DETAIL(productiteminventorycategory.toString());
 //							}
 //						}
 //					}
 //				}
-//				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventories));
-//			} else if (jsonProductItemInventorys != null){
-//				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventorys.toString());
-//			
-//			} else if (jsonProductItemInventory != null){
-//				apiRequest.setREQUEST_OUTPUT(jsonProductItemInventory.toString());
+//				rtnAPIResponse = mapper.writeValueAsString(customer);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+//			} else if (jsonProductItemInventorys != null) {
+//				rtnAPIResponse = jsonCustomers.toString();
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+//			} else if (jsonProductItemInventory != null) {
+//				rtnAPIResponse = jsonCustomers.toString();
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 //			} else {
-//				apiRequest.setREQUEST_OUTPUT(mapper.writeValueAsString(productiteminventory));
+//				rtnAPIResponse = mapper.writeValueAsString(customer);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 //			}
 //			apiRequest.setRESPONSE_DATETIME(dateFormat1.format(date));
 //			apiRequest.setREQUEST_STATUS("Success");
-//			apirequestdatalogRepository.saveAndFlush(apiRequest);
+//			JSONObjectRepository.saveAndFlush(apiRequest);
 //		}
 //		
 //		if (isTableLog)
-//			tbldatalogrepository.saveAndFlush(tableDataLogs.TableSaveDataLog(productiteminventoryID, apiRequest.getDATABASETABLE_ID(), apiRequest.getREQUEST_ID(), apiRequest.getREQUEST_OUTPUT()));
+//			tbldatalogrepository.saveAndFlush(tableDataLogs.TableSaveDataLog(productiteminventoryID, apiRequest.getDATABASETABLE_ID(), apiRequest.getLong("request_ID"), apiRequest.getREQUEST_OUTPUT()));
 //		
 //		if (apiRequest.getREQUEST_OUTPUT().contains("bearer"))
 //			apiRequest.setREQUEST_OUTPUT(null);
@@ -295,7 +257,7 @@ public class productItemInventorySageController {
 //		log.info("Output: " + apiRequest.getREQUEST_OUTPUT());
 //		log.info("--------------------------------------------------------");
 
-		return apiRequest;
+		return rtnAPIResponse;
 	}
 
 }

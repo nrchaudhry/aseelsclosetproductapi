@@ -1,8 +1,6 @@
 package com.cwiztech.services;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -23,9 +21,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.cwiztech.datalogs.model.APIRequestDataLog;
-import com.cwiztech.datalogs.model.DatabaseTables;
-import com.cwiztech.datalogs.model.tableDataLogs;
+import com.cwiztech.log.apiRequestLog;
 import com.cwiztech.token.AccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -41,11 +37,9 @@ public class SageService {
         SageService.sageService = env.getRequiredProperty("file_path.SAGESERVICE");
     }
 
-    public static APIRequestDataLog GET(String URI, String accessToken, DatabaseTables databaseTableID)
+    public static JSONObject GET(String URI, String accessToken)
             throws JsonProcessingException, JSONException, ParseException, InterruptedException {
-        String rtnAPIResponse="Invalid Resonse";
-		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date date = new Date();
+    	JSONObject rtnAPIResponse = new JSONObject();
         
         CloseableHttpClient httpClient = HttpClients.custom().setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
@@ -57,34 +51,30 @@ public class SageService {
 
         log.info("GET: " + appPath + URI);
 		
-        APIRequestDataLog apiRequest;
-		apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, (long) 0, URI, null, "");
+        JSONObject apiRequest = apiRequestLog.apiRequestCreateLog("GET", (long) 0, appPath + URI, null, "");
 
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         try {
             ResponseEntity<String> response = restTemplate.exchange(appPath + URI, HttpMethod.GET, entity, String.class);
-            rtnAPIResponse = response.getBody().toString();
+            rtnAPIResponse = new JSONObject(response.getBody().toString());
         } catch (RestClientException e) {
-        	if(e instanceof HttpStatusCodeException) {
+        	if (e instanceof HttpStatusCodeException) {
 	        	JSONArray response = new JSONArray(((HttpStatusCodeException)e).getResponseBodyAsString());
-	        	rtnAPIResponse = response.get(0).toString();
+	        	rtnAPIResponse = new JSONObject(response.get(0).toString());
         	}
         }
 
-		apiRequest.setREQUEST_OUTPUT(rtnAPIResponse);
-		apiRequest.setRESPONSE_DATETIME(dateFormat1.format(date));
-		apiRequest.setREQUEST_STATUS("Success");
-
-        log.info("Response: " + rtnAPIResponse);
+        log.info("Response: " + rtnAPIResponse.toString());
         log.info("----------------------------------------------------------------------------------");
-        return apiRequest;
+
+        apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse.toString(), "Success");
+
+		return rtnAPIResponse;
     }
 
-    public static APIRequestDataLog POST(String URI, String body, String accessToken, DatabaseTables databaseTableID)
+    public static JSONObject POST(String URI, String body, String accessToken)
             throws JsonProcessingException, JSONException, ParseException, InterruptedException {
-        String rtnAPIResponse="Invalid Resonse";
-		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date date = new Date();
+    	JSONObject rtnAPIResponse = new JSONObject();
         
         CloseableHttpClient httpClient = HttpClients.custom().setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
@@ -97,64 +87,92 @@ public class SageService {
         log.info("POST: " + appPath + URI);
         log.info("Body: " + body);
 
-		APIRequestDataLog apiRequest;
-		apiRequest = tableDataLogs.apiRequestDataLog("POST", databaseTableID, (long) 0, URI, body, "");
+        JSONObject apiRequest = apiRequestLog.apiRequestCreateLog("POST", (long) 0, appPath + URI, body, "");
 
         HttpEntity<String> entity = new HttpEntity<String>(body.toString(), headers);
         try {
             ResponseEntity<String> response = restTemplate.exchange(appPath + URI, HttpMethod.POST, entity, String.class);
-            rtnAPIResponse=response.getBody().toString();
+            rtnAPIResponse = new JSONObject(response.getBody().toString());
         } catch (RestClientException e) {
-        	if(e instanceof HttpStatusCodeException) {
+        	if (e instanceof HttpStatusCodeException) {
 	        	JSONArray response = new JSONArray(((HttpStatusCodeException)e).getResponseBodyAsString());
-	        	rtnAPIResponse = response.get(0).toString();
+	        	rtnAPIResponse = new JSONObject(response.get(0).toString());
         	}
         }
 
-		apiRequest.setREQUEST_OUTPUT(rtnAPIResponse);
-		apiRequest.setRESPONSE_DATETIME(dateFormat1.format(date));
-		apiRequest.setREQUEST_STATUS("Success");
-
-		log.info("Response: " + rtnAPIResponse);
+        log.info("Response: " + rtnAPIResponse.toString());
         log.info("----------------------------------------------------------------------------------");
-        return apiRequest;
+
+        apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse.toString(), "Success");
+
+		return rtnAPIResponse;
     }
 
-    public static String PUT(String URI, String body, String accessToken)
-            throws JsonProcessingException, JSONException, ParseException {
-        String rtnAPIResponse="Invalid Resonse";
-        RestTemplate restTemplate = new RestTemplate();
+    public static JSONObject PUT(String URI, String body, String accessToken)
+            throws JsonProcessingException, JSONException, ParseException, InterruptedException {
+    	JSONObject rtnAPIResponse = new JSONObject();
+        
+        CloseableHttpClient httpClient = HttpClients.custom().setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+        requestFactory.setHttpClient(httpClient);
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
         HttpHeaders headers = AccessToken.getHttpHeader(accessToken, (long) 0);
         String appPath = AccessToken.findApplicationDetail(sageService, headers);
+        headers = AccessToken.getHttpHeader(generateToken(AccessToken.applicationID, AccessToken.oauthservicePath, AccessToken.refreshToken, accessToken), (long) 0);
 
         log.info("PUT: " + appPath + URI);
         log.info("Body: " + body);
 
-        HttpEntity<String> entity = new HttpEntity<String>(body.toString(), headers);
-        ResponseEntity<String> response = restTemplate.exchange(appPath + URI, HttpMethod.PUT, entity, String.class);
-        rtnAPIResponse=response.getBody().toString();
+        JSONObject apiRequest = apiRequestLog.apiRequestCreateLog("PUT", (long) 0, appPath + URI, body, "");
 
-        log.info("Response: " + rtnAPIResponse);
+        HttpEntity<String> entity = new HttpEntity<String>(body.toString(), headers);
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(appPath + URI, HttpMethod.PUT, entity, String.class);
+            rtnAPIResponse = new JSONObject(response.getBody().toString());
+        } catch (RestClientException e) {
+        	if (e instanceof HttpStatusCodeException) {
+	        	JSONArray response = new JSONArray(((HttpStatusCodeException)e).getResponseBodyAsString());
+	        	rtnAPIResponse = new JSONObject(response.get(0).toString());
+        	}
+        }
+
+        log.info("Response: " + rtnAPIResponse.toString());
         log.info("----------------------------------------------------------------------------------");
-        return rtnAPIResponse;
+
+        apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse.toString(), "Success");
+
+		return rtnAPIResponse;
     }
 
-    public static String DELETE(String URI, String accessToken)
+    public static JSONObject DELETE(String URI, String accessToken)
             throws JsonProcessingException, JSONException, ParseException {
-        String rtnAPIResponse="Invalid Resonse";
-        RestTemplate restTemplate = new RestTemplate();
+    	JSONObject rtnAPIResponse = new JSONObject();
+
+    	RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = AccessToken.getHttpHeader(accessToken, (long) 0);
         String appPath = AccessToken.findApplicationDetail(sageService, headers);
 
         log.info("DELETE: " + appPath + URI);
 
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(appPath + URI, HttpMethod.DELETE, entity, String.class);
-        rtnAPIResponse=response.getBody().toString();
+        JSONObject apiRequest = apiRequestLog.apiRequestCreateLog("DELETE", (long) 0, appPath + URI, null, "");
 
-        log.info("Response: " + rtnAPIResponse);
-        log.info("----------------------------------------------------------------------------------");
-        return rtnAPIResponse;
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        try {
+	        ResponseEntity<String> response = restTemplate.exchange(appPath + URI, HttpMethod.DELETE, entity, String.class);
+	        rtnAPIResponse = new JSONObject(response.getBody().toString());
+	    } catch (RestClientException e) {
+	    	if (e instanceof HttpStatusCodeException) {
+	        	JSONArray response = new JSONArray(((HttpStatusCodeException)e).getResponseBodyAsString());
+	        	rtnAPIResponse = new JSONObject(response.get(0).toString());
+	    	}
+	    }
+	
+	    log.info("Response: " + rtnAPIResponse.toString());
+	    log.info("----------------------------------------------------------------------------------");
+	
+	    apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse.toString(), "Success");
+	
+		return rtnAPIResponse;
     }
 
     public static String generateToken(long applicationID, String oauthservicePath, String refreshToken, String accessToken)
