@@ -48,7 +48,7 @@ public class productItemPriceLevelController {
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitempricelevel", null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<ProductItemPriceLevel> productitempricelevels = productitempricelevelrepository.findActive();
 		return new ResponseEntity(getAPIResponse(productitempricelevels, null , null, null, null, apiRequest, true), HttpStatus.OK);
@@ -58,7 +58,7 @@ public class productItemPriceLevelController {
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public ResponseEntity getAll(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitempricelevel/all", null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<ProductItemPriceLevel> productitempricelevels = productitempricelevelrepository.findAll();
 
@@ -69,7 +69,7 @@ public class productItemPriceLevelController {
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity getOne(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitempricelevel/"+id, null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		ProductItemPriceLevel productitempricelevel = productitempricelevelrepository.findOne(id);
 
@@ -81,7 +81,7 @@ public class productItemPriceLevelController {
 	public ResponseEntity getByIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitempricelevel/ids", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<Integer> productitempricelevel_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -101,7 +101,7 @@ public class productItemPriceLevelController {
 	public ResponseEntity getByNotInIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitempricelevel/notin/ids", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<Integer> productitempricelevel_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -121,7 +121,7 @@ public class productItemPriceLevelController {
 	public ResponseEntity insert(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitempricelevel", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		return insertupdateAll(null, new JSONObject(data), apiRequest);
 	}
@@ -132,7 +132,7 @@ public class productItemPriceLevelController {
 			throws JsonProcessingException, JSONException, ParseException {
 
 		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productitempricelevel/"+id, data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		JSONObject jsonObj = new JSONObject(data);
 		jsonObj.put("id", id);
 
@@ -144,7 +144,7 @@ public class productItemPriceLevelController {
 	public ResponseEntity insertupdate(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productitempricelevel", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		return insertupdateAll(new JSONArray(data), null, apiRequest);
 	}
@@ -172,19 +172,19 @@ public class productItemPriceLevelController {
 					productitempricelevel = productitempricelevelrepository.findOne(productitempricelevelid);
 
 					if (productitempricelevel == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemPriceLevel Data!", apiRequest, true), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemPriceLevel Data!", apiRequest, true), HttpStatus.OK);
 				}
 			}
 
 			if (productitempricelevelid == 0) {
 				if (!jsonObj.has("productitem_ID") || jsonObj.isNull("productitem_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, true), HttpStatus.OK);
 
 				if (!jsonObj.has("productitem_QUANTITY") || jsonObj.isNull("productitem_QUANTITY"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_QUANTITY is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_QUANTITY is missing", apiRequest, true), HttpStatus.OK);
 
 				if (!jsonObj.has("productitem_UNITPRICE") || jsonObj.isNull("productitem_UNITPRICE"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_UNITPRICE is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_UNITPRICE is missing", apiRequest, true), HttpStatus.OK);
 			}
 			if (jsonObj.has("currency_ID") && !jsonObj.isNull("currency_ID")) 			
 				productitempricelevel.setCURRENCY_ID(jsonObj.getLong("currency_ID"));
@@ -244,7 +244,7 @@ public class productItemPriceLevelController {
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity delete(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitempricelevel/"+id, null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		ProductItemPriceLevel productitempricelevel = productitempricelevelrepository.findOne(id);
 		productitempricelevelrepository.delete(productitempricelevel);
@@ -256,7 +256,7 @@ public class productItemPriceLevelController {
 	@RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
 	public ResponseEntity remove(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitempricelevel/"+id, null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		JSONObject productitempricelevel = new JSONObject();
 		productitempricelevel.put("id", id);
@@ -280,7 +280,7 @@ public class productItemPriceLevelController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity BySearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitempricelevel/search" + ((active == true) ? "" : "/all"), data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		JSONObject jsonObj = new JSONObject(data);
 
@@ -306,7 +306,7 @@ public class productItemPriceLevelController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitempricelevel/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		JSONObject jsonObj = new JSONObject(data);
 		List<ProductItemPriceLevel> productitempricelevels = new ArrayList<ProductItemPriceLevel>();
@@ -446,7 +446,7 @@ public class productItemPriceLevelController {
 	@RequestMapping(value = "/bycustomer", method = RequestMethod.POST)
 	public ResponseEntity getAllByCustomer(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitempricelevel/bycustomer", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		JSONArray objProductItems = new JSONArray();
 
@@ -560,7 +560,7 @@ public class productItemPriceLevelController {
 	public ResponseEntity ChangePrice(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productimage", null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		String rtn = null, workstation = null;
 
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

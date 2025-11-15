@@ -45,7 +45,7 @@ public class productItemAttributeValueController {
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemattributevalue", null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<ProductItemAttributeValue> productitemattributevalues = productitemattributevaluerepository.findActive();
 		return new ResponseEntity(getAPIResponse(productitemattributevalues, null , null, null, null, apiRequest, true), HttpStatus.OK);
@@ -55,7 +55,7 @@ public class productItemAttributeValueController {
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public ResponseEntity getAll(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemattributevalue/all", null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<ProductItemAttributeValue> productitemattributevalues = productitemattributevaluerepository.findAll();
 		
@@ -66,7 +66,7 @@ public class productItemAttributeValueController {
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity getOne(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemattributevalue/"+id, null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		ProductItemAttributeValue productitemattributevalue = productitemattributevaluerepository.findOne(id);
 		
@@ -78,7 +78,7 @@ public class productItemAttributeValueController {
 	public ResponseEntity getByIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemattributevalue/ids", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<Integer> productitemattributevalue_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -98,7 +98,7 @@ public class productItemAttributeValueController {
 	public ResponseEntity getByProductItemIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemattributevalue/productitem/ids", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<Integer> productitem_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -118,7 +118,7 @@ public class productItemAttributeValueController {
 	public ResponseEntity getByNotInIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemattributevalue/notin/ids", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<Integer> productitemattributevalue_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -138,7 +138,7 @@ public class productItemAttributeValueController {
 	public ResponseEntity insert(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemattributevalue", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		
 		return insertupdateAll(null, new JSONObject(data), apiRequest);
 	}
@@ -149,7 +149,7 @@ public class productItemAttributeValueController {
 			throws JsonProcessingException, JSONException, ParseException {
 		
 		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productitemattributevalue/"+id, data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		JSONObject jsonObj = new JSONObject(data);
 		jsonObj.put("id", id);
 		
@@ -161,7 +161,7 @@ public class productItemAttributeValueController {
 	public ResponseEntity insertupdate(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productitemattributevalue", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		
 		return insertupdateAll(new JSONArray(data), null, apiRequest);
 	}
@@ -189,16 +189,16 @@ public class productItemAttributeValueController {
 					productitemattributevalue = productitemattributevaluerepository.findOne(productitemattributevalueid);
 					
 					if (productitemattributevalue == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemAttributeValue Data!", apiRequest, true), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductItemAttributeValue Data!", apiRequest, true), HttpStatus.OK);
 				}
 			}
 			
 			if (productitemattributevalueid == 0) {
 				if (!jsonObj.has("productitem_ID") || jsonObj.isNull("productitem_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productitem_ID is missing", apiRequest, true), HttpStatus.OK);
 				
 				if (!jsonObj.has("productattribute_ID") || jsonObj.isNull("productattribute_ID"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productattribute_ID is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productattribute_ID is missing", apiRequest, true), HttpStatus.OK);
 					
 			}
 			if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID"))
@@ -242,7 +242,7 @@ public class productItemAttributeValueController {
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity delete(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemattributevalue/"+id, null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		ProductItemAttributeValue productitemattributevalue = productitemattributevaluerepository.findOne(id);
 		productitemattributevaluerepository.delete(productitemattributevalue);
@@ -254,7 +254,7 @@ public class productItemAttributeValueController {
 	@RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
 	public ResponseEntity remove(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemattributevalue/"+id, null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		
 		JSONObject productitemattributevalue = new JSONObject();
 		productitemattributevalue.put("id", id);
@@ -278,7 +278,7 @@ public class productItemAttributeValueController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity BySearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemattributevalue/search" + ((active == true) ? "" : "/all"), data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		JSONObject jsonObj = new JSONObject(data);
 
@@ -304,7 +304,7 @@ public class productItemAttributeValueController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemattributevalue/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		List<ProductItemAttributeValue> campuss = new ArrayList<ProductItemAttributeValue>();
 
 		JSONObject jsonObj = new JSONObject(data);

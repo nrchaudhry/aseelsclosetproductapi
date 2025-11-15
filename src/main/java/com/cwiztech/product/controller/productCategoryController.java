@@ -45,7 +45,7 @@ public class productCategoryController {
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productcategory", null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<ProductCategory> productcategories = productcategoryrepository.findActive();
 
@@ -56,7 +56,7 @@ public class productCategoryController {
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public ResponseEntity getAll(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productcategory/all", null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<ProductCategory> productcategories = productcategoryrepository.findAll();
 
@@ -67,7 +67,7 @@ public class productCategoryController {
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity getOne(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productcategory/"+id, null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		ProductCategory productcategory = productcategoryrepository.findOne(id);
 
@@ -79,7 +79,7 @@ public class productCategoryController {
 	public ResponseEntity getByIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productcategory/ids", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<Integer> productcategory_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -99,7 +99,7 @@ public class productCategoryController {
 	public ResponseEntity getByNotInIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productcategory/notin/ids", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<Integer> productcategory_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
@@ -119,7 +119,7 @@ public class productCategoryController {
 	public ResponseEntity insert(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productcategory", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		return insertupdateAll(null, new JSONObject(data), apiRequest);
 	}
@@ -130,7 +130,7 @@ public class productCategoryController {
 			throws JsonProcessingException, JSONException, ParseException {
 
 		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productcategory/"+id, data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		JSONObject jsonObj = new JSONObject(data);
 		jsonObj.put("id", id);
 
@@ -142,7 +142,7 @@ public class productCategoryController {
 	public ResponseEntity insertupdate(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productcategory", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		return insertupdateAll(new JSONArray(data), null, apiRequest);
 	}
@@ -170,16 +170,16 @@ public class productCategoryController {
 					productcategory = productcategoryrepository.findOne(productcategoryid);
 
 					if (productcategory == null)
-						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductCategory Data!", apiRequest, true), HttpStatus.BAD_REQUEST);
+						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid ProductCategory Data!", apiRequest, true), HttpStatus.OK);
 				}
 			}
 
 			if (productcategoryid == 0) {
 				if (!jsonObj.has("productcategory_NAME") || jsonObj.isNull("productcategory_NAME"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategory_NAME is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategory_NAME is missing", apiRequest, true), HttpStatus.OK);
 
 				if (!jsonObj.has("productcategoryorder_NO") || jsonObj.isNull("productcategoryorder_NO"))
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategoryorder_NO is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategoryorder_NO is missing", apiRequest, true), HttpStatus.OK);
 			}
 
 			if (jsonObj.has("productcategoryparent_ID") && !jsonObj.isNull("productcategoryparent_ID"))
@@ -243,7 +243,7 @@ public class productCategoryController {
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity delete(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productcategory/"+id, null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		ProductCategory productcategory = productcategoryrepository.findOne(id);
 		productcategoryrepository.delete(productcategory);
@@ -255,7 +255,7 @@ public class productCategoryController {
 	@RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
 	public ResponseEntity remove(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productcategory/"+id, null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		JSONObject productcategory = new JSONObject();
 		productcategory.put("id", id);
@@ -279,7 +279,7 @@ public class productCategoryController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity BySearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productcategory/search" + ((active == true) ? "" : "/all"), data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		JSONObject jsonObj = new JSONObject(data);
 
@@ -305,7 +305,7 @@ public class productCategoryController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/productcategory/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<ProductCategory> productcategories = new ArrayList<ProductCategory>();
 		JSONObject jsonObj = new JSONObject(data);
@@ -429,7 +429,7 @@ public class productCategoryController {
 	@RequestMapping(value = "/web/{id}", method = RequestMethod.GET)
 	public ResponseEntity getOneWeb(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productcategory/"+id, null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		JSONObject objproductcategory = new JSONObject();
 

@@ -43,7 +43,7 @@ public class productSageController {
 	@RequestMapping(value = "/sendtosage", method = RequestMethod.GET)
 	public ResponseEntity SendToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/product/sendtosage", null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 
 		JSONArray objProducts = new JSONArray();
@@ -130,7 +130,7 @@ public class productSageController {
 	@RequestMapping(value = "/getfromsage/{page}", method = RequestMethod.GET)
 	public ResponseEntity GetFromSage(@PathVariable Long page, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/product/getfromsage", null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		boolean lastPage = false;
 
