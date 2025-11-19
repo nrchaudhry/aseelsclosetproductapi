@@ -35,6 +35,9 @@ public class ProductItemPriceLevel {
 	@Column(name = "PRODUCTITEM_UNITPRICE")
 	private Double PRODUCTITEM_UNITPRICE;
 	
+	@Column(name = "ISINCLUDEVAT")
+	private String ISINCLUDEVAT;
+	
 	@Column(name = "CURRENCY_ID")
 	private Long CURRENCY_ID;
 	
@@ -110,6 +113,14 @@ public class ProductItemPriceLevel {
 
 	public void setPRODUCTITEM_UNITPRICE(Double pRODUCTITEM_UNITPRICE) {
 		PRODUCTITEM_UNITPRICE = pRODUCTITEM_UNITPRICE;
+	}
+
+	public String getISINCLUDEVAT() {
+		return ISINCLUDEVAT;
+	}
+
+	public void setISINCLUDEVAT(String iSINCLUDEVAT) {
+		ISINCLUDEVAT = iSINCLUDEVAT;
 	}
 
 	public Long getCURRENCY_ID() {

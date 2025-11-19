@@ -42,7 +42,7 @@ public class productItemInventorySageController {
 	@RequestMapping(value = "/sendtosage", method = RequestMethod.GET)
 	public ResponseEntity SendToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productiteminventory/sendtosage", null, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 
 		JSONArray objProductItemInventorys = new JSONArray();
@@ -122,7 +122,7 @@ public class productItemInventorySageController {
     @RequestMapping(value = "/updatestock", method = RequestMethod.GET)
     public ResponseEntity UpdateStock(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
         JSONObject apiRequest = AccessToken.checkToken("GET", "/productiteminventory/updatestock", null, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 
         JSONArray objProductItemInventorys = new JSONArray();
