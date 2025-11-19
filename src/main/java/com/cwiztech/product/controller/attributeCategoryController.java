@@ -45,7 +45,7 @@ public class attributeCategoryController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
         JSONObject apiRequest = AccessToken.checkToken("GET", "/attributecategory", null, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
         List<AttributeCategory> attributecategories = attributecategoryrepository.findActive();
         return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, true), HttpStatus.OK);
@@ -55,7 +55,7 @@ public class attributeCategoryController {
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public ResponseEntity getAll(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
         JSONObject apiRequest = AccessToken.checkToken("GET", "/attributecategory/all", null, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
         List<AttributeCategory> attributecategories = attributecategoryrepository.findAll();
 
@@ -66,7 +66,7 @@ public class attributeCategoryController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity getOne(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
         JSONObject apiRequest = AccessToken.checkToken("GET", "/attributecategory/"+id, null, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
         AttributeCategory attributecategory = attributecategoryrepository.findOne(id);
 
@@ -78,7 +78,7 @@ public class attributeCategoryController {
     public ResponseEntity getByIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
             throws JsonProcessingException, JSONException, ParseException {
         JSONObject apiRequest = AccessToken.checkToken("POST", "/attributecategory/ids", data, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
         List<Integer> attributecategory_IDS = new ArrayList<Integer>(); 
         JSONObject jsonObj = new JSONObject(data);
@@ -98,7 +98,7 @@ public class attributeCategoryController {
     public ResponseEntity getByNotInIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
             throws JsonProcessingException, JSONException, ParseException {
         JSONObject apiRequest = AccessToken.checkToken("POST", "/attributecategory/notin/ids", data, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
         List<Integer> attributecategory_IDS = new ArrayList<Integer>(); 
         JSONObject jsonObj = new JSONObject(data);
@@ -118,7 +118,7 @@ public class attributeCategoryController {
     public ResponseEntity insert(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
             throws JsonProcessingException, JSONException, ParseException {
         JSONObject apiRequest = AccessToken.checkToken("POST", "/attributecategory", data, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
         return insertupdateAll(null, new JSONObject(data), apiRequest);
     }
@@ -129,7 +129,7 @@ public class attributeCategoryController {
             throws JsonProcessingException, JSONException, ParseException {
 
         JSONObject apiRequest = AccessToken.checkToken("PUT", "/attributecategory/"+id, data, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
         JSONObject jsonObj = new JSONObject(data);
         jsonObj.put("id", id);
 
@@ -141,7 +141,7 @@ public class attributeCategoryController {
     public ResponseEntity insertupdate(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
             throws JsonProcessingException, JSONException, ParseException {
         JSONObject apiRequest = AccessToken.checkToken("PUT", "/attributecategory", data, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
         return insertupdateAll(new JSONArray(data), null, apiRequest);
     }
@@ -169,16 +169,16 @@ public class attributeCategoryController {
                     attributecategory = attributecategoryrepository.findOne(attributecategoryid);
 
                     if (attributecategory == null)
-                        return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid AttributeCategory Data!", apiRequest, true), HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid AttributeCategory Data!", apiRequest, true), HttpStatus.OK);
                 }
             }
 
             if (attributecategoryid == 0) {
                 if (!jsonObj.has("attributecategory_NAME") || jsonObj.isNull("attributecategory_NAME"))
-                    return new ResponseEntity(getAPIResponse(null, null , null, null, "attributecategory_NAME is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity(getAPIResponse(null, null , null, null, "attributecategory_NAME is missing", apiRequest, true), HttpStatus.OK);
 
                 if (!jsonObj.has("attributecategoryorder_NO") || jsonObj.isNull("attributecategoryorder_NO"))
-                    return new ResponseEntity(getAPIResponse(null, null , null, null, "attributecategoryorder_NO is missing", apiRequest, true), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity(getAPIResponse(null, null , null, null, "attributecategoryorder_NO is missing", apiRequest, true), HttpStatus.OK);
             }
 
             if (jsonObj.has("attributecategoryparent_ID") && !jsonObj.isNull("attributecategoryparent_ID"))
@@ -222,7 +222,7 @@ public class attributeCategoryController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity delete(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
         JSONObject apiRequest = AccessToken.checkToken("GET", "/attributecategory/"+id, null, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
         AttributeCategory attributecategory = attributecategoryrepository.findOne(id);
         attributecategoryrepository.delete(attributecategory);
@@ -234,7 +234,7 @@ public class attributeCategoryController {
     @RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
     public ResponseEntity remove(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
         JSONObject apiRequest = AccessToken.checkToken("GET", "/attributecategory/"+id, null, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
         JSONObject attributecategory = new JSONObject();
         attributecategory.put("id", id);
@@ -258,7 +258,7 @@ public class attributeCategoryController {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public ResponseEntity BySearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
         JSONObject apiRequest = AccessToken.checkToken("POST", "/attributecategory/search" + ((active == true) ? "" : "/all"), data, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
         JSONObject jsonObj = new JSONObject(data);
 
@@ -284,7 +284,7 @@ public class attributeCategoryController {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
         JSONObject apiRequest = AccessToken.checkToken("POST", "/attributecategory/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
-        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
+        if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
         List<AttributeCategory> attributecategories = new ArrayList<AttributeCategory>();
         JSONObject jsonObj = new JSONObject(data);

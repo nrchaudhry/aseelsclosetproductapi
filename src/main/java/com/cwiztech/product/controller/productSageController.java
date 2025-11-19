@@ -47,17 +47,30 @@ public class productSageController {
 
 
 		JSONArray objProducts = new JSONArray();
+
+		JSONArray ledgeraccounts = new JSONArray(ServiceCall.GET("ledgeraccount/all", apiRequest.getString("access_TOKEN"), false));
 		
 		List<Product> products = productrepository.findByNullSageID();
         for (int i=0; i<products.size(); i++) {
     		JSONObject objProduct = new JSONObject();
     		JSONObject objProductDetail = new JSONObject();	
+    		
+    		String saleledgeraccount = "", purchaseledgeraccount = "";
+    		
+    		for (int j=0; j<ledgeraccounts.length(); j++) {
+    			if (ledgeraccounts.getJSONObject(j).getLong("ledgeraccount_ID") == products.get(i).getPURCHASELEDGERACCOUNT_ID()) {
+    				purchaseledgeraccount = ledgeraccounts.getJSONObject(j).getString("sage_ID");
+    			}
+    			if (ledgeraccounts.getJSONObject(j).getLong("ledgeraccount_ID") == products.get(i).getSALELEDGERACCOUNT_ID()) {
+    				saleledgeraccount = ledgeraccounts.getJSONObject(j).getString("sage_ID");
+    			}
+    		}
 
     		objProductDetail.put("catalog_item_type_id", "STOCK_ITEM");	
     		objProductDetail.put("item_code", products.get(i).getPRODUCT_CODE());
     		objProductDetail.put("description", products.get(i).getPRODUCT_NAME());	
-    		objProductDetail.put("sales_ledger_account_id", "819fd52d842f11ed84fa0252b90cda0d");
-    		objProductDetail.put("purchase_ledger_account_id", "81a0cf2c842f11ed84fa0252b90cda0d");
+    		objProductDetail.put("sales_ledger_account_id", saleledgeraccount);
+    		objProductDetail.put("purchase_ledger_account_id", purchaseledgeraccount);
 			if (products.get(i).getTAXCODE_ID() == 1) {
 	    		objProductDetail.put("sales_tax_rate_id", "GB_STANDARD");
 	    		objProductDetail.put("purchase_tax_rate_id", "GB_STANDARD");
@@ -74,9 +87,9 @@ public class productSageController {
 				JSONArray productitempricelevels = new JSONArray(ServiceCall.POST("productitempricelevel/advancedsearch", "{productitem_ID: "+productitem.getLong("productitem_ID")+"}", apiRequest.getString("access_TOKEN"), false));
 		        for (int j=0; j<productitempricelevels.length(); j++) {
 		    		JSONObject productitempricelevel = new JSONObject();	
-		    		productitempricelevel.put("product_sales_price_type_id", "264fdb5bd99e45c389e5e322f87d6780");
+		    		productitempricelevel.put("product_sales_price_type_id", "c0a3306394684a82b2abb0a9af244b55");
 		    		productitempricelevel.put("price", productitempricelevels.getJSONObject(j).getDouble("productitem_UNITPRICE"));
-		    		productitempricelevel.put("price_includes_tax", "true");
+		    		productitempricelevel.put("price_includes_tax", "false");
 
 		    		salesprices.add(productitempricelevel);
 		        }
