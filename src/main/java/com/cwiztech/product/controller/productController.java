@@ -442,10 +442,14 @@ public class productController {
 
 		JSONArray searchObject = new JSONArray();
 		List<Integer> productcategory_IDS = new ArrayList<Integer>(); 
+		List<Integer> saleledgeraccount_IDS = new ArrayList<Integer>();
+		List<Integer> purchaseledgeraccount_IDS = new ArrayList<Integer>();
 
 		productcategory_IDS.add((int) 0);
+		saleledgeraccount_IDS.add((int) 0);
+		purchaseledgeraccount_IDS.add((int) 0);
 
-		long productcategory_ID = 0;
+		long productcategory_ID = 0, saleledgeraccount_ID = 0, purchaseledgeraccount_ID = 0;
 
 		boolean isWithDetail = true;
 		if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
@@ -469,10 +473,42 @@ public class productController {
 			}
 		}
 
-		if (productcategory_ID != 0) {
+		if (jsonObj.has("saleledgeraccount_ID") && !jsonObj.isNull("saleledgeraccount_ID") && jsonObj.getLong("saleledgeraccount_ID") != 0) {
+			saleledgeraccount_ID = jsonObj.getLong("saleledgeraccount_ID");
+			saleledgeraccount_IDS.add((int) saleledgeraccount_ID);
+		} else if (jsonObj.has("saleledgeraccount") && !jsonObj.isNull("saleledgeraccount") && jsonObj.getLong("saleledgeraccount") != 0) {
+			if (active == true) {
+				searchObject = new JSONArray(ServiceCall.POST("ledgeraccount/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
+			} else {
+				searchObject = new JSONArray(ServiceCall.POST("ledgeraccount/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
+			}
+
+			saleledgeraccount_ID = searchObject.length();
+			for (int i=0; i<searchObject.length(); i++) {
+				saleledgeraccount_IDS.add((int) searchObject.getJSONObject(i).getLong("ledgeraccount_ID"));
+			}
+		}
+
+		if (jsonObj.has("purchaseledgeraccount_ID") && !jsonObj.isNull("purchaseledgeraccount_ID") && jsonObj.getLong("purchaseledgeraccount_ID") != 0) {
+			purchaseledgeraccount_ID = jsonObj.getLong("purchaseledgeraccount_ID");
+			purchaseledgeraccount_IDS.add((int) purchaseledgeraccount_ID);
+		} else if (jsonObj.has("purchaseledgeraccount") && !jsonObj.isNull("purchaseledgeraccount") && jsonObj.getLong("purchaseledgeraccount") != 0) {
+			if (active == true) {
+				searchObject = new JSONArray(ServiceCall.POST("ledgeraccount/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
+			} else {
+				searchObject = new JSONArray(ServiceCall.POST("ledgeraccount/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
+			}
+
+			purchaseledgeraccount_ID = searchObject.length();
+			for (int i=0; i<searchObject.length(); i++) {
+				purchaseledgeraccount_IDS.add((int) searchObject.getJSONObject(i).getLong("ledgeraccount_ID"));
+			}
+		}
+
+		if (productcategory_ID != 0 || saleledgeraccount_ID != 0 || purchaseledgeraccount_ID != 0) {
 			products = ((active == true)
-					? productrepository.findByAdvancedSearch(productcategory_ID, productcategory_IDS)
-							: productrepository.findAllByAdvancedSearch(productcategory_ID, productcategory_IDS));
+					? productrepository.findByAdvancedSearch(productcategory_ID, productcategory_IDS, saleledgeraccount_ID, saleledgeraccount_IDS, purchaseledgeraccount_ID, purchaseledgeraccount_IDS)
+							: productrepository.findAllByAdvancedSearch(productcategory_ID, productcategory_IDS, saleledgeraccount_ID, saleledgeraccount_IDS, purchaseledgeraccount_ID, purchaseledgeraccount_IDS));
 		}
 		return new ResponseEntity(getAPIResponse(products, null , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 	}
@@ -485,6 +521,8 @@ public class productController {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "Product", message).toString();
 		} else {
 			if (product != null && isWithDetail == true) {
+				List<Integer> ledgeraccountList = new ArrayList<Integer>();
+
 				if (product.getPRODUCTCATEGORY_ID() != null) {
 					JSONObject productcategory = new JSONObject(ServiceCall.GET("productcategory/"+product.getPRODUCTCATEGORY_ID(), apiRequest.getString("access_TOKEN"), false));
 					product.setPRODUCTCATEGORY_DETAIL(productcategory.toString());
@@ -495,6 +533,27 @@ public class productController {
 					product.setTAXCODE_DETAIL(taxcode.toString());
 				}
 
+				if (product.getSALELEDGERACCOUNT_ID() != null) {
+					ledgeraccountList.add(Integer.parseInt(product.getSALELEDGERACCOUNT_ID().toString()));
+				}
+
+				if (product.getPURCHASELEDGERACCOUNT_ID() != null) {
+					ledgeraccountList.add(Integer.parseInt(product.getPURCHASELEDGERACCOUNT_ID().toString()));
+				}
+
+				JSONArray ledgeraccountObject = new JSONArray(ServiceCall.POST("ledgeraccount/ids", "{ledgeraccounts: "+ledgeraccountList+"}", apiRequest.getString("access_TOKEN"), false));
+				for (int j=0; j<ledgeraccountObject.length(); j++) {
+					JSONObject ledgeraccount = ledgeraccountObject.getJSONObject(j);
+
+					if (product.getSALELEDGERACCOUNT_ID() != null && product.getSALELEDGERACCOUNT_ID() == ledgeraccount.getLong("ledgeraccount_ID")) {
+						product.setSALELEDGERACCOUNT_DETAIL(ledgeraccount.toString());
+					}
+
+					if (product.getPURCHASELEDGERACCOUNT_ID() != null && product.getPURCHASELEDGERACCOUNT_ID() == ledgeraccount.getLong("ledgeraccount_ID")) {
+						product.setPURCHASELEDGERACCOUNT_DETAIL(ledgeraccount.toString());
+					}
+				}
+
 				rtnAPIResponse = mapper.writeValueAsString(product);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
@@ -502,18 +561,29 @@ public class productController {
 				if (products.size()>0) {
 					List<Integer> productcategoryList = new ArrayList<Integer>();
 					List<Integer> taxcodeList = new ArrayList<Integer>();
+				List<Integer> ledgeraccountList = new ArrayList<Integer>();
 
 					for (int i=0; i<products.size(); i++) {
 						if (products.get(i).getPRODUCTCATEGORY_ID() != null) {
 							productcategoryList.add(Integer.parseInt(products.get(i).getPRODUCTCATEGORY_ID().toString()));
 						}
+
 						if (products.get(i).getTAXCODE_ID() != null) {
 							taxcodeList.add(Integer.parseInt(products.get(i).getTAXCODE_ID().toString()));
+						}
+
+						if (products.get(i).getSALELEDGERACCOUNT_ID() != null) {
+							ledgeraccountList.add(Integer.parseInt(products.get(i).getSALELEDGERACCOUNT_ID().toString()));
+						}
+		
+						if (products.get(i).getPURCHASELEDGERACCOUNT_ID() != null) {
+							ledgeraccountList.add(Integer.parseInt(products.get(i).getPURCHASELEDGERACCOUNT_ID().toString()));
 						}
 					}
 
 					JSONArray productcategoryObject = new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getString("access_TOKEN"), false));
 					JSONArray taxcodeObject = new JSONArray(ServiceCall.POST("taxcode/ids", "{taxcodes: "+taxcodeList+"}", apiRequest.getString("access_TOKEN"), false));
+					JSONArray ledgeraccountObject = new JSONArray(ServiceCall.POST("ledgeraccount/ids", "{ledgeraccounts: "+ledgeraccountList+"}", apiRequest.getString("access_TOKEN"), false));
 
 					for (int i=0; i<products.size(); i++) {
 						for (int j=0; j<productcategoryObject.length(); j++) {
@@ -528,8 +598,20 @@ public class productController {
 								products.get(i).setTAXCODE_DETAIL(taxcode.toString());
 							}
 						}
+						for (int j=0; j<ledgeraccountObject.length(); j++) {
+							JSONObject ledgeraccount = ledgeraccountObject.getJSONObject(j);
+		
+							if (products.get(i).getSALELEDGERACCOUNT_ID() != null && products.get(i).getSALELEDGERACCOUNT_ID() == ledgeraccount.getLong("ledgeraccount_ID")) {
+								products.get(i).setSALELEDGERACCOUNT_DETAIL(ledgeraccount.toString());
+							}
+		
+							if (products.get(i).getPURCHASELEDGERACCOUNT_ID() != null && products.get(i).getPURCHASELEDGERACCOUNT_ID() == ledgeraccount.getLong("ledgeraccount_ID")) {
+								products.get(i).setPURCHASELEDGERACCOUNT_DETAIL(ledgeraccount.toString());
+							}
+						}
 					}
 				}
+				
 				rtnAPIResponse = mapper.writeValueAsString(products);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
