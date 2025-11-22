@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -35,6 +36,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RequestMapping("/product")
 public class productSageController {
 	private static final Logger log = LoggerFactory.getLogger(productSageController.class);
+    private static String sageService;
+
+    public productSageController(Environment env) {
+    	productSageController.sageService = env.getRequiredProperty("file_path.SAGESERVICE");
+    }
 
 	@Autowired
 	private productRepository productrepository;
@@ -88,8 +94,12 @@ public class productSageController {
 	    		JSONObject productitem = productitems.getJSONObject(0);
 				JSONArray productitempricelevels = new JSONArray(ServiceCall.POST("productitempricelevel/advancedsearch", "{productitem_ID: "+productitem.getLong("productitem_ID")+"}", apiRequest.getString("access_TOKEN"), false));
 		        for (int j=0; j<productitempricelevels.length(); j++) {
-		    		JSONObject productitempricelevel = new JSONObject();	
-		    		productitempricelevel.put("product_sales_price_type_id", "c0a3306394684a82b2abb0a9af244b55");
+		    		JSONObject productitempricelevel = new JSONObject();
+		    		if (sageService.compareTo("BFSSAGE") == 0)
+		    			productitempricelevel.put("product_sales_price_type_id", "c0a3306394684a82b2abb0a9af244b55");
+		    		else
+		    			productitempricelevel.put("product_sales_price_type_id", "264fdb5bd99e45c389e5e322f87d6780");
+		    			
 		    		productitempricelevel.put("price", productitempricelevels.getJSONObject(j).getDouble("productitem_UNITPRICE"));
 		    		productitempricelevel.put("price_includes_tax", "false");
 
@@ -127,11 +137,15 @@ public class productSageController {
 
 
 			objProduct.put("stock_item", objProductDetail);
-			JSONObject response = SageService.POST("stock_items", objProduct.toString(), headToken);
+			JSONObject apiRequestResponse = SageService.POST("stock_items", objProduct.toString(), headToken);
 
 			JSONObject product = new JSONObject();
 			product.put("product_ID", products.get(i).getPRODUCT_ID());
-			product.put("sage_ID", response.getString("id"));
+			if (apiRequestResponse.has("id"))
+				product.put("sage_ID", apiRequestResponse.getString("id"));
+			else
+				product.put("sage_ID", apiRequestResponse.toString());
+			
 			product = new JSONObject(ServiceCall.POST("product", product.toString(), apiRequest.getString("access_TOKEN"), false));
 
 			objProducts.put(objProduct);
