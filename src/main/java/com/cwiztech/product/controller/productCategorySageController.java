@@ -33,13 +33,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/product")
-public class productSageController {
-	private static final Logger log = LoggerFactory.getLogger(productSageController.class);
+@RequestMapping("/productcategory")
+public class productCategorySageController {
+	private static final Logger log = LoggerFactory.getLogger(productCategorySageController.class);
     private static String sageService;
 
-    public productSageController(Environment env) {
-    	productSageController.sageService = env.getRequiredProperty("file_path.SAGESERVICE");
+    public productCategorySageController(Environment env) {
+    	productCategorySageController.sageService = env.getRequiredProperty("file_path.SAGESERVICE");
     }
 
 	@Autowired
@@ -48,7 +48,7 @@ public class productSageController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/sendtosage", method = RequestMethod.GET)
 	public ResponseEntity SendToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
-		JSONObject apiRequest = AccessToken.checkToken("GET", "/product/sendtosage", null, null, headToken);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productcategory/sendtosage", null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 
