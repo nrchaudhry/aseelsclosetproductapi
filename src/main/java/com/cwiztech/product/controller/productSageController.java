@@ -174,6 +174,7 @@ public class productSageController {
 				JSONObject jsonProduct = jsonProducts.getJSONObject(i);
 				long productitem_id = 0;
 
+				JSONObject responseProduct = new JSONObject(new JSONObject(SageService.GET("stock_items/" + jsonProduct.getString("id"), headToken)).getString("REQUEST_OUTPUT"));
 				Product product = productrepository.findBySageID(jsonProduct.getString("id"));
 //				Product product = productrepository.findBySageID("186b84b02cf5444b979cac29b585451a");
 				JSONObject objProduct = new JSONObject();
@@ -189,26 +190,29 @@ public class productSageController {
 
 						JSONArray productitemprices = new JSONArray(ServiceCall.POST("productitempricelevel/advancedsearch", objProductItem.toString(), apiRequest.getString("access_TOKEN"), false));
 						JSONArray productiteminventory = new JSONArray(ServiceCall.POST("productiteminventory/advancedsearch", objProductItem.toString(), apiRequest.getString("access_TOKEN"), false));
+					} else {
+						break;
 					}
+				} else {
+					objProduct.put("productcategory_ID", 0);
+					if (responseProduct.has("item_code") && !responseProduct.isNull("item_code")) {
+						objProduct.put("product_CODE", responseProduct.getString("item_code"));
+					} else {
+						responseProduct.put("product_CODE", "AAA");
+					}
+					if (responseProduct.has("description") && !responseProduct.isNull("description")) {
+						objProduct.put("product_NAME", responseProduct.getString("description"));
+						objProductItem.put("productitem_NAME", responseProduct.getString("description"));
+					} else {
+						objProduct.put("product_NAME","AAA");
+						objProductItem.put("productitem_NAME","AAA");
+					}
+					objProductItem.put("application_ID", 1);
+
 				}
-				JSONObject responseProduct = new JSONObject(new JSONObject(SageService.GET("stock_items/" + jsonProduct.getString("id"), headToken)).getString("REQUEST_OUTPUT"));
 //				JSONObject responseProduct = new JSONObject(SageService.GET("contacts/186b84b02cf5444b979cac29b585451a?show_balance=true&show_overdue_balance=true", headToken));
 
 				objProduct.put("sage_ID", responseProduct.getString("id"));
-				objProduct.put("productcategory_ID", 1);
-				if (responseProduct.has("item_code") && !responseProduct.isNull("item_code")) {
-					objProduct.put("product_CODE", responseProduct.getString("item_code"));
-				} else {
-					responseProduct.put("product_CODE", "AAA");
-				}
-				if (responseProduct.has("description") && !responseProduct.isNull("description")) {
-					objProduct.put("product_NAME", responseProduct.getString("description"));
-					objProductItem.put("productitem_NAME", responseProduct.getString("description"));
-				} else {
-					objProduct.put("product_NAME","AAA");
-					objProductItem.put("productitem_NAME","AAA");
-				}
-
 				if (responseProduct.has("sales_tax_rate") && !responseProduct.isNull("sales_tax_rate")) {
 					if (responseProduct.getJSONObject("sales_tax_rate").getString("id").compareTo("GB_STANDARD") == 0) {
 						objProduct.put("taxcode_ID", 1);
@@ -229,7 +233,6 @@ public class productSageController {
 					objProduct.put("product_DESC", responseProduct.getString("notes"));
 					objProductItem.put("productitem_DESC", responseProduct.getString("notes"));
 				}
-				objProductItem.put("application_ID", 1);
 
 				log.info("objProduct: "+objProduct);
 				log.info("page: "+page);
