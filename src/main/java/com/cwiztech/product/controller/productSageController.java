@@ -163,7 +163,7 @@ public class productSageController {
 
 		boolean lastPage = false;
 
-		JSONObject response = new JSONObject(SageService.GET("products?page=" + (page-1) + "&items_per_page=100", headToken));
+		JSONObject response = new JSONObject(new JSONObject(SageService.GET("products?page=" + (page-1) + "&items_per_page=100", headToken)).getString("request_OUTPUT"));
 
 		log.info("response sage: "+response);
 		
@@ -174,7 +174,7 @@ public class productSageController {
 				JSONObject jsonProduct = jsonProducts.getJSONObject(i);
 				long productitem_id = 0;
 
-				JSONObject responseProduct = new JSONObject(SageService.GET("stock_items/" + jsonProduct.getString("id"), headToken));
+				JSONObject responseProduct = new JSONObject(new JSONObject(SageService.GET("stock_items/" + jsonProduct.getString("id"), headToken)).getString("request_OUTPUT"));
 				Product product = productrepository.findBySageID(jsonProduct.getString("id"));
 //				Product product = productrepository.findBySageID("186b84b02cf5444b979cac29b585451a");
 				JSONObject objProduct = new JSONObject();
@@ -260,7 +260,7 @@ public class productSageController {
 
 			if (response.isNull("$next"))
 				lastPage = true;
-			response = new JSONObject(SageService.GET("stock_items?page=" + page + "&items_per_page=100", headToken));
+			response = new JSONObject(new JSONObject(SageService.GET("stock_items?page=" + page + "&items_per_page=100", headToken)).getString("request_OUTPUT"));
 			page = page + 1;
 		}
 
