@@ -30,7 +30,7 @@ public interface productRepository extends JpaRepository<Product, Long>{
 	@Query(value = "select * from TBLPRODUCT where SAGE_ID is NULL and ISACTIVE='Y'", nativeQuery = true)
 	public List<Product> findByNullSageID();
 	
-	@Query(value = "SELECT PRODUCT_CODE FROM TBLPRODUCT where PRODUCTCATEGORY_ID =?1 order by PRODUCT_CODE desc limit 1", nativeQuery = true)
+	@Query(value = "SELECT PRODUCT_CODE FROM TBLPRODUCT where PRODUCTCATEGORY_ID=?1 order by PRODUCT_CODE desc limit 1", nativeQuery = true)
 	public String GenerateNewCode(Long pid);
 
 	@Query(value = "select * from TBLPRODUCT where PRODUCT_CODE=?1", nativeQuery = true)
