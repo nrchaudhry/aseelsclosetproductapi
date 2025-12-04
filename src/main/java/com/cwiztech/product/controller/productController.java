@@ -279,22 +279,21 @@ public class productController {
 					JSONObject productcategory = new JSONObject(ServiceCall.GET("productcategory/"+jsonObj.getLong("productcategory_ID"), apiRequest.getString("access_TOKEN"), false));
 	    	    	new_code = productcategory.getString("productcategory_CODE") + "001";
     	    	} else {
-		     		String last_4letters = productcategory_CODE.substring(productcategory_CODE.length() - 3);
-		     		int z=Integer.parseInt(last_4letters) + 1;
-		     		String first_letters = productcategory_CODE.substring(0,productcategory_CODE.length() - 3);
+		     		String codeDigits = productcategory_CODE.substring(productcategory_CODE.length() - 3);
+		     		int z=Integer.parseInt(codeDigits) + 1;
+		     		String codeProductCategory = productcategory_CODE.substring(0,productcategory_CODE.length() - 3);
 		         	
-		     		if (z<10) {new_code =  first_letters +"000"+ String.valueOf(z);}
-		         	else if (z>9 && z<100) {new_code =  first_letters +"00"+ String.valueOf(z);}
-		         	else if (z>=100 && z<1000) {new_code =  first_letters +"0"+ String.valueOf(z);}
-		         	else {new_code =  first_letters + String.valueOf(z);}
+		     		codeDigits = "000" + String.valueOf(z);
+		     		new_code = codeProductCategory + codeDigits.substring(codeDigits.length() - 3);
 		     	}
 	     		
 	    	    product.setPRODUCT_CODE(new_code);
 			}
+
 			if (jsonObj.has("productcategory_ID") && !jsonObj.isNull("productcategory_ID")) {
-				JSONObject productcategory = new JSONObject(ServiceCall.GET("productcategory/"+jsonObj.getLong("productcategory_ID"), apiRequest.getString("access_TOKEN"), false));
-				if (productcategory == null) 
-					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategory_ID doesn't exist!", apiRequest, true), HttpStatus.OK);
+//				JSONObject productcategory = new JSONObject(ServiceCall.GET("productcategory/"+jsonObj.getLong("productcategory_ID"), apiRequest.getString("access_TOKEN"), false));
+//				if (productcategory == null) 
+//					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategory_ID doesn't exist!", apiRequest, true), HttpStatus.OK);
 				product.setPRODUCTCATEGORY_ID(jsonObj.getLong("productcategory_ID"));
 			}
 
