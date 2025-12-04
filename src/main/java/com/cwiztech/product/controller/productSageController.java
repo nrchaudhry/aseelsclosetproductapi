@@ -343,23 +343,23 @@ public class productSageController {
 
 		JSONArray objProducts = new JSONArray();
 
-		JSONArray ledgeraccounts = new JSONArray(ServiceCall.GET("ledgeraccount/all", apiRequest.getString("access_TOKEN"), false));
+//		JSONArray ledgeraccounts = new JSONArray(ServiceCall.GET("ledgeraccount/all", apiRequest.getString("access_TOKEN"), false));
 
 		List<Product> products = productrepository.findBySage();
 		for (int i=0; i<products.size(); i++) {
 			JSONObject objProduct = new JSONObject();
 			JSONObject objProductDetail = new JSONObject();	
 
-			String saleledgeraccount = "", purchaseledgeraccount = "";
-
-			for (int j=0; j<ledgeraccounts.length(); j++) {
-				if (ledgeraccounts.getJSONObject(j).getLong("ledgeraccount_ID") == products.get(i).getPURCHASELEDGERACCOUNT_ID()) {
-					purchaseledgeraccount = ledgeraccounts.getJSONObject(j).getString("sage_ID");
-				}
-				if (ledgeraccounts.getJSONObject(j).getLong("ledgeraccount_ID") == products.get(i).getSALELEDGERACCOUNT_ID()) {
-					saleledgeraccount = ledgeraccounts.getJSONObject(j).getString("sage_ID");
-				}
-			}
+//			String saleledgeraccount = "", purchaseledgeraccount = "";
+//
+//			for (int j=0; j<ledgeraccounts.length(); j++) {
+//				if (ledgeraccounts.getJSONObject(j).getLong("ledgeraccount_ID") == products.get(i).getPURCHASELEDGERACCOUNT_ID()) {
+//					purchaseledgeraccount = ledgeraccounts.getJSONObject(j).getString("sage_ID");
+//				}
+//				if (ledgeraccounts.getJSONObject(j).getLong("ledgeraccount_ID") == products.get(i).getSALELEDGERACCOUNT_ID()) {
+//					saleledgeraccount = ledgeraccounts.getJSONObject(j).getString("sage_ID");
+//				}
+//			}
 
 //			objProductDetail.put("catalog_item_type_id", "STOCK_ITEM");	
 			objProductDetail.put("item_code", products.get(i).getPRODUCT_CODE());
