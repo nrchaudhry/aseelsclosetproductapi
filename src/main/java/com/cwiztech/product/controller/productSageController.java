@@ -178,6 +178,9 @@ public class productSageController {
 				long productitem_id = 0;
 
 				JSONObject responseProduct = SageService.GET("stock_items/" + jsonProduct.getString("id"), headToken);
+				if (responseProduct.getBoolean("active") == false)
+					break;
+				
 				Product product = productrepository.findBySageID(jsonProduct.getString("id"));
 				//				Product product = productrepository.findBySageID("186b84b02cf5444b979cac29b585451a");
 				JSONObject objProduct = new JSONObject();
@@ -329,6 +332,116 @@ public class productSageController {
 		}
 
 		return rtnAPIResponse;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/updatetosage", method = RequestMethod.GET)
+	public ResponseEntity updateToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/product/sendtosage", null, null, headToken);
+		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
+
+
+		JSONArray objProducts = new JSONArray();
+
+		JSONArray ledgeraccounts = new JSONArray(ServiceCall.GET("ledgeraccount/all", apiRequest.getString("access_TOKEN"), false));
+
+		List<Product> products = productrepository.findAll();
+		for (int i=0; i<products.size(); i++) {
+			JSONObject objProduct = new JSONObject();
+			JSONObject objProductDetail = new JSONObject();	
+
+			String saleledgeraccount = "", purchaseledgeraccount = "";
+
+			for (int j=0; j<ledgeraccounts.length(); j++) {
+				if (ledgeraccounts.getJSONObject(j).getLong("ledgeraccount_ID") == products.get(i).getPURCHASELEDGERACCOUNT_ID()) {
+					purchaseledgeraccount = ledgeraccounts.getJSONObject(j).getString("sage_ID");
+				}
+				if (ledgeraccounts.getJSONObject(j).getLong("ledgeraccount_ID") == products.get(i).getSALELEDGERACCOUNT_ID()) {
+					saleledgeraccount = ledgeraccounts.getJSONObject(j).getString("sage_ID");
+				}
+			}
+
+			objProductDetail.put("catalog_item_type_id", "STOCK_ITEM");	
+			objProductDetail.put("item_code", products.get(i).getPRODUCT_CODE());
+			objProductDetail.put("description", products.get(i).getPRODUCT_NAME());	
+			objProductDetail.put("weight", products.get(i).getPRODUCT_WEIGHT());
+			objProductDetail.put("cost_price", products.get(i).getPURCHASE_PRICE());
+			objProductDetail.put("sales_ledger_account_id", saleledgeraccount);
+			objProductDetail.put("purchase_ledger_account_id", purchaseledgeraccount);
+			if (products.get(i).getTAXCODE_ID() == 1) {
+				objProductDetail.put("sales_tax_rate_id", "GB_STANDARD");
+				objProductDetail.put("purchase_tax_rate_id", "GB_STANDARD");
+			} else {
+				objProductDetail.put("sales_tax_rate_id", "GB_ZERO");
+				objProductDetail.put("purchase_tax_rate_id", "GB_ZERO");
+			}
+
+			JSONArray productitems = new JSONArray(ServiceCall.POST("productitem/advancedsearch", "{product_ID: "+products.get(i).getPRODUCT_ID()+"}", apiRequest.getString("access_TOKEN"), false));
+			if (productitems.length()>0) {
+				List<Object> salesprices = new ArrayList<Object>();
+
+				JSONObject productitem = productitems.getJSONObject(0);
+				JSONArray productitempricelevels = new JSONArray(ServiceCall.POST("productitempricelevel/advancedsearch", "{productitem_ID: "+productitem.getLong("productitem_ID")+"}", apiRequest.getString("access_TOKEN"), false));
+				for (int j=0; j<productitempricelevels.length(); j++) {
+					JSONObject productitempricelevel = new JSONObject();
+					if (sageService.compareTo("BFSSAGE") == 0)
+						productitempricelevel.put("product_sales_price_type_id", "c0a3306394684a82b2abb0a9af244b55");
+					else
+						productitempricelevel.put("product_sales_price_type_id", "264fdb5bd99e45c389e5e322f87d6780");
+
+					productitempricelevel.put("price", productitempricelevels.getJSONObject(j).getDouble("productitem_UNITPRICE"));
+					productitempricelevel.put("price_includes_tax", "false");
+
+					salesprices.add(productitempricelevel);
+				}
+				objProductDetail.put("sales_prices", salesprices);
+
+
+				//				JSONArray productiteminventories = new JSONArray(ServiceCall.POST("productiteminventory/advancedsearch", "{productitem_ID: "+productitem.getLong("productitem_ID")+"}", apiRequest.getREQUEST_OUTPUT()));
+				//		        for (int j=0; j<productitempricelevels.length(); j++) {
+				//		        }
+
+				JSONArray productitemattributevalues = new JSONArray(ServiceCall.POST("productitemattributevalue/advancedsearch", "{productitem_ID: "+productitem.getLong("productitem_ID")+"}", apiRequest.getString("access_TOKEN"), false));
+				for (int j=0; j<productitemattributevalues.length(); j++) {
+					JSONObject productitemattributevalue = productitemattributevalues.getJSONObject(j);
+					JSONObject jsonproductattribute = new JSONObject(productitemattributevalue.getString("productattribute_DETAIL"));
+					JSONObject jsonattribute = new JSONObject(jsonproductattribute.getString("attribute_DETAIL"));
+
+					if (jsonattribute.getString("attribute_KEY").equals("taxcode")) {
+						if (productitemattributevalues.getJSONObject(j).getLong("productattributevalue_ID")==1) {
+							objProductDetail.put("sales_tax_rate_id", "GB_STANDARD");
+							objProductDetail.put("purchase_tax_rate_id", "GB_STANDARD");
+						} else {
+							objProductDetail.put("sales_tax_rate_id", "GB_ZERO");
+							objProductDetail.put("purchase_tax_rate_id", "GB_ZERO");
+						}
+					}
+
+					if (!productitemattributevalue.isNull("productattributeitem_ID"))
+						productitem.put(jsonattribute.getString("attribute_KEY"), productitemattributevalues.getJSONObject(j).getLong("productattributevalue_ID"));
+					else if (!productitemattributevalues.getJSONObject(j).isNull("productattributeitem_VALUE"))
+						productitem.put(jsonattribute.getString("attribute_KEY"), productitemattributevalues.getJSONObject(j).getString("productattributeitem_VALUE"));
+				}
+			}
+
+
+			objProduct.put("stock_item", objProductDetail);
+			JSONObject apiRequestResponse = SageService.POST("stock_items", objProduct.toString(), headToken);
+
+			JSONObject product = new JSONObject();
+			product.put("product_ID", products.get(i).getPRODUCT_ID());
+			if (apiRequestResponse.has("id"))
+				product.put("sage_ID", apiRequestResponse.getString("id"));
+			else
+				product.put("sage_ID", apiRequestResponse.toString());
+
+			product = new JSONObject(ServiceCall.POST("product", product.toString(), apiRequest.getString("access_TOKEN"), false));
+
+			objProducts.put(objProduct);
+
+		}
+
+		return new ResponseEntity(getAPIResponse(null, null , objProducts, null, null, apiRequest, false), HttpStatus.OK);
 	}
 
 }
