@@ -168,7 +168,7 @@ public class productSageController {
 
 		JSONObject response = SageService.GET("products?page=" + (page-1) + "&items_per_page=100", headToken);
 
-		log.info("response sage: "+response);
+		log.info("response sage-" + (page-1) + ": "+response);
 
 		while (lastPage == false) {
 			JSONArray jsonProducts = response.getJSONArray("$items");
@@ -178,6 +178,7 @@ public class productSageController {
 				long productitem_id = 0;
 
 				JSONObject responseProduct = SageService.GET("stock_items/" + jsonProduct.getString("id"), headToken);
+				log.info("responseProduct sage: "+responseProduct);
 				if (responseProduct.getBoolean("active") == false)
 					break;
 				
@@ -195,12 +196,23 @@ public class productSageController {
 						objProductItem.put("productitem_ID", productitem_id);
 
 						JSONArray productitemprices = new JSONArray(ServiceCall.POST("productitempricelevel/advancedsearch", objProductItem.toString(), apiRequest.getString("access_TOKEN"), false));
+						if (productitemprices.length() > 0) {
+							objProductItemPrice.put("productitempricelevel_ID", productitemprices.getJSONObject(productitemprices.length()-1).getLong("productitempricelevel_ID"));
+							objProductItemPrice.put("pricelevel_CODE", "2");
+							objProductItemPrice.put("currency_CODE", "GB");
+							objProductItemPrice.put("productitem_QUANTITY", 1);
+						}
+
 						JSONArray productiteminventory = new JSONArray(ServiceCall.POST("productiteminventory/advancedsearch", objProductItem.toString(), apiRequest.getString("access_TOKEN"), false));
+						if (productitemprices.length() > 0) {
+							objProductItemInventory.put("productiteminventory_ID", productiteminventory.getJSONObject(productiteminventory.length()-1).getLong("productiteminventory_ID"));
+							objProductItemInventory.put("productlocation_CODE", "1");
+						}
 					} else {
 						break;
 					}
 				} else {
-					objProduct.put("productcategory_ID", 0);
+					objProduct.put("productcategory_ID", 1);
 					if (responseProduct.has("item_code") && !responseProduct.isNull("item_code")) {
 						objProduct.put("product_CODE", responseProduct.getString("item_code"));
 					} else {
@@ -264,14 +276,10 @@ public class productSageController {
 
 				JSONArray salesprices = responseProduct.getJSONArray("sales_prices");
 				objProductItemPrice.put("productitem_ID", productitems.getLong("productitem_ID"));
-				objProductItemPrice.put("pricelevel_CODE", "2");
-				objProductItemPrice.put("currency_CODE", "GB");
-				objProductItemPrice.put("productitem_QUANTITY", 1);
 				objProductItemPrice.put("productitem_UNITPRICE", salesprices.getJSONObject(0).getString("price"));
 				ServiceCall.POST("productitempricelevel", objProductItemPrice.toString(), apiRequest.getString("access_TOKEN"), false);
 
 				objProductItemInventory.put("productitem_ID", productitems.getLong("productitem_ID"));
-				objProductItemInventory.put("productlocation_CODE", "1");
 				objProductItemInventory.put("quantity_ONHAND", responseProduct.getDouble("quantity_in_stock"));
 				objProductItemInventory.put("quantity_AVAILABLE", responseProduct.getDouble("quantity_in_stock"));
 				ServiceCall.POST("productiteminventory", objProductItemInventory.toString(), apiRequest.getString("access_TOKEN"), false);
@@ -281,6 +289,7 @@ public class productSageController {
 			if (response.isNull("$next"))
 				lastPage = true;
 			response = SageService.GET("stock_items?page=" + page + "&items_per_page=100", headToken);
+			log.info("response sage-" + page + ": "+response);
 			page = page + 1;
 		}
 
