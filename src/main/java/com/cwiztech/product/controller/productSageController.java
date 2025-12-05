@@ -166,7 +166,7 @@ public class productSageController {
 		JSONArray ledgeraccounts = new JSONArray(ServiceCall.GET("ledgeraccount", apiRequest.getString("access_TOKEN"), false));	
 		JSONArray taxcodes = new JSONArray(ServiceCall.GET("taxcode", apiRequest.getString("access_TOKEN"), false));	
 
-		JSONObject response = SageService.GET("products?page=" + (page-1) + "&items_per_page=100", headToken);
+		JSONObject response = SageService.GET("stock_items?page=" + (page-1) + "&items_per_page=100", headToken);
 
 		log.info("response sage-" + (page-1) + ": "+response);
 
