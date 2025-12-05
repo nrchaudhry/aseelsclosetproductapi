@@ -173,6 +173,7 @@ public class productSageController {
 		while (lastPage == false) {
 			JSONArray jsonProducts = response.getJSONArray("$items");
 
+			log.info("jsonProducts.length(): "+jsonProducts.length());
 			for (int i=0; i<jsonProducts.length(); i++) {
 				JSONObject jsonProduct = jsonProducts.getJSONObject(i);
 				long productitem_id = 0;
@@ -190,10 +191,12 @@ public class productSageController {
 				JSONObject objProductItemInventory = new JSONObject();
 				if (product != null) {
 					objProduct.put("product_ID", product.getPRODUCT_ID());
+					objProduct.put("iswithdetail", false);
 					JSONArray productitems = new JSONArray(ServiceCall.POST("productitem/advancedsearch", objProduct.toString(), apiRequest.getString("access_TOKEN"), false));
 					if (productitems.length() > 0) {
 						productitem_id = productitems.getJSONObject(productitems.length()-1).getLong("productitem_ID");
 						objProductItem.put("productitem_ID", productitem_id);
+						objProductItem.put("iswithdetail", false);
 
 						JSONArray productitemprices = new JSONArray(ServiceCall.POST("productitempricelevel/advancedsearch", objProductItem.toString(), apiRequest.getString("access_TOKEN"), false));
 						if (productitemprices.length() > 0) {
