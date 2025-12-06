@@ -374,8 +374,8 @@ public class productSageController {
 //			}
 
 //			objProductDetail.put("catalog_item_type_id", "STOCK_ITEM");	
-			objProductDetail.put("item_code", products.get(i).getPRODUCT_CODE());
-//			objProductDetail.put("description", products.get(i).getPRODUCT_NAME());	
+//			objProductDetail.put("item_code", products.get(i).getPRODUCT_CODE());
+			objProductDetail.put("description", products.get(i).getPRODUCT_NAME());	
 //			objProductDetail.put("weight", products.get(i).getPRODUCT_WEIGHT());
 //			objProductDetail.put("cost_price", products.get(i).getPURCHASE_PRICE());
 //			objProductDetail.put("sales_ledger_account_id", saleledgeraccount);
