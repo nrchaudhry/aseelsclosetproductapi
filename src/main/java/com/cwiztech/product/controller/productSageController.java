@@ -181,7 +181,7 @@ public class productSageController {
 				JSONObject responseProduct = SageService.GET("stock_items/" + jsonProduct.getString("id"), headToken);
 				log.info("responseProduct sage: "+responseProduct);
 				if (responseProduct.getBoolean("active") == false)
-					break;
+					continue;
 				
 				Product product = productrepository.findBySageID(jsonProduct.getString("id"));
 				//				Product product = productrepository.findBySageID("186b84b02cf5444b979cac29b585451a");
