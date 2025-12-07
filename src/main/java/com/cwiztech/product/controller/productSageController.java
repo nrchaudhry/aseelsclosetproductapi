@@ -201,6 +201,7 @@ public class productSageController {
 						JSONArray productitemprices = new JSONArray(ServiceCall.POST("productitempricelevel/advancedsearch", objProductItem.toString(), apiRequest.getString("access_TOKEN"), false));
 						if (productitemprices.length() > 0) {
 							objProductItemPrice.put("productitempricelevel_ID", productitemprices.getJSONObject(productitemprices.length()-1).getLong("productitempricelevel_ID"));
+						} else {
 							objProductItemPrice.put("pricelevel_CODE", "2");
 							objProductItemPrice.put("currency_CODE", "GB");
 							objProductItemPrice.put("productitem_QUANTITY", 1);
@@ -209,10 +210,11 @@ public class productSageController {
 						JSONArray productiteminventory = new JSONArray(ServiceCall.POST("productiteminventory/advancedsearch", objProductItem.toString(), apiRequest.getString("access_TOKEN"), false));
 						if (productitemprices.length() > 0) {
 							objProductItemInventory.put("productiteminventory_ID", productiteminventory.getJSONObject(productiteminventory.length()-1).getLong("productiteminventory_ID"));
+						} else {
 							objProductItemInventory.put("productlocation_CODE", "1");
 						}
 					} else {
-						break;
+						continue;
 					}
 				} else {
 					objProduct.put("productcategory_ID", 1);
