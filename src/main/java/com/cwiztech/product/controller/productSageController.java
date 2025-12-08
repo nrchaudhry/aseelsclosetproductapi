@@ -237,22 +237,15 @@ public class productSageController {
 
 				objProduct.put("sage_ID", responseProduct.getString("id"));
 
-//				for (int j=0; j<taxcodes.length(); j++) {
-//					JSONObject taxcode = ledgeraccounts.getJSONObject(j);
-//
-//					if (responseProduct.has("sales_tax_rate") && !responseProduct.isNull("sales_tax_rate") && !taxcode.isNull("sage_ID") && taxcode.getString("sage_ID").compareTo(responseProduct.getJSONObject("sales_tax_rate").getString("id")) == 0) {
-//						objProduct.put("taxcode_ID", taxcode.getLong("ledgeraccount_ID"));
-//						break;
-//					}
-//				}
+				for (int j=0; j<taxcodes.length(); j++) {
+					JSONObject taxcode = ledgeraccounts.getJSONObject(j);
 
-<<<<<<< HEAD
 					if (responseProduct.has("sales_tax_rate") && !responseProduct.isNull("sales_tax_rate") && !taxcode.isNull("sage_ID") && taxcode.getString("sage_ID").compareTo(responseProduct.getJSONObject("sales_tax_rate").getString("id")) == 0) {
 						objProduct.put("taxcode_ID", taxcode.getLong("taxcode_ID"));
 						break;
 					}
 				}
-=======
+
 //				for (int j=0; j<ledgeraccounts.length(); j++) {
 //					JSONObject ledgeraccount = ledgeraccounts.getJSONObject(j);
 //
@@ -264,7 +257,6 @@ public class productSageController {
 //						objProduct.put("saleledgeraccount_ID", ledgeraccount.getLong("ledgeraccount_ID"));
 //					}
 //				}
->>>>>>> dd2a8dacc57b63aad35e40f5b1b995de2bdf9d77
 
 //				if (responseProduct.has("cost_price") && !responseProduct.isNull("cost_price")) {
 //					objProduct.put("purchase_PRICE", responseProduct.getDouble("cost_price"));
@@ -282,7 +274,7 @@ public class productSageController {
 //				log.info("objProduct: "+objProduct);
 //				log.info("page: "+page);
 //
-//				JSONObject products = new JSONObject(ServiceCall.POST("product", objProduct.toString(), apiRequest.getString("access_TOKEN"), false));
+				JSONObject products = new JSONObject(ServiceCall.POST("product", objProduct.toString(), apiRequest.getString("access_TOKEN"), false));
 
 //				objProductItem.put("product_ID", products.getLong("product_ID"));
 //				JSONObject productitems = new JSONObject(ServiceCall.POST("productitem", objProductItem.toString(), apiRequest.getString("access_TOKEN"), false));
@@ -291,13 +283,13 @@ public class productSageController {
 //				objProductItemPrice.put("productitem_ID", productitems.getLong("productitem_ID"));
 				objProductItemPrice.put("productitem_ID", productitem_id);
 				objProductItemPrice.put("productitem_UNITPRICE", salesprices.getJSONObject(0).getString("price"));
-				ServiceCall.POST("productitempricelevel", objProductItemPrice.toString(), apiRequest.getString("access_TOKEN"), false);
+				//ServiceCall.POST("productitempricelevel", objProductItemPrice.toString(), apiRequest.getString("access_TOKEN"), false);
 
 //				objProductItemInventory.put("productitem_ID", productitems.getLong("productitem_ID"));
 				objProductItemInventory.put("productitem_ID", productitem_id);
 				objProductItemInventory.put("quantity_ONHAND", responseProduct.getDouble("quantity_in_stock"));
 				objProductItemInventory.put("quantity_AVAILABLE", responseProduct.getDouble("quantity_in_stock"));
-				ServiceCall.POST("productiteminventory", objProductItemInventory.toString(), apiRequest.getString("access_TOKEN"), false);
+				//ServiceCall.POST("productiteminventory", objProductItemInventory.toString(), apiRequest.getString("access_TOKEN"), false);
 			}
 
 
