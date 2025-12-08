@@ -67,8 +67,6 @@ public class AccessToken {
 		JSONObject apiRequest = new JSONObject();
 		
 		log.info(requestType + ": " + requestURI);
-		if (requestBody != null)
-			log.info("Input: " + requestBody);
 
 		if (checkTokenResponse.has("error")) {
 			apiRequest = apiRequestLog.apiRequestCreateLog(requestType, (long) 0, requestURI, requestBody, workstation);

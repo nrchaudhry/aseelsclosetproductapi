@@ -71,14 +71,9 @@ public class apiRequestLog {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-type", "application/json");
 
-		log.info("apiRequestLogPath: " + apiRequestLogPath);
-		log.info("Body: " + apiRequest.toString());
 		HttpEntity<String> entity = new HttpEntity<String>(apiRequest.toString(), headers);
 		ResponseEntity<String> response = restTemplate.exchange(apiRequestLogPath + "log", HttpMethod.POST, entity, String.class);
 		rtnAPIResponse=response.getBody().toString();
-
-		log.info("Output: " + rtnAPIResponse);
-		log.info("--------------------------------------------------------");
 
 		return rtnAPIResponse;
 	}

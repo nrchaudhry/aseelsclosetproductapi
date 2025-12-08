@@ -246,7 +246,6 @@ public class productController {
 			jsonProducts = new JSONArray();
 			jsonProducts.put(jsonProduct);
 		}
-		log.info(jsonProducts.toString());
 
 		for (int a=0; a<jsonProducts.length(); a++) {
 			JSONObject jsonObj = jsonProducts.getJSONObject(a);
