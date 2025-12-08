@@ -246,6 +246,13 @@ public class productSageController {
 //					}
 //				}
 
+<<<<<<< HEAD
+					if (responseProduct.has("sales_tax_rate") && !responseProduct.isNull("sales_tax_rate") && !taxcode.isNull("sage_ID") && taxcode.getString("sage_ID").compareTo(responseProduct.getJSONObject("sales_tax_rate").getString("id")) == 0) {
+						objProduct.put("taxcode_ID", taxcode.getLong("taxcode_ID"));
+						break;
+					}
+				}
+=======
 //				for (int j=0; j<ledgeraccounts.length(); j++) {
 //					JSONObject ledgeraccount = ledgeraccounts.getJSONObject(j);
 //
@@ -257,6 +264,7 @@ public class productSageController {
 //						objProduct.put("saleledgeraccount_ID", ledgeraccount.getLong("ledgeraccount_ID"));
 //					}
 //				}
+>>>>>>> dd2a8dacc57b63aad35e40f5b1b995de2bdf9d77
 
 //				if (responseProduct.has("cost_price") && !responseProduct.isNull("cost_price")) {
 //					objProduct.put("purchase_PRICE", responseProduct.getDouble("cost_price"));
