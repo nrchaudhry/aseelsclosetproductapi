@@ -153,18 +153,23 @@ public class productItemPriceLevelController {
 	public ResponseEntity insertupdateAll(JSONArray jsonProductItemPriceLevels, JSONObject jsonProductItemPriceLevel, JSONObject apiRequest) throws JsonProcessingException, JSONException, ParseException {
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
+		boolean isWithDetail = true;
 
 		List<ProductItemPriceLevel> productitempricelevels = new ArrayList<ProductItemPriceLevel>();
 		if (jsonProductItemPriceLevel != null) {
 			jsonProductItemPriceLevels = new JSONArray();
 			jsonProductItemPriceLevels.put(jsonProductItemPriceLevel);
 		}
-		log.info(jsonProductItemPriceLevels.toString());
 
 		for (int a=0; a<jsonProductItemPriceLevels.length(); a++) {
 			JSONObject jsonObj = jsonProductItemPriceLevels.getJSONObject(a);
 			ProductItemPriceLevel productitempricelevel = new ProductItemPriceLevel();
 			long productitempricelevelid = 0;
+
+			if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+				isWithDetail = jsonObj.getBoolean("iswithdetail");
+			}
+			jsonObj.put("iswithdetail", false);
 
 			if (jsonObj.has("productitempricelevel_ID")) {
 				productitempricelevelid = jsonObj.getLong("productitempricelevel_ID");
@@ -239,9 +244,9 @@ public class productItemPriceLevelController {
 
 		ResponseEntity responseentity;
 		if (jsonProductItemPriceLevel != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productitempricelevels.get(0) , null, null, null, apiRequest, true), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productitempricelevels.get(0) , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productitempricelevels, null , null, null, null, apiRequest, true), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productitempricelevels, null , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 		return responseentity;
 	}
 

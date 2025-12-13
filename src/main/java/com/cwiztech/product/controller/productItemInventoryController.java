@@ -149,18 +149,23 @@ public class productItemInventoryController {
 	public ResponseEntity insertupdateAll(JSONArray jsonProductItemInventories, JSONObject jsonProductItemInventory, JSONObject apiRequest) throws JsonProcessingException, JSONException, ParseException {
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
+		boolean isWithDetail = true;
 
 		List<ProductItemInventory> productiteminventories = new ArrayList<ProductItemInventory>();
 		if (jsonProductItemInventory != null) {
 			jsonProductItemInventories = new JSONArray();
 			jsonProductItemInventories.put(jsonProductItemInventory);
 		}
-		log.info(jsonProductItemInventories.toString());
 
 		for (int a=0; a<jsonProductItemInventories.length(); a++) {
 			JSONObject jsonObj = jsonProductItemInventories.getJSONObject(a);
 			ProductItemInventory productiteminventory = new ProductItemInventory();
 			long productiteminventoryid = 0;
+
+			if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+				isWithDetail = jsonObj.getBoolean("iswithdetail");
+			}
+			jsonObj.put("iswithdetail", false);
 
 			if (jsonObj.has("productiteminventory_ID")) {
 				productiteminventoryid = jsonObj.getLong("productiteminventory_ID");
@@ -304,9 +309,9 @@ public class productItemInventoryController {
 
 		ResponseEntity responseentity;
 		if (jsonProductItemInventory != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, productiteminventories.get(0) , null, null, null, apiRequest, true), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productiteminventories.get(0) , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, true), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productiteminventories, null , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 		return responseentity;
 	}
 

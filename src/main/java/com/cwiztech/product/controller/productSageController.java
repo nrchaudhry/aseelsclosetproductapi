@@ -240,7 +240,9 @@ public class productSageController {
 				for (int j=0; j<taxcodes.length(); j++) {
 					JSONObject taxcode = ledgeraccounts.getJSONObject(j);
 
+					log.info("sales_tax_rate: " + responseProduct.getJSONObject("sales_tax_rate").getString("id") + " == taxcode: " + taxcode.getString("sage_ID") + " == compare result: " + taxcode.getString("sage_ID").compareTo(responseProduct.getJSONObject("sales_tax_rate").getString("id")));
 					if (responseProduct.has("sales_tax_rate") && !responseProduct.isNull("sales_tax_rate") && !taxcode.isNull("sage_ID") && taxcode.getString("sage_ID").compareTo(responseProduct.getJSONObject("sales_tax_rate").getString("id")) == 0) {
+						log.info("taxcode_ID: " + taxcode.getLong("taxcode_ID"));
 						objProduct.put("taxcode_ID", taxcode.getLong("taxcode_ID"));
 						break;
 					}
@@ -283,13 +285,13 @@ public class productSageController {
 //				objProductItemPrice.put("productitem_ID", productitems.getLong("productitem_ID"));
 				objProductItemPrice.put("productitem_ID", productitem_id);
 				objProductItemPrice.put("productitem_UNITPRICE", salesprices.getJSONObject(0).getString("price"));
-				//ServiceCall.POST("productitempricelevel", objProductItemPrice.toString(), apiRequest.getString("access_TOKEN"), false);
+				ServiceCall.POST("productitempricelevel", objProductItemPrice.toString(), apiRequest.getString("access_TOKEN"), false);
 
 //				objProductItemInventory.put("productitem_ID", productitems.getLong("productitem_ID"));
 				objProductItemInventory.put("productitem_ID", productitem_id);
 				objProductItemInventory.put("quantity_ONHAND", responseProduct.getDouble("quantity_in_stock"));
 				objProductItemInventory.put("quantity_AVAILABLE", responseProduct.getDouble("quantity_in_stock"));
-				//ServiceCall.POST("productiteminventory", objProductItemInventory.toString(), apiRequest.getString("access_TOKEN"), false);
+				ServiceCall.POST("productiteminventory", objProductItemInventory.toString(), apiRequest.getString("access_TOKEN"), false);
 			}
 
 

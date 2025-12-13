@@ -240,6 +240,7 @@ public class productController {
 	public ResponseEntity insertupdateAll(JSONArray jsonProducts, JSONObject jsonProduct, JSONObject apiRequest) throws JsonProcessingException, JSONException, ParseException {
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
+		boolean isWithDetail = true;
 
 		List<Product> products = new ArrayList<Product>();
 		if (jsonProduct != null) {
@@ -251,6 +252,11 @@ public class productController {
 			JSONObject jsonObj = jsonProducts.getJSONObject(a);
 			Product product = new Product();
 			long productid = 0;
+
+			if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+				isWithDetail = jsonObj.getBoolean("iswithdetail");
+			}
+			jsonObj.put("iswithdetail", false);
 
 			if (jsonObj.has("product_ID")) {
 				productid = jsonObj.getLong("product_ID");
@@ -357,9 +363,9 @@ public class productController {
 
 		ResponseEntity responseentity;
 		if (jsonProduct != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, products.get(0) , null, null, null, apiRequest, true), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, products.get(0) , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(products, null, null , null, null, apiRequest, true), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(products, null, null , null, null, apiRequest, isWithDetail), HttpStatus.OK);
 		return responseentity;
 	}
 
