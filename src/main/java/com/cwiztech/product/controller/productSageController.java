@@ -238,7 +238,7 @@ public class productSageController {
 				objProduct.put("sage_ID", responseProduct.getString("id"));
 
 				for (int j=0; j<taxcodes.length(); j++) {
-					JSONObject taxcode = ledgeraccounts.getJSONObject(j);
+					JSONObject taxcode = taxcodes.getJSONObject(j);
 
 					log.info("sales_tax_rate: " + responseProduct.getJSONObject("sales_tax_rate").getString("id") + " == taxcode: " + taxcode.getString("sage_ID") + " == compare result: " + taxcode.getString("sage_ID").compareTo(responseProduct.getJSONObject("sales_tax_rate").getString("id")));
 					if (responseProduct.has("sales_tax_rate") && !responseProduct.isNull("sales_tax_rate") && !taxcode.isNull("sage_ID") && taxcode.getString("sage_ID").compareTo(responseProduct.getJSONObject("sales_tax_rate").getString("id")) == 0) {
