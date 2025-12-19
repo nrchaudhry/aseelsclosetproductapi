@@ -37,7 +37,7 @@ import com.google.maps.errors.ApiException;
 @RestController
 @CrossOrigin
 @RequestMapping("/ProductItemStockAdjustment")
-public class productItemStockAdjustmentController {
+public class productItemStockAdjustmentController {                                                                        
 	private static final Logger log = LoggerFactory.getLogger(productItemStockAdjustmentController.class);
 
 	@Autowired
@@ -101,7 +101,6 @@ public class productItemStockAdjustmentController {
 		return new ResponseEntity(getAPIResponse(ProductItemStockAdjustments, null, null, null, null, apiRequest, true).toString(), HttpStatus.OK);
 	}
 
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity insert(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
@@ -122,7 +121,6 @@ public class productItemStockAdjustmentController {
 		return insertupdateAll(new JSONArray(data), null, apiRequest);
 	}
 
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public ResponseEntity update(@PathVariable Long id, @RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
@@ -136,7 +134,6 @@ public class productItemStockAdjustmentController {
 
 		return insertupdateAll(null, jsonObj, apiRequest);
 	}
-
 
 	@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
 	public ResponseEntity insertupdateAll(JSONArray jsonProductItemStockAdjustments, JSONObject jsonProductItemStockAdjustment, JSONObject apiRequest) throws JSONException, ParseException, InterruptedException, ExecutionException, ApiException, InterruptedException, IOException, ExecutionException {
@@ -319,7 +316,6 @@ public class productItemStockAdjustmentController {
 		}
 		return new ResponseEntity(getAPIResponse(ProductItemStockAdjustments, null, null, null, null, apiRequest, isWithDetail).toString(), HttpStatus.OK);
 	}
-
 
 	//getAPI response Function
 	String getAPIResponse(List<ProductItemStockAdjustment> productitemstockadjustments, ProductItemStockAdjustment productitemstockadjustment, JSONArray Jsonproductitemstockadjustments, JSONObject Jsonproductitemstockadjustment, String message, JSONObject apiRequest, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException, InterruptedException, ExecutionException {

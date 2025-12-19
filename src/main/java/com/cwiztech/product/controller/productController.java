@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -446,14 +447,16 @@ public class productController {
 
 		JSONArray searchObject = new JSONArray();
 		List<Integer> productcategory_IDS = new ArrayList<Integer>(); 
+		List<Integer> taxcode_IDS = new ArrayList<Integer>();
 		List<Integer> saleledgeraccount_IDS = new ArrayList<Integer>();
 		List<Integer> purchaseledgeraccount_IDS = new ArrayList<Integer>();
 
 		productcategory_IDS.add((int) 0);
+		taxcode_IDS.add((int) 0);
 		saleledgeraccount_IDS.add((int) 0);
 		purchaseledgeraccount_IDS.add((int) 0);
 
-		long productcategory_ID = 0, saleledgeraccount_ID = 0, purchaseledgeraccount_ID = 0;
+		long productcategory_ID = 0,taxcode_ID = 0, saleledgeraccount_ID = 0, purchaseledgeraccount_ID = 0;
 
 		boolean isWithDetail = true;
 		if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
@@ -477,6 +480,22 @@ public class productController {
 			}
 		}
 
+		if (jsonObj.has("taxcode_ID") && !jsonObj.isNull("taxcode_ID") && jsonObj.getLong("taxcode_ID") != 0) {
+			productcategory_ID = jsonObj.getLong("taxcode_ID");
+			productcategory_IDS.add((int) productcategory_ID);
+		} else if (jsonObj.has("taxcode") && !jsonObj.isNull("taxcode") && jsonObj.getLong("taxcode") != 0) {
+			if (active == true) {
+				searchObject = new JSONArray(ServiceCall.POST("taxcode/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
+			} else {
+				searchObject = new JSONArray(ServiceCall.POST("taxcode/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
+			}
+
+			taxcode_ID = searchObject.length();
+			for (int i=0; i<searchObject.length(); i++) {
+				taxcode_IDS.add((int) searchObject.getJSONObject(i).getLong("taxcode_ID"));
+			}
+		}
+		
 		if (jsonObj.has("saleledgeraccount_ID") && !jsonObj.isNull("saleledgeraccount_ID") && jsonObj.getLong("saleledgeraccount_ID") != 0) {
 			saleledgeraccount_ID = jsonObj.getLong("saleledgeraccount_ID");
 			saleledgeraccount_IDS.add((int) saleledgeraccount_ID);
@@ -509,10 +528,10 @@ public class productController {
 			}
 		}
 
-		if (productcategory_ID != 0 || saleledgeraccount_ID != 0 || purchaseledgeraccount_ID != 0) {
+		if (productcategory_ID != 0 ||taxcode_ID != 0 || saleledgeraccount_ID != 0 || purchaseledgeraccount_ID != 0) {
 			products = ((active == true)
-					? productrepository.findByAdvancedSearch(productcategory_ID, productcategory_IDS, saleledgeraccount_ID, saleledgeraccount_IDS, purchaseledgeraccount_ID, purchaseledgeraccount_IDS)
-							: productrepository.findAllByAdvancedSearch(productcategory_ID, productcategory_IDS, saleledgeraccount_ID, saleledgeraccount_IDS, purchaseledgeraccount_ID, purchaseledgeraccount_IDS));
+					? productrepository.findByAdvancedSearch(productcategory_ID, productcategory_IDS,taxcode_ID,taxcode_IDS, saleledgeraccount_ID, saleledgeraccount_IDS)
+							: productrepository.findAllByAdvancedSearch(productcategory_ID, productcategory_IDS,taxcode_ID,taxcode_IDS, saleledgeraccount_ID, saleledgeraccount_IDS, purchaseledgeraccount_ID, purchaseledgeraccount_IDS));
 		}
 		return new ResponseEntity(getAPIResponse(products, null , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 	}
@@ -524,6 +543,76 @@ public class productController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "Product", message).toString();
 		} else {
+				if (product != null && isWithDetail == true) {
+
+					CompletableFuture<JSONObject> productcategoryFuture = CompletableFuture.supplyAsync(() -> {
+						if (product.getPRODUCTCATEGORY_ID() == null) {
+							return new JSONObject();
+						}
+
+						try {
+							return new JSONObject(ServiceCall.GET("product/"+product.getPRODUCTCATEGORY_ID(), apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONObject();
+						}
+					});
+
+					CompletableFuture<JSONObject> taxcodeFuture = CompletableFuture.supplyAsync(() -> {
+						if (product.getTAXCODE_ID() == null) {
+							return new JSONObject();
+						}
+
+						try {
+							return new JSONObject(ServiceCall.GET("product/"+product.getPRODUCT_ID(), apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONObject();
+						}
+					});
+
+					CompletableFuture<JSONObject> saleledgeraccountFuture = CompletableFuture.supplyAsync(() -> {
+						if (product.getSALELEDGERACCOUNT_ID() == null) {
+							return new JSONObject();
+						}
+
+						try {
+							return new JSONObject(ServiceCall.GET("product/"+product.getSALELEDGERACCOUNT_ID(), apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONObject();
+						}
+					});
+
+					CompletableFuture<JSONObject> purchaseledgeraccountFuture = CompletableFuture.supplyAsync(() -> {
+						if (product.getPURCHASELEDGERACCOUNT_ID() == null) {
+							return new JSONObject();
+						}
+
+						try {
+							return new JSONObject(ServiceCall.GET("product/"+product.getPURCHASELEDGERACCOUNT_ID(), apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONObject();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(productcategoryFuture, taxcodeFuture,saleledgeraccountFuture,purchaseledgeraccountFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					product.setPRODUCTCATEGORY_DETAIL(productcategoryFuture.toString());
+					product.setTAXCODE_DETAIL(taxcodeFuture.toString());
+					product.setSALELEDGERACCOUNT_DETAIL(saleledgeraccountFuture.toString());
+					product.setPURCHASELEDGERACCOUNT_DETAIL(purchaseledgeraccountFuture.toString());
+
+					rtnAPIResponse = mapper.writeValueAsString(product);
+					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+				} 
 			if (product != null && isWithDetail == true) {
 				List<Integer> ledgeraccountList = new ArrayList<Integer>();
 

@@ -31,7 +31,6 @@ public interface productItemStockAdjustmentRepository extends JpaRepository<Prod
 	public List<ProductItemStockAdjustment> findByAdvancedSearch(
 			@Param("PRODUCTITEM_ID") Long productitem_ID, @Param("PRODUCTITEM_IDS") List<Integer> PRODUCTITEM_IDS);
 
-
 	@Query(value = "select * from tblproductitemstockadjustment " 
 			+ "where (CASE WHEN :PRODUCTITEM_ID = 0 THEN PRODUCTITEM_ID=PRODUCTITEM_ID ELSE PRODUCTITEM_ID IN (:PRODUCTITEM_IDS) END or PRODUCTITEM_ID is NULL) "
 			+ "", nativeQuery = true)

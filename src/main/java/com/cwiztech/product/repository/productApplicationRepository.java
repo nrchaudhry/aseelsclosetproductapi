@@ -14,11 +14,22 @@ public interface productApplicationRepository extends JpaRepository<ProductAppli
 	@Query(value = "select * from TBLPRODUCTAPPLICATION where ISACTIVE='Y'" , nativeQuery = true)
 	public List<ProductApplication> findActive();
 
-	@Query(value = "select * from TBLPRODUCTAPPLICATION  "
-			+ "where CASE WHEN :APPLICATION_ID = 0 THEN APPLICATION_ID=APPLICATION_ID ELSE APPLICATION_ID IN (:APPLICATION_IDS) END "
-			+ "and CASE WHEN :PRODUCT_ID = 0 THEN PRODUCT_ID=PRODUCT_ID ELSE PRODUCT_ID IN (:PRODUCT_IDS) END "
-			+ "and ISACTIVE='Y'", nativeQuery = true)
+	@Query(value = "select * from TBLPRODUCTAPPLICATION "
+			+ "where PRODUCTAPPLICATION_ID in (:ids) "
+			+ "", nativeQuery = true)
+	public List<ProductApplication> findByIDs(@Param("ids") List<Integer> ids);
 
+	@Query(value = "select * from TBLPRODUCTAPPLICATION "
+			+ "where PRODUCTAPPLICATION_ID not in (:ids) "
+			+ "", nativeQuery = true)
+	public List<ProductApplication> findByNotInIDs(@Param("ids") List<Integer> ids);
+
+	@Query(value = "select * from TBLPRODUCTAPPLICATION  "
+			+ "where MODIFIED_WORKSTATION like ?1 and ISACTIVE='Y'", nativeQuery = true)
+	public List<ProductApplication> findBySearch(String search);
+
+	@Query(value = "select * from TBLPRODUCTAPPLICATION  "
+			+ "where MODIFIED_WORKSTATION like ?1", nativeQuery = true)
 	public List<ProductApplication> findAllBySearch(String search);
 
 	@Query(value = "select * from TBLPRODUCTAPPLICATION "
@@ -37,15 +48,6 @@ public interface productApplicationRepository extends JpaRepository<ProductAppli
 			@Param("APPLICATION_ID") Long APPLICATION_ID, @Param("APPLICATION_IDS") List<Integer> APPLICATION_IDS,    
 			@Param("PRODUCT_ID") Long PRODUCT_ID, @Param("PRODUCT_IDS") List<Integer> PRODUCT_IDS);  
 
-	@Query(value = "select * from TBLPRODUCTAPPLICATION "
-			+ "where PRODUCTAPPLICATION_ID in (:ids) "
-			+ "", nativeQuery = true)
-	public List<ProductApplication> findByIDs(@Param("ids") List<Integer> ids);
-
-	@Query(value = "select * from TBLPRODUCTAPPLICATION "
-			+ "where PRODUCTAPPLICATION_ID not in (:ids) "
-			+ "", nativeQuery = true)
-	public List<ProductApplication> findByNotInIDs(@Param("ids") List<Integer> ids);
 
 }
 
