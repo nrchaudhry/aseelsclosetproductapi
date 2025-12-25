@@ -47,7 +47,7 @@ public class productController {
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<Product> products = productrepository.findActive();
-		
+
 		return new ResponseEntity(getAPIResponse(products, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
@@ -73,10 +73,10 @@ public class productController {
 
 		for (int i=0; i<jsonProducts.length(); i++) {
 			jsonProducts.getJSONObject(i).put("unitprice", jsonProducts.getJSONObject(i).getDouble("purchase_PRICE"));
-            JSONObject taxcode = new JSONObject(jsonProducts.getJSONObject(i).getString("taxcode_DETAIL"));
-            jsonProducts.getJSONObject(i).put("taxcode_ID", taxcode.getLong("taxcode_ID"));
-            jsonProducts.getJSONObject(i).put("taxcode", taxcode.getString("taxcode_TITLE"));
-            jsonProducts.getJSONObject(i).put("vat", taxcode.getLong("taxcode_PERCENTAGE"));
+			JSONObject taxcode = new JSONObject(jsonProducts.getJSONObject(i).getString("taxcode_DETAIL"));
+			jsonProducts.getJSONObject(i).put("taxcode_ID", taxcode.getLong("taxcode_ID"));
+			jsonProducts.getJSONObject(i).put("taxcode", taxcode.getString("taxcode_TITLE"));
+			jsonProducts.getJSONObject(i).put("vat", taxcode.getLong("taxcode_PERCENTAGE"));
 			for (int j=0; j<productattributevalues.length(); j++) {
 				JSONObject productattributevalue = productattributevalues.getJSONObject(j);
 				JSONObject productattribute = new JSONObject(productattributevalue.getString("productattribute_DETAIL"));
@@ -270,8 +270,8 @@ public class productController {
 			}
 
 			if (productid == 0) {
-//				if (!jsonObj.has("product_CODE") || jsonObj.isNull("product_CODE"))
-//					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_CODE is missing", apiRequest, true), HttpStatus.OK);
+				//				if (!jsonObj.has("product_CODE") || jsonObj.isNull("product_CODE"))
+				//					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_CODE is missing", apiRequest, true), HttpStatus.OK);
 
 				if (!jsonObj.has("product_NAME") || jsonObj.isNull("product_NAME"))
 					return new ResponseEntity(getAPIResponse(null, null , null, null, "product_NAME is missing", apiRequest, true), HttpStatus.OK);
@@ -280,26 +280,26 @@ public class productController {
 					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategory_ID is missing", apiRequest, true), HttpStatus.OK);
 
 				String new_code = null;
-	    	    String productcategory_CODE = productrepository.GenerateNewCode(jsonObj.getLong("productcategory_ID"));
-	    	    if (productcategory_CODE == null) {
+				String productcategory_CODE = productrepository.GenerateNewCode(jsonObj.getLong("productcategory_ID"));
+				if (productcategory_CODE == null) {
 					JSONObject productcategory = new JSONObject(ServiceCall.GET("productcategory/"+jsonObj.getLong("productcategory_ID"), apiRequest.getString("access_TOKEN"), false));
-	    	    	new_code = productcategory.getString("productcategory_CODE") + "001";
-    	    	} else {
-		     		String codeDigits = productcategory_CODE.substring(productcategory_CODE.length() - 3);
-		     		int z=Integer.parseInt(codeDigits) + 1;
-		     		String codeProductCategory = productcategory_CODE.substring(0,productcategory_CODE.length() - 3);
-		         	
-		     		codeDigits = "000" + String.valueOf(z);
-		     		new_code = codeProductCategory + codeDigits.substring(codeDigits.length() - 3);
-		     	}
-	     		
-	    	    product.setPRODUCT_CODE(new_code);
+					new_code = productcategory.getString("productcategory_CODE") + "001";
+				} else {
+					String codeDigits = productcategory_CODE.substring(productcategory_CODE.length() - 3);
+					int z=Integer.parseInt(codeDigits) + 1;
+					String codeProductCategory = productcategory_CODE.substring(0,productcategory_CODE.length() - 3);
+
+					codeDigits = "000" + String.valueOf(z);
+					new_code = codeProductCategory + codeDigits.substring(codeDigits.length() - 3);
+				}
+
+				product.setPRODUCT_CODE(new_code);
 			}
 
 			if (jsonObj.has("productcategory_ID") && !jsonObj.isNull("productcategory_ID")) {
-//				JSONObject productcategory = new JSONObject(ServiceCall.GET("productcategory/"+jsonObj.getLong("productcategory_ID"), apiRequest.getString("access_TOKEN"), false));
-//				if (productcategory == null) 
-//					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategory_ID doesn't exist!", apiRequest, true), HttpStatus.OK);
+				//				JSONObject productcategory = new JSONObject(ServiceCall.GET("productcategory/"+jsonObj.getLong("productcategory_ID"), apiRequest.getString("access_TOKEN"), false));
+				//				if (productcategory == null) 
+				//					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategory_ID doesn't exist!", apiRequest, true), HttpStatus.OK);
 				product.setPRODUCTCATEGORY_ID(jsonObj.getLong("productcategory_ID"));
 			}
 
@@ -495,7 +495,7 @@ public class productController {
 				taxcode_IDS.add((int) searchObject.getJSONObject(i).getLong("taxcode_ID"));
 			}
 		}
-		
+
 		if (jsonObj.has("saleledgeraccount_ID") && !jsonObj.isNull("saleledgeraccount_ID") && jsonObj.getLong("saleledgeraccount_ID") != 0) {
 			saleledgeraccount_ID = jsonObj.getLong("saleledgeraccount_ID");
 			saleledgeraccount_IDS.add((int) saleledgeraccount_ID);
@@ -533,128 +533,24 @@ public class productController {
 					? productrepository.findByAdvancedSearch(productcategory_ID, productcategory_IDS,taxcode_ID,taxcode_IDS, saleledgeraccount_ID, saleledgeraccount_IDS)
 							: productrepository.findAllByAdvancedSearch(productcategory_ID, productcategory_IDS,taxcode_ID,taxcode_IDS, saleledgeraccount_ID, saleledgeraccount_IDS, purchaseledgeraccount_ID, purchaseledgeraccount_IDS));
 		}
-		return new ResponseEntity(getAPIResponse(products, null , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(products, null, null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 	}
 
-	String getAPIResponse(List<Product> products, Product product , JSONArray jsonProducts, JSONObject jsonProduct, String message, JSONObject apiRequest, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
+	String getAPIResponse(List<Product> products, Product product, JSONArray jsonProducts, JSONObject jsonProduct, String message, JSONObject apiRequest, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
 		ObjectMapper mapper = new ObjectMapper();
 		String rtnAPIResponse="Invalid Resonse";
 
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "Product", message).toString();
 		} else {
-				if (product != null && isWithDetail == true) {
+			if (isWithDetail == true) {
+				if (product != null)
+					products.add(product);
 
-					CompletableFuture<JSONObject> productcategoryFuture = CompletableFuture.supplyAsync(() -> {
-						if (product.getPRODUCTCATEGORY_ID() == null) {
-							return new JSONObject();
-						}
-
-						try {
-							return new JSONObject(ServiceCall.GET("product/"+product.getPRODUCTCATEGORY_ID(), apiRequest.getString("access_TOKEN"), true));
-						} catch (JSONException | JsonProcessingException | ParseException e) {
-							e.printStackTrace();
-							return new JSONObject();
-						}
-					});
-
-					CompletableFuture<JSONObject> taxcodeFuture = CompletableFuture.supplyAsync(() -> {
-						if (product.getTAXCODE_ID() == null) {
-							return new JSONObject();
-						}
-
-						try {
-							return new JSONObject(ServiceCall.GET("product/"+product.getPRODUCT_ID(), apiRequest.getString("access_TOKEN"), true));
-						} catch (JSONException | JsonProcessingException | ParseException e) {
-							e.printStackTrace();
-							return new JSONObject();
-						}
-					});
-
-					CompletableFuture<JSONObject> saleledgeraccountFuture = CompletableFuture.supplyAsync(() -> {
-						if (product.getSALELEDGERACCOUNT_ID() == null) {
-							return new JSONObject();
-						}
-
-						try {
-							return new JSONObject(ServiceCall.GET("product/"+product.getSALELEDGERACCOUNT_ID(), apiRequest.getString("access_TOKEN"), true));
-						} catch (JSONException | JsonProcessingException | ParseException e) {
-							e.printStackTrace();
-							return new JSONObject();
-						}
-					});
-
-					CompletableFuture<JSONObject> purchaseledgeraccountFuture = CompletableFuture.supplyAsync(() -> {
-						if (product.getPURCHASELEDGERACCOUNT_ID() == null) {
-							return new JSONObject();
-						}
-
-						try {
-							return new JSONObject(ServiceCall.GET("product/"+product.getPURCHASELEDGERACCOUNT_ID(), apiRequest.getString("access_TOKEN"), true));
-						} catch (JSONException | JsonProcessingException | ParseException e) {
-							e.printStackTrace();
-							return new JSONObject();
-						}
-					});
-
-					// Wait until all futures complete
-					CompletableFuture<Void> allDone =
-							CompletableFuture.allOf(productcategoryFuture, taxcodeFuture,saleledgeraccountFuture,purchaseledgeraccountFuture);
-
-					// Block until all are done
-					allDone.join();
-
-					product.setPRODUCTCATEGORY_DETAIL(productcategoryFuture.toString());
-					product.setTAXCODE_DETAIL(taxcodeFuture.toString());
-					product.setSALELEDGERACCOUNT_DETAIL(saleledgeraccountFuture.toString());
-					product.setPURCHASELEDGERACCOUNT_DETAIL(purchaseledgeraccountFuture.toString());
-
-					rtnAPIResponse = mapper.writeValueAsString(product);
-					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-				} 
-			if (product != null && isWithDetail == true) {
-				List<Integer> ledgeraccountList = new ArrayList<Integer>();
-
-				if (product.getPRODUCTCATEGORY_ID() != null) {
-					JSONObject productcategory = new JSONObject(ServiceCall.GET("productcategory/"+product.getPRODUCTCATEGORY_ID(), apiRequest.getString("access_TOKEN"), false));
-					product.setPRODUCTCATEGORY_DETAIL(productcategory.toString());
-				}
-
-				if (product.getTAXCODE_ID() != null) {
-					JSONObject taxcode = new JSONObject(ServiceCall.GET("taxcode/"+product.getTAXCODE_ID(), apiRequest.getString("access_TOKEN"), false));
-					product.setTAXCODE_DETAIL(taxcode.toString());
-				}
-
-				if (product.getSALELEDGERACCOUNT_ID() != null) {
-					ledgeraccountList.add(Integer.parseInt(product.getSALELEDGERACCOUNT_ID().toString()));
-				}
-
-				if (product.getPURCHASELEDGERACCOUNT_ID() != null) {
-					ledgeraccountList.add(Integer.parseInt(product.getPURCHASELEDGERACCOUNT_ID().toString()));
-				}
-
-				JSONArray ledgeraccountObject = new JSONArray(ServiceCall.POST("ledgeraccount/ids", "{ledgeraccounts: "+ledgeraccountList+"}", apiRequest.getString("access_TOKEN"), false));
-				for (int j=0; j<ledgeraccountObject.length(); j++) {
-					JSONObject ledgeraccount = ledgeraccountObject.getJSONObject(j);
-
-					if (product.getSALELEDGERACCOUNT_ID() != null && product.getSALELEDGERACCOUNT_ID() == ledgeraccount.getLong("ledgeraccount_ID")) {
-						product.setSALELEDGERACCOUNT_DETAIL(ledgeraccount.toString());
-					}
-
-					if (product.getPURCHASELEDGERACCOUNT_ID() != null && product.getPURCHASELEDGERACCOUNT_ID() == ledgeraccount.getLong("ledgeraccount_ID")) {
-						product.setPURCHASELEDGERACCOUNT_DETAIL(ledgeraccount.toString());
-					}
-				}
-
-				rtnAPIResponse = mapper.writeValueAsString(product);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (products != null && isWithDetail == true) {
 				if (products.size()>0) {
 					List<Integer> productcategoryList = new ArrayList<Integer>();
 					List<Integer> taxcodeList = new ArrayList<Integer>();
-				List<Integer> ledgeraccountList = new ArrayList<Integer>();
+					List<Integer> ledgeraccountList = new ArrayList<Integer>();
 
 					for (int i=0; i<products.size(); i++) {
 						if (products.get(i).getPRODUCTCATEGORY_ID() != null) {
@@ -668,15 +564,61 @@ public class productController {
 						if (products.get(i).getSALELEDGERACCOUNT_ID() != null) {
 							ledgeraccountList.add(Integer.parseInt(products.get(i).getSALELEDGERACCOUNT_ID().toString()));
 						}
-		
+
 						if (products.get(i).getPURCHASELEDGERACCOUNT_ID() != null) {
 							ledgeraccountList.add(Integer.parseInt(products.get(i).getPURCHASELEDGERACCOUNT_ID().toString()));
 						}
 					}
 
-					JSONArray productcategoryObject = new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getString("access_TOKEN"), false));
-					JSONArray taxcodeObject = new JSONArray(ServiceCall.POST("taxcode/ids", "{taxcodes: "+taxcodeList+"}", apiRequest.getString("access_TOKEN"), false));
-					JSONArray ledgeraccountObject = new JSONArray(ServiceCall.POST("ledgeraccount/ids", "{ledgeraccounts: "+ledgeraccountList+"}", apiRequest.getString("access_TOKEN"), false));
+					CompletableFuture<JSONArray> productcategoryFuture = CompletableFuture.supplyAsync(() -> {
+						if (productcategoryList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					CompletableFuture<JSONArray> taxcodeFuture = CompletableFuture.supplyAsync(() -> {
+						if (taxcodeList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("taxcode/ids", "{taxcodes: "+taxcodeList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					CompletableFuture<JSONArray>ledgeraccountFuture = CompletableFuture.supplyAsync(() -> {
+						if (ledgeraccountList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("ledgeraccount/ids", "{ledgeraccounts: "+ledgeraccountList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(productcategoryFuture, taxcodeFuture, ledgeraccountFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray productcategoryObject = new JSONArray(productcategoryFuture.toString());
+					JSONArray taxcodeObject = new JSONArray(taxcodeFuture.toString());
+					JSONArray ledgeraccountObject = new JSONArray(ledgeraccountFuture.toString());
 
 					for (int i=0; i<products.size(); i++) {
 						for (int j=0; j<productcategoryObject.length(); j++) {
@@ -693,19 +635,22 @@ public class productController {
 						}
 						for (int j=0; j<ledgeraccountObject.length(); j++) {
 							JSONObject ledgeraccount = ledgeraccountObject.getJSONObject(j);
-		
+
 							if (products.get(i).getSALELEDGERACCOUNT_ID() != null && products.get(i).getSALELEDGERACCOUNT_ID() == ledgeraccount.getLong("ledgeraccount_ID")) {
 								products.get(i).setSALELEDGERACCOUNT_DETAIL(ledgeraccount.toString());
 							}
-		
+
 							if (products.get(i).getPURCHASELEDGERACCOUNT_ID() != null && products.get(i).getPURCHASELEDGERACCOUNT_ID() == ledgeraccount.getLong("ledgeraccount_ID")) {
 								products.get(i).setPURCHASELEDGERACCOUNT_DETAIL(ledgeraccount.toString());
 							}
 						}
 					}
 				}
-				
-				rtnAPIResponse = mapper.writeValueAsString(products);
+
+				if (product != null)
+					rtnAPIResponse = mapper.writeValueAsString(products.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(products);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (product != null && isWithDetail == false) {

@@ -94,9 +94,7 @@ public class productItemStockAdjustmentController {
 
 		List<ProductItemStockAdjustment> ProductItemStockAdjustments = new ArrayList<ProductItemStockAdjustment>();   
 		if (jsonProductItemStockAdjustments.length()>0)
-
 			ProductItemStockAdjustments = productitemstockadjustmentrepository.findByIDs(ProductItemStockAdjustment_IDS);
-
 
 		return new ResponseEntity(getAPIResponse(ProductItemStockAdjustments, null, null, null, null, apiRequest, true).toString(), HttpStatus.OK);
 	}
@@ -220,12 +218,9 @@ public class productItemStockAdjustmentController {
 		ProductItemStockAdjustment.put("ProductItemStockAdjustment_ID", id);
 		ProductItemStockAdjustment.put("isactive", "N");
 
-
 		return insertupdateAll(null, ProductItemStockAdjustment, apiRequest);
 	}
 
-	// Calls a common method BySearch()
-	// true means → fetch only active records
 	@SuppressWarnings({ "rawtypes" })
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	public ResponseEntity getBySearch(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
@@ -233,8 +228,6 @@ public class productItemStockAdjustmentController {
 		return BySearch(data, true, headToken, LimitGrant);
 	}
 
-	// Calls same logic as /search
-	// false means: (active + inactive records )
 	@SuppressWarnings({ "rawtypes" })
 	@RequestMapping(value = "/search/all", method = RequestMethod.POST)
 	public ResponseEntity getAllBySearch(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
@@ -249,11 +242,7 @@ public class productItemStockAdjustmentController {
 
 		JSONObject jsonObj = new JSONObject(data);
 
-		// If active == true  ,  Calls findBySearch() → active records only
-		// Else  ,   Calls findAllBySearch() → all records
-
 		List<ProductItemStockAdjustment> ProductItemStockAdjustments = ((active == true)
-
 				? productitemstockadjustmentrepository.findBySearch("%" + jsonObj.getString("search") + "%")
 						: productitemstockadjustmentrepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 
@@ -289,18 +278,18 @@ public class productItemStockAdjustmentController {
 
 		long productitem_ID=0;
 		List<Integer> productitem_IDS = new ArrayList<Integer>(); 
-		
+
 		productitem_IDS.add((int) 0);
 
 		if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID") && jsonObj.getLong("productitem_ID") != 0) {
 			productitem_ID = jsonObj.getLong("productitem_ID");
 			productitem_IDS.add((int) productitem_ID);
 
-		}  else if (jsonObj.has("product") && !jsonObj.isNull("product") && jsonObj.getLong("product") != 0) {
+		} else if (jsonObj.has("productitem") && !jsonObj.isNull("productitem") && jsonObj.getLong("productitem") != 0) {
 			if (active == true) {
-				searchObject = new JSONArray(ServiceCall.POST("product/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, true));
+				searchObject = new JSONArray(ServiceCall.POST("productitem/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, true));
 			} else {
-				searchObject = new JSONArray(ServiceCall.POST("product/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, true));
+				searchObject = new JSONArray(ServiceCall.POST("productitem/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, true));
 			}
 
 			productitem_ID = searchObject.length();
@@ -308,12 +297,13 @@ public class productItemStockAdjustmentController {
 				productitem_IDS.add((int) searchObject.getJSONObject(i).getLong("promotion_ID"));
 			}
 		}
-		
+
 		if (productitem_ID != 0) {
 			ProductItemStockAdjustments = ((active == true)
 					? productitemstockadjustmentrepository.findByAdvancedSearch(productitem_ID, productitem_IDS)
 							: productitemstockadjustmentrepository.findAllByAdvancedSearch(productitem_ID, productitem_IDS));
 		}
+		
 		return new ResponseEntity(getAPIResponse(ProductItemStockAdjustments, null, null, null, null, apiRequest, isWithDetail).toString(), HttpStatus.OK);
 	}
 
@@ -326,61 +316,86 @@ public class productItemStockAdjustmentController {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductItemStockAdjustment", message).toString();
 		} else  {
 			if (productitemstockadjustment != null && isWithDetail == true) {
+				if (isWithDetail == true) {
+					if (productitemstockadjustment != null)
+						productitemstockadjustments.add(productitemstockadjustment);
 
-				CompletableFuture<JSONObject> productitemFuture = CompletableFuture.supplyAsync(() -> {
-					if (productitemstockadjustment.getPRODUCTITEM_ID() == null) {
-						return new JSONObject();
+					if (productitemstockadjustments.size()>0) {
+						List<Integer> productitemList = new ArrayList<Integer>();
+
+						for (int i=0; i<productitemstockadjustments.size(); i++) {
+							if (productitemstockadjustments.get(i).getPRODUCTITEM_ID() != null) {
+								productitemList.add(Integer.parseInt(productitemstockadjustments.get(i).getPRODUCTITEM_ID().toString()));
+							}
+						}
+
+						CompletableFuture<JSONObject> productitemFuture = CompletableFuture.supplyAsync(() -> {
+							if (productitemstockadjustment.getPRODUCTITEM_ID() == null) {
+								return new JSONObject();
+							}
+
+							try {
+								return new JSONObject(ServiceCall.GET("productitem/"+productitemstockadjustment.getPRODUCTITEM_ID(), apiRequest.getString("access_TOKEN"), true));
+							} catch (JSONException | JsonProcessingException | ParseException e) {
+								e.printStackTrace();
+								return new JSONObject();
+							}
+						});
+
+						// Wait until all futures complete
+						CompletableFuture<Void> allDone =
+								CompletableFuture.allOf(productitemFuture);
+
+						// Block until all are done
+						allDone.join();
+
+						productitemstockadjustment.setPRODUCTITEM_DETAIL(productitemFuture.get().toString());
+
+
+						JSONObject personObject = productitemFuture.get();
+
+						for (int  i=0; i<productitemstockadjustments.size(); i++) {
+							for (int j=0; j<personObject.length(); j++) {
+								JSONObject person = personObject.getJSONObject(j);
+								if (productitemstockadjustments.get(i).getPRODUCTITEM_ID() != null && productitemstockadjustments.get(i).getPRODUCTITEM_ID() == person.getLong("person_ID") ) {
+									productitemstockadjustments.get(i).setPRODUCTITEM_DETAIL(person.toString());
+								}
+							}
+
+
+							if (productitemstockadjustments != null && isWithDetail == true) {
+								if (productitemstockadjustments.size()>0) {
+								}
+
+								rtnAPIResponse = mapper.writeValueAsString(productitemstockadjustments);
+								apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+							} else if (productitemstockadjustment != null && isWithDetail == false) {
+								rtnAPIResponse = mapper.writeValueAsString(productitemstockadjustment);
+								apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+							} else if (productitemstockadjustments != null && isWithDetail == false) {
+								rtnAPIResponse = mapper.writeValueAsString(productitemstockadjustments);
+								apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+							} else if (Jsonproductitemstockadjustments != null) {
+								rtnAPIResponse = Jsonproductitemstockadjustments.toString();
+								apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+							} else if (Jsonproductitemstockadjustment != null) {
+								rtnAPIResponse = mapper.writeValueAsString(Jsonproductitemstockadjustment.toString());
+								apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+							}
+
+							return rtnAPIResponse;
+						}
 					}
-
-					try {
-						return new JSONObject(ServiceCall.GET("promotion/"+productitemstockadjustment.getPRODUCTITEM_ID(), apiRequest.getString("access_TOKEN"), true));
-					} catch (JSONException | JsonProcessingException | ParseException e) {
-						e.printStackTrace();
-						return new JSONObject();
-					}
-				});
-
-				// Wait until all futures complete
-				CompletableFuture<Void> allDone =
-						CompletableFuture.allOf(productitemFuture);
-
-				// Block until all are done
-				allDone.join();
-
-				productitemstockadjustment.setPRODUCTITEM_DETAIL(productitemFuture.get().toString());
-				
-
-				rtnAPIResponse = mapper.writeValueAsString(productitemstockadjustment);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			}  if (productitemstockadjustments != null && isWithDetail == true) {
-				if (productitemstockadjustments.size()>0) {
 				}
-
-				rtnAPIResponse = mapper.writeValueAsString(productitemstockadjustments);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (productitemstockadjustment != null && isWithDetail == false) {
-				rtnAPIResponse = mapper.writeValueAsString(productitemstockadjustment);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (productitemstockadjustments != null && isWithDetail == false) {
-				rtnAPIResponse = mapper.writeValueAsString(productitemstockadjustments);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (Jsonproductitemstockadjustments != null) {
-				rtnAPIResponse = Jsonproductitemstockadjustments.toString();
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (Jsonproductitemstockadjustment != null) {
-				rtnAPIResponse = mapper.writeValueAsString(Jsonproductitemstockadjustment.toString());
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
 		}
-
-		return rtnAPIResponse;
 	}
 }
+
 
 
 
