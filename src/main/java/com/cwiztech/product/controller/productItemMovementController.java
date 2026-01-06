@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.cwiztech.product.model.Product;
 import com.cwiztech.product.model.ProductItemMovement;
 import com.cwiztech.product.repository.productItemMovementRepository;
 import com.cwiztech.log.apiRequestLog;
@@ -366,50 +368,81 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductItemMovement", message).toString();
 		} else {
-			if (productitemmovement != null && isWithDetail == true) {
-				if (productitemmovement.getPRODUCT_ID() != null) {
-				JSONObject product = new JSONObject(ServiceCall.GET("product/"+productitemmovement.getPRODUCT_ID(), apiRequest.getString("access_TOKEN"), true));
-				productitemmovement.setPRODUCT_DETAIL(product.toString());
+			if ((productitemmovements != null || productitemmovement != null) && isWithDetail == true) {
+				if (productitemmovement != null) {
+					productitemmovements = new ArrayList<ProductItemMovement>();
+					productitemmovements.add(productitemmovement);
 				}
-				if (productitemmovement.getEMPLOYEE_ID() != null) {
-				JSONObject employee = new JSONObject(ServiceCall.GET("employee/"+productitemmovement.getEMPLOYEE_ID(), apiRequest.getString("access_TOKEN"), true));
-					productitemmovement.setEMPLOYEE_DETAIL(employee.toString());
-				}
-				rtnAPIResponse = mapper.writeValueAsString(productitemmovement);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-				
-			} else if (productitemmovements != null && isWithDetail == true) {
 				if (productitemmovements.size()>0) {
 					List<Integer> productList = new ArrayList<Integer>();
 					List<Integer> employeeList = new ArrayList<Integer>();
-					
+
 					for (int i=0; i<productitemmovements.size(); i++) {
-						if (productitemmovements.get(i).getPRODUCT_ID() != null) 
-						  productList.add(Integer.parseInt(productitemmovements.get(i).getPRODUCT_ID().toString()));
-						
-						if (productitemmovements.get(i).getEMPLOYEE_ID() != null) 
-						  employeeList.add(Integer.parseInt(productitemmovements.get(i).getEMPLOYEE_ID().toString()));
+						if (productitemmovements.get(i).getPRODUCT_ID() != null) {
+							productList.add(Integer.parseInt(productitemmovements.get(i).getPRODUCT_ID().toString()));
+						}
+
+						if (productitemmovements.get(i).getEMPLOYEE_ID() != null) {
+							employeeList.add(Integer.parseInt(productitemmovements.get(i).getEMPLOYEE_ID().toString()));
+						}
 					}
-					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), true));
-					JSONArray employeeObject = new JSONArray(ServiceCall.POST("employee/ids", "{employees: "+employeeList+"}", apiRequest.getString("access_TOKEN"), true));	
-					
+
+					CompletableFuture<JSONArray> productFuture = CompletableFuture.supplyAsync(() -> {
+						if (productList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					CompletableFuture<JSONArray> employeeFuture = CompletableFuture.supplyAsync(() -> {
+						if (employeeList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("employee/ids", "{employees: "+employeeList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(productFuture,employeeFuture );
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray productObject = new JSONArray(productFuture.toString());
+					JSONArray employeeObject = new JSONArray(employeeFuture.toString());
+
 					for (int i=0; i<productitemmovements.size(); i++) {
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
-							if (productitemmovements.get(i).getPRODUCT_ID() == product.getLong("product_ID") ) {
+							if (productitemmovements.get(i).getPRODUCT_ID() != null && productitemmovements.get(i).getPRODUCT_ID() == product.getLong("product_ID")) {
 								productitemmovements.get(i).setPRODUCT_DETAIL(product.toString());
 							}
 						}
 						for (int j=0; j<employeeObject.length(); j++) {
 							JSONObject employee = employeeObject.getJSONObject(j);
-							if (productitemmovements.get(i).getEMPLOYEE_ID() == employee.getLong("employee_ID") ) {
+							if (productitemmovements.get(i).getEMPLOYEE_ID() != null && productitemmovements.get(i).getEMPLOYEE_ID() == employee.getLong("EMPLOYEE_ID")) {
 								productitemmovements.get(i).setEMPLOYEE_DETAIL(employee.toString());
 							}
 						}
 					}
 				}
-				
-				rtnAPIResponse = mapper.writeValueAsString(productitemmovements);
+
+				if (productitemmovement != null)
+					rtnAPIResponse = mapper.writeValueAsString(productitemmovements.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(productitemmovements);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (productitemmovement != null && isWithDetail == false) {
@@ -419,18 +452,19 @@ private static final Logger log = LoggerFactory.getLogger(productItemMovementCon
 			} else if (productitemmovements != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(productitemmovements);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-				
-			} else if (jsonProductItemMovements != null ) {
+
+			} else if (jsonProductItemMovements != null) {
 				rtnAPIResponse = jsonProductItemMovements.toString();
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-			
+
 			} else if (jsonProductItemMovement != null) {
-				rtnAPIResponse = jsonProductItemMovement.toString();
+				rtnAPIResponse = jsonProductItemMovements.toString();
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
 		}
-		
+
 		return rtnAPIResponse;
 	}
-
 }
+
+		

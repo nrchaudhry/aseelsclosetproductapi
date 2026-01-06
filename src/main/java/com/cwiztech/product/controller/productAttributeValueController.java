@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -368,26 +369,11 @@ public class productAttributeValueController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductAttributeValue", message).toString();
 		} else {
-			if (productattributevalue != null && isWithDetail == true) {
-				if (productattributevalue.getPRODUCT_ID()==null) {
-					JSONObject product = new JSONObject(ServiceCall.GET("product/"+productattributevalue.getPRODUCT_ID(), apiRequest.getString("access_TOKEN"), false));
-					productattributevalue.setPRODUCT_DETAIL(product.toString());
+			if ((productattributevalues != null || productattributevalue != null) && isWithDetail == true) {
+				if (productattributevalue != null) {
+					productattributevalues = new ArrayList<ProductAttributeValue>();
+					productattributevalues.add(productattributevalue);
 				}
-
-				if (productattributevalue.getPRODUCTATTRIBUTE_ID() != null) {
-					JSONObject productattribute = new JSONObject(ServiceCall.GET("productattribute/"+productattributevalue.getPRODUCTATTRIBUTE_ID(), apiRequest.getString("access_TOKEN"), false));
-					productattributevalue.setPRODUCTATTRIBUTE_DETAIL(productattribute.toString());
-
-					if (productattributevalue.getATTRIBUTEVALUE_ID()==null) {
-						JSONObject attributevalue = new JSONObject(ServiceCall.GET("attributevalue/"+productattributevalue.getATTRIBUTEVALUE_ID(), apiRequest.getString("access_TOKEN"), false));
-						productattributevalue.setATTRIBUTEVALUE_DETAIL(attributevalue.toString());
-					}
-				}
-
-				rtnAPIResponse = mapper.writeValueAsString(productattributevalue);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (productattributevalues != null && isWithDetail == true) {
 				if (productattributevalues.size()>0) {
 					List<Integer> productList = new ArrayList<Integer>();
 					List<Integer> productattributeList = new ArrayList<Integer>();
@@ -397,47 +383,93 @@ public class productAttributeValueController {
 						if (productattributevalues.get(i).getPRODUCT_ID() != null) {
 							productList.add(Integer.parseInt(productattributevalues.get(i).getPRODUCT_ID().toString()));
 						}
-					}
 
-					for (int i=0; i<productattributevalues.size(); i++) {
 						if (productattributevalues.get(i).getPRODUCTATTRIBUTE_ID() != null) {
 							productattributeList.add(Integer.parseInt(productattributevalues.get(i).getPRODUCTATTRIBUTE_ID().toString()));
 						}
-					}
 
-					for (int i=0; i<productattributevalues.size(); i++) {
 						if (productattributevalues.get(i).getATTRIBUTEVALUE_ID() != null) {
 							attributevalueList.add(Integer.parseInt(productattributevalues.get(i).getATTRIBUTEVALUE_ID().toString()));
 						}
 					}
-					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), false));
-					JSONArray productattributeObject = new JSONArray(ServiceCall.POST("productattribute/ids", "{productattributes: "+productattributeList+"}", apiRequest.getString("access_TOKEN"), false));
-					JSONArray attributevalueObject = new JSONArray(ServiceCall.POST("attributevalue/ids", "{attributevalues: "+attributevalueList+"}", apiRequest.getString("access_TOKEN"), false));
+
+					CompletableFuture<JSONArray> productFuture = CompletableFuture.supplyAsync(() -> {
+						if (productList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					CompletableFuture<JSONArray> productattributeFuture = CompletableFuture.supplyAsync(() -> {
+						if (productattributeList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("productattribute/ids", "{productattributes: "+productattributeList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					CompletableFuture<JSONArray> attributevalueFuture = CompletableFuture.supplyAsync(() -> {
+						if (attributevalueList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("attributevalue/ids", "{attributevalues: "+attributevalueList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(productFuture, productattributeFuture, attributevalueFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray productObject = new JSONArray(productFuture.toString());
+					JSONArray productattributeObject = new JSONArray(productattributeFuture.toString());
+					JSONArray attributevalueObject = new JSONArray(attributevalueFuture.toString());
 
 					for (int i=0; i<productattributevalues.size(); i++) {
-
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
-							if (productattributevalues.get(i).getPRODUCT_ID() == product.getLong("product_ID")) {
+							if (productattributevalues.get(i).getPRODUCT_ID() != null && productattributevalues.get(i).getPRODUCT_ID() == product.getLong("PRODUCT_ID")) {
 								productattributevalues.get(i).setPRODUCT_DETAIL(product.toString());
 							}
 						}
-
 						for (int j=0; j<productattributeObject.length(); j++) {
 							JSONObject productattribute = productattributeObject.getJSONObject(j);
-							if (productattributevalues.get(i).getPRODUCTATTRIBUTE_ID() == productattribute.getLong("productattribute_ID")) {
+							if (productattributevalues.get(i).getPRODUCTATTRIBUTE_ID() != null && productattributevalues .get(i).getPRODUCTATTRIBUTE_ID() == productattribute.getLong("getPRODUCTATTRIBUTE_ID")) {
 								productattributevalues.get(i).setPRODUCTATTRIBUTE_DETAIL(productattribute.toString());
 							}
 						}
 						for (int j=0; j<attributevalueObject.length(); j++) {
-							JSONObject attributevalue = productattributeObject.getJSONObject(j);
-							if (productattributevalues.get(i).getATTRIBUTEVALUE_ID() == attributevalue.getLong("attributevalue_ID")) {
+							JSONObject attributevalue = attributevalueObject.getJSONObject(j);
+
+							if (productattributevalues.get(i).getATTRIBUTEVALUE_ID() != null && productattributevalues.get(i).getATTRIBUTEVALUE_ID() == attributevalue.getLong("ATTRIBUTEVALUE_ID")) {
 								productattributevalues.get(i).setATTRIBUTEVALUE_DETAIL(attributevalue.toString());
 							}
-						}                     
+						}
 					}
 				}
-				rtnAPIResponse = mapper.writeValueAsString(productattributevalues);
+
+				if (productattributevalue != null)
+					rtnAPIResponse = mapper.writeValueAsString(productattributevalues.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(productattributevalues);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (productattributevalue != null && isWithDetail == false) {
@@ -460,5 +492,4 @@ public class productAttributeValueController {
 
 		return rtnAPIResponse;
 	}
-
 }

@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cwiztech.product.model.Product;
 import com.cwiztech.product.model.ProductItemAttributeValue;
 import com.cwiztech.product.repository.productItemAttributeValueRepository;
 import com.cwiztech.log.apiRequestLog;
@@ -453,73 +455,117 @@ public class productItemAttributeValueController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductItemAttributeValue", message).toString();
 		} else {
-			if (productitemattributevalue != null && isWithDetail == true) {
-				JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productitemattributevalue.getPRODUCTITEM_ID(), apiRequest.getString("access_TOKEN"), false));
-				productitemattributevalue.setPRODUCTITEM_DETAIL(productitem.toString());
-				
-				JSONObject productattribute = new JSONObject(ServiceCall.GET("productattribute/"+productitemattributevalue.getPRODUCTATTRIBUTE_ID(), apiRequest.getString("access_TOKEN"), false));
-				productitemattributevalue.setPRODUCTATTRIBUTE_DETAIL(productattribute.toString());
-				
-//				if (productitemattributevalue.getPRODUCTATTRIBUTEVALUE_ID() != null) {
-//					JSONObject productattributevalue = new JSONObject(ServiceCall.GET("productattributevalue/"+productitemattributevalue.getPRODUCTATTRIBUTEVALUE_ID(), apiRequest.getREQUEST_OUTPUT()));
-//					productitemattributevalue.setPRODUCTATTRIBUTEVALUE_DETAIL(productattributevalue.toString());
-//				}
-				
-				rtnAPIResponse = mapper.writeValueAsString(productitemattributevalue);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (productitemattributevalues != null && isWithDetail == true) {
+			if ((productitemattributevalues != null || productitemattributevalue != null) && isWithDetail == true) {
+				if (productitemattributevalue != null) {
+					productitemattributevalues = new ArrayList<ProductItemAttributeValue>();
+					productitemattributevalues.add(productitemattributevalue);
+				}
 				if (productitemattributevalues.size()>0) {
 					List<Integer> productitemList = new ArrayList<Integer>();
-					List<Integer> productattributevalueList = new ArrayList<Integer>();
 					List<Integer> productattributeList = new ArrayList<Integer>();
-					for (int i=0; i<productitemattributevalues.size(); i++) {
-						if (productitemattributevalues.get(i).getPRODUCTATTRIBUTEVALUE_ID() != null)
-							productattributevalueList.add(Integer.parseInt(productitemattributevalues.get(i).getPRODUCTATTRIBUTEVALUE_ID().toString()));
-						if (productitemattributevalues.get(i).getPRODUCTITEM_ID() != null)			
-							productitemList.add(Integer.parseInt(productitemattributevalues.get(i).getPRODUCTITEM_ID().toString()));
-						if (productitemattributevalues.get(i).getPRODUCTATTRIBUTE_ID() != null)
-							productattributeList.add(Integer.parseInt(productitemattributevalues.get(i).getPRODUCTATTRIBUTE_ID().toString()));
+					List<Integer> productattributevalueList = new ArrayList<Integer>();
 
+					for (int i=0; i<productitemattributevalues.size(); i++) {
+						if (productitemattributevalues.get(i).getPRODUCTITEM_ID() != null) {
+							productitemList.add(Integer.parseInt(productitemattributevalues.get(i).getPRODUCTITEM_ID().toString()));
+						}
+
+						if (productitemattributevalues.get(i).getPRODUCTATTRIBUTE_ID() != null) {
+							productattributeList.add(Integer.parseInt(productitemattributevalues.get(i).getPRODUCTATTRIBUTE_ID().toString()));
+						}
+
+						if (productitemattributevalues.get(i).getPRODUCTATTRIBUTEVALUE_ID() != null) {
+							productattributevalueList.add(Integer.parseInt(productitemattributevalues.get(i).getPRODUCTATTRIBUTEVALUE_ID().toString()));
+						}
 					}
-					JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getString("access_TOKEN"), false));
-					JSONArray productattributeObject = new JSONArray(ServiceCall.POST("productattribute/ids", "{productattributes: "+productattributeList+"}", apiRequest.getString("access_TOKEN"), false));
-//					JSONArray productattributevalueObject = new JSONArray(ServiceCall.POST("productattributevalue/ids", "{productattributevalues: "+productattributevalueList+"}", apiRequest.getREQUEST_OUTPUT()));
-					
+
+					CompletableFuture<JSONArray> productitemFuture = CompletableFuture.supplyAsync(() -> {
+						if (productitemList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("productitem/ids", "{productitems: "+productitemList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					CompletableFuture<JSONArray> productattributeFuture = CompletableFuture.supplyAsync(() -> {
+						if (productattributeList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("productattribute/ids", "{productattributes: "+productattributeList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					CompletableFuture<JSONArray> productattributevalueFuture = CompletableFuture.supplyAsync(() -> {
+						if (productattributevalueList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("productattributevalue/ids", "{productattributevalues: "+productattributevalueList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(productitemFuture, productattributeFuture, productattributevalueFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray productitemObject = new JSONArray(productitemFuture.toString());
+					JSONArray productattributeObject = new JSONArray(productattributeFuture.toString());
+					JSONArray productattributevalueObject = new JSONArray(productattributevalueFuture.toString());
+
 					for (int i=0; i<productitemattributevalues.size(); i++) {
 						for (int j=0; j<productitemObject.length(); j++) {
 							JSONObject productitem = productitemObject.getJSONObject(j);
-							if (productitemattributevalues.get(i).getPRODUCTITEM_ID() == productitem.getLong("productitem_ID") ) {
+							if (productitemattributevalues.get(i).getPRODUCTITEM_ID() != null && productitemattributevalues.get(i).getPRODUCTITEM_ID() == productitem.getLong("getPRODUCTITEM_ID")) {
 								productitemattributevalues.get(i).setPRODUCTITEM_DETAIL(productitem.toString());
 							}
 						}
 						for (int j=0; j<productattributeObject.length(); j++) {
 							JSONObject productattribute = productattributeObject.getJSONObject(j);
-							if (productitemattributevalues.get(i).getPRODUCTATTRIBUTE_ID() == productattribute.getLong("productattribute_ID") ) {
+							if (productitemattributevalues.get(i).getPRODUCTATTRIBUTE_ID() != null && productitemattributevalues.get(i).getPRODUCTATTRIBUTE_ID() == productattribute.getLong("PRODUCTATTRIBUTE_ID")) {
 								productitemattributevalues.get(i).setPRODUCTATTRIBUTE_DETAIL(productattribute.toString());
 							}
 						}
-//						for (int j=0; j<productattributevalueObject.length(); j++) {
-//							JSONObject productattributevalue = productattributevalueObject.getJSONObject(j);
-//							if (productitemattributevalues.get(i).getPRODUCTATTRIBUTEVALUE_ID() == productattributevalue.getLong("productattributevalue_ID") ) {
-//								productitemattributevalues.get(i).setPRODUCTATTRIBUTEVALUE_DETAIL(productattributevalue.toString());
-//							}
-//						}
+						for (int j=0; j<productattributevalueObject.length(); j++) {
+							JSONObject productattributevalue = productattributevalueObject.getJSONObject(j);
+							if (productitemattributevalues.get(i).getPRODUCTATTRIBUTEVALUE_ID() != null && productitemattributevalues.get(i).getPRODUCTATTRIBUTEVALUE_ID() == productattributevalue.getLong("PRODUCTATTRIBUTEVALUE_ID")) {
+								productitemattributevalues.get(i).setPRODUCTATTRIBUTEVALUE_DETAIL(productattributevalue.toString());
+							}
+						}
 					}
 				}
-				
-				rtnAPIResponse = mapper.writeValueAsString(productitemattributevalues);
+
+				if (productitemattributevalue != null)
+					rtnAPIResponse = mapper.writeValueAsString(productitemattributevalues.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(productitemattributevalues);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (productitemattributevalue != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(productitemattributevalue);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-			
+
 			} else if (productitemattributevalues != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(productitemattributevalues);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-			}
-			else if (jsonProductItemAttributeValues != null) {
+
+			} else if (jsonProductItemAttributeValues != null) {
 				rtnAPIResponse = jsonProductItemAttributeValues.toString();
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
@@ -528,7 +574,7 @@ public class productItemAttributeValueController {
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
 		}
-		
+
 		return rtnAPIResponse;
 	}
 }

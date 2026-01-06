@@ -1,5 +1,7 @@
 package com.cwiztech.product.model;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -33,7 +35,7 @@ public class ProductItemPriceLevel {
 	private Long PRODUCTITEM_QUANTITY;
 	
 	@Column(name = "PRODUCTITEM_UNITPRICE")
-	private Double PRODUCTITEM_UNITPRICE;
+	private  BigDecimal PRODUCTITEM_UNITPRICE;
 	
 	@Column(name = "ISINCLUDEVAT")
 	private String ISINCLUDEVAT;
@@ -106,12 +108,12 @@ public class ProductItemPriceLevel {
 	public void setPRODUCTITEM_QUANTITY(Long pRODUCTITEM_QUANTITY) {
 		PRODUCTITEM_QUANTITY = pRODUCTITEM_QUANTITY;
 	}
-
-	public Double getPRODUCTITEM_UNITPRICE() {
+	
+	public BigDecimal getPRODUCTITEM_UNITPRICE() {
 		return PRODUCTITEM_UNITPRICE;
 	}
 
-	public void setPRODUCTITEM_UNITPRICE(Double pRODUCTITEM_UNITPRICE) {
+	public void setPRODUCTITEM_UNITPRICE(BigDecimal pRODUCTITEM_UNITPRICE) {
 		PRODUCTITEM_UNITPRICE = pRODUCTITEM_UNITPRICE;
 	}
 

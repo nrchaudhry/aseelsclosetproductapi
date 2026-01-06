@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -326,20 +327,11 @@ public class productApplicationController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductApplication", message).toString();
 		} else {
-			if (productapplication != null && isWithDetail == true) {
-				if (productapplication.getAPPLICATION_ID() != null) {
-					JSONObject application = new JSONObject(ServiceCall.GET("application/"+productapplication.getAPPLICATION_ID(), apiRequest.getString("access_TOKEN"), true));
-					productapplication.setAPPLICATION_DETAIL(application.toString());
+			if ((productapplications != null || productapplication != null) && isWithDetail == true) {
+				if (productapplication != null) {
+					productapplications = new ArrayList<ProductApplication>();
+					productapplications.add(productapplication);
 				}
-				if (productapplication.getPRODUCT_ID() != null) {
-					JSONObject product = new JSONObject(ServiceCall.GET("product/"+productapplication.getPRODUCT_ID(), apiRequest.getString("access_TOKEN"), false));
-					productapplication.setPRODUCT_DETAIL(product.toString());
-				}
-
-				rtnAPIResponse = mapper.writeValueAsString(productapplication);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (productapplications != null && isWithDetail == true) {
 				if (productapplications.size()>0) {
 					List<Integer> applicationList = new ArrayList<Integer>();
 					List<Integer> productList = new ArrayList<Integer>();
@@ -348,32 +340,86 @@ public class productApplicationController {
 						if (productapplications.get(i).getAPPLICATION_ID() != null) {
 							applicationList.add(Integer.parseInt(productapplications.get(i).getAPPLICATION_ID().toString()));
 						}
+
 						if (productapplications.get(i).getPRODUCT_ID() != null) {
 							productList.add(Integer.parseInt(productapplications.get(i).getPRODUCT_ID().toString()));
 						}
 					}
 
-					JSONArray applicationObject = new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getString("access_TOKEN"), true));
-					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), false));
+					CompletableFuture<JSONArray> applicationFuture = CompletableFuture.supplyAsync(() -> {
+						if (applicationList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					CompletableFuture<JSONArray> productFuture = CompletableFuture.supplyAsync(() -> {
+						if (productList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(applicationFuture,productFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray applicationObject = new JSONArray(applicationFuture.toString());
+					JSONArray productObject = new JSONArray(productFuture.toString());
 
 					for (int i=0; i<productapplications.size(); i++) {
 						for (int j=0; j<applicationObject.length(); j++) {
 							JSONObject application = applicationObject.getJSONObject(j);
-							if (productapplications.get(i).getAPPLICATION_ID() != null && productapplications.get(i).getAPPLICATION_ID() == application.getLong("application_ID")) {
+							if (productapplications.get(i).getAPPLICATION_ID() != null && productapplications.get(i).getAPPLICATION_ID() == application.getLong("getAPPLICATION_ID")) {
 								productapplications.get(i).setAPPLICATION_DETAIL(application.toString());
 							}
 						}
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
-							if (productapplications.get(i).getPRODUCT_ID() != null && productapplications.get(i).getPRODUCT_ID() == product.getLong("product_ID")) {
+							if (productapplications.get(i).getPRODUCT_ID() != null && productapplications.get(i).getPRODUCT_ID() == product.getLong("getPRODUCT_ID")) {
 								productapplications.get(i).setPRODUCT_DETAIL(product.toString());
 							}
 						}
-
 					}
-				}
+			   if (productapplication != null)
+					rtnAPIResponse = mapper.writeValueAsString(productapplications.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(productapplications);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+			} else if (productapplication != null && isWithDetail == false) {
+				rtnAPIResponse = mapper.writeValueAsString(productapplication);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+			} else if (productapplications != null && isWithDetail == false) {
+				rtnAPIResponse = mapper.writeValueAsString(productapplications);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+			} else if (jsonProductApplications != null) {
+				rtnAPIResponse = jsonProductApplications.toString();
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+			} else if (jsonProductApplications != null) {
+				rtnAPIResponse = jsonProductApplications.toString();
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
 		}
-		return rtnAPIResponse;
-	}
-}
+     }
+	return rtnAPIResponse;	
+   }
+}	

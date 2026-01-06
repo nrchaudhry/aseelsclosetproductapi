@@ -1,5 +1,37 @@
 package com.cwiztech.product.controller;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cwiztech.product.model.Product;
+import com.cwiztech.product.repository.productRepository;
+import com.cwiztech.log.apiRequestLog;
+import com.cwiztech.services.ServiceCall;
+import com.cwiztech.token.AccessToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -191,10 +223,10 @@ public class productItemPriceChangeController {
 			productitempricechange.setCURRENCY_ID((long) 91);
 
 		if (jsonObj.has("productitem_PURCHASEPRICE") && !jsonObj.isNull("productitem_PURCHASEPRICE"))
-			productitempricechange.setPRODUCTITEM_PURCHASEPRICE(jsonObj.getDouble("productitem_PURCHASEPRICE"));
+			productitempricechange.setPRODUCTITEM_PURCHASEPRICE(BigDecimal.valueOf(jsonObj.getDouble("productitem_PURCHASEPRICE")));
 
 		if (jsonObj.has("productitem_LASTPURCHASEPRICE") && !jsonObj.isNull("productitem_LASTPURCHASEPRICE"))
-			productitempricechange.setPRODUCTITEM_LASTPURCHASEPRICE(jsonObj.getDouble("productitem_LASTPURCHASEPRICE"));
+			productitempricechange.setPRODUCTITEM_LASTPURCHASEPRICE(BigDecimal.valueOf(jsonObj.getDouble("productitem_LASTPURCHASEPRICE")) );
 		
 		if (productitempricechangeid == 0)
 			productitempricechange.setISACTIVE("Y");
@@ -354,46 +386,81 @@ public class productItemPriceChangeController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductItemPriceChange", message).toString();
 		} else {
-			if (productitempricechange != null && isWithDetail == true) {
-				JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productitempricechange.getPRODUCTITEM_ID(), apiRequest.getString("access_TOKEN"), true));
-				productitempricechange.setPRODUCTITEM_DETAIL(productitem.toString());
-				
-				if (productitempricechange.getCURRENCY_ID() != null) {
-				JSONObject currency = new JSONObject(ServiceCall.GET("lookup/"+productitempricechange.getCURRENCY_ID(), apiRequest.getString("access_TOKEN"), true));
-				productitempricechange.setCURRENCY_DETAIL(currency.toString());
-			}
-				rtnAPIResponse = mapper.writeValueAsString(productitempricechange);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (productitempricechanges != null && isWithDetail == true) {
+			if ((productitempricechanges != null || productitempricechange != null) && isWithDetail == true) {
+				if (productitempricechange != null) {
+					productitempricechanges = new ArrayList<ProductItemPriceChange>();
+					productitempricechanges.add(productitempricechange);
+				}
 				if (productitempricechanges.size()>0) {
 					List<Integer> productitemList = new ArrayList<Integer>();
 					List<Integer> currencyList = new ArrayList<Integer>();
+
 					for (int i=0; i<productitempricechanges.size(); i++) {
-						if (productitempricechanges.get(i).getPRODUCTITEM_ID() != null)
-						   productitemList.add(Integer.parseInt(productitempricechanges.get(i).getPRODUCTITEM_ID().toString()));
-						if (productitempricechanges.get(i).getCURRENCY_ID() != null)
-						   currencyList.add(Integer.parseInt(productitempricechanges.get(i).getCURRENCY_ID().toString()));
+						if (productitempricechanges.get(i).getPRODUCTITEM_ID() != null) {
+							productitemList.add(Integer.parseInt(productitempricechanges.get(i).getPRODUCTITEM_ID().toString()));
+						}
+
+						if (productitempricechanges.get(i).getCURRENCY_ID() != null) {
+							currencyList.add(Integer.parseInt(productitempricechanges.get(i).getCURRENCY_ID().toString()));
+						}
 					}
-					JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getString("access_TOKEN"), true));
-					JSONArray currencyObject = new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+currencyList+"}", apiRequest.getString("access_TOKEN"), true));		
+
+					CompletableFuture<JSONArray> productitemFuture = CompletableFuture.supplyAsync(() -> {
+						if (productitemList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("productitem/ids", "{productitems: "+productitemList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					CompletableFuture<JSONArray> currencyFuture = CompletableFuture.supplyAsync(() -> {
+						if (currencyList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("currency/ids", "{currencies: "+currencyList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(productitemFuture, currencyFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray productitemObject = new JSONArray(productitemFuture.toString());
+					JSONArray currencyObject = new JSONArray(currencyFuture.toString());
+
 					for (int i=0; i<productitempricechanges.size(); i++) {
 						for (int j=0; j<productitemObject.length(); j++) {
 							JSONObject productitem = productitemObject.getJSONObject(j);
-							if (productitempricechanges.get(i).getPRODUCTITEM_ID() == productitem.getLong("productitem_ID") ) {
+							if (productitempricechanges.get(i).getPRODUCTITEM_ID() != null && productitempricechanges.get(i).getPRODUCTITEM_ID() == productitem.getLong("productitem_ID")) {
 								productitempricechanges.get(i).setPRODUCTITEM_DETAIL(productitem.toString());
 							}
 						}
 						for (int j=0; j<currencyObject.length(); j++) {
 							JSONObject currency = currencyObject.getJSONObject(j);
-							if (productitempricechanges.get(i).getCURRENCY_ID() != null && productitempricechanges.get(i).getCURRENCY_ID() == currency.getLong("id") ) {
+							if (productitempricechanges.get(i).getCURRENCY_ID() != null && productitempricechanges.get(i).getCURRENCY_ID() == currency.getLong("CURRENCY_ID")) {
 								productitempricechanges.get(i).setCURRENCY_DETAIL(currency.toString());
 							}
 						}
-					}
+                    }
 				}
-				
-				rtnAPIResponse = mapper.writeValueAsString(productitempricechanges);
+
+				if (productitempricechange != null)
+					rtnAPIResponse = mapper.writeValueAsString(productitempricechanges.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(productitempricechanges);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (productitempricechange != null && isWithDetail == false) {
@@ -407,13 +474,13 @@ public class productItemPriceChangeController {
 			} else if (jsonProductItemPriceChanges != null) {
 				rtnAPIResponse = jsonProductItemPriceChanges.toString();
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-			
+
 			} else if (jsonProductItemPriceChange != null) {
 				rtnAPIResponse = jsonProductItemPriceChange.toString();
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
 		}
-		
+
 		return rtnAPIResponse;
 	}
 }

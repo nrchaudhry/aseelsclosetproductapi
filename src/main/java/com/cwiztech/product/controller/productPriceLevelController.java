@@ -1,5 +1,37 @@
 package com.cwiztech.product.controller;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cwiztech.product.model.Product;
+import com.cwiztech.product.repository.productRepository;
+import com.cwiztech.log.apiRequestLog;
+import com.cwiztech.services.ServiceCall;
+import com.cwiztech.token.AccessToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -198,7 +230,7 @@ public class productPriceLevelController {
 				productpricelevel.setPRODUCT_QUANTITY(jsonObj.getLong("product_QUANTITY"));
 
 			if (jsonObj.has("product_UNITPRICE") && !jsonObj.isNull("product_UNITPRICE"))
-				productpricelevel.setPRODUCT_UNITPRICE(jsonObj.getDouble("product_UNITPRICE"));
+				productpricelevel.setPRODUCT_UNITPRICE(BigDecimal.valueOf(jsonObj.getDouble("product_UNITPRICE")));
 
 			if (productpricelevelid == 0)
 				productpricelevel.setISACTIVE("Y");

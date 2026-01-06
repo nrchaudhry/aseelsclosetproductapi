@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cwiztech.product.model.Product;
 import com.cwiztech.product.model.ProductItemApplication;
 import com.cwiztech.product.repository.productItemApplicationRepository;
 import com.cwiztech.log.apiRequestLog;
@@ -323,70 +325,103 @@ public class productItemApplicationController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductItemApplication", message).toString();
 		} else {
-			if (productitemapplication != null && isWithDetail == true) {
-				if (productitemapplication.getAPPLICATION_ID() != null) {
-					JSONObject application = new JSONObject(ServiceCall.GET("application/"+productitemapplication.getAPPLICATION_ID(), apiRequest.getString("access_TOKEN"), false));
-					productitemapplication.setAPPLICATION_DETAIL(application.toString());
-
+			if ((productitemapplications != null || productitemapplication != null) && isWithDetail == true) {
+				if (productitemapplication != null) {
+					productitemapplications = new ArrayList<ProductItemApplication>();
+					productitemapplications.add(productitemapplication);
 				}
-				if (productitemapplication.getPRODUCTITEM_ID() != null) {
-					JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productitemapplication.getPRODUCTITEM_ID(), apiRequest.getString("access_TOKEN"), false));
-					productitemapplication.setPRODUCTITEM_DETAIL(productitem.toString());
-
-					rtnAPIResponse = mapper.writeValueAsString(productitemapplication);
-					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-				} else if (productitemapplications != null && isWithDetail == true) {
-					if (productitemapplications.size()>0) {
-						List<Integer> productitemList = new ArrayList<Integer>();
-						List<Integer> applicationList = new ArrayList<Integer>();
-						for (int i=0; i<productitemapplications.size(); i++) {
-							if (productitemapplications.get(i).getPRODUCTITEM_ID() != null)
-								productitemList.add(Integer.parseInt(productitemapplications.get(i).getPRODUCTITEM_ID().toString()));
-							if (productitemapplications.get(i).getAPPLICATION_ID() != null)
-								productitemList.add(Integer.parseInt(productitemapplications.get(i).getAPPLICATION_ID().toString()));
+				if (productitemapplications.size()>0) {
+					List<Integer> applicationList = new ArrayList<Integer>();
+					List<Integer> productitemList = new ArrayList<Integer>();
+					
+					for (int i=0; i<productitemapplications.size(); i++) {
+						if (productitemapplications.get(i).getAPPLICATION_ID() != null) {
+							applicationList.add(Integer.parseInt(productitemapplications.get(i).getAPPLICATION_ID().toString()));
 						}
-						JSONArray logisticsObject = new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getString("access_TOKEN"), false));
-						JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getString("access_TOKEN"), false));
 
-						for (int i=0; i<productitemapplications.size(); i++) {
-							for (int j=0; j<logisticsObject.length(); j++) {
-								JSONObject application = logisticsObject.getJSONObject(j);
-								if (productitemapplications.get(i).getAPPLICATION_ID() == application.getLong("application_ID") ) {
-									productitemapplications.get(i).setAPPLICATION_DETAIL(application.toString());
-								}
-							}
-							for (int j=0; j<productitemObject.length(); j++) {
-								JSONObject productitem = productitemObject.getJSONObject(j);
-								if (productitemapplications.get(i).getPRODUCTITEM_ID() == productitem.getLong("productitem_ID") ) {
-									productitemapplications.get(i).setPRODUCTITEM_DETAIL(productitem.toString());
-								}
-							}
+						if (productitemapplications.get(i).getPRODUCTITEM_ID() != null) {
+							productitemList.add(Integer.parseInt(productitemapplications.get(i).getPRODUCTITEM_ID().toString()));
 						}
 					}
 
-					rtnAPIResponse = mapper.writeValueAsString(productitemapplications);
-					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+					CompletableFuture<JSONArray> applicationFuture = CompletableFuture.supplyAsync(() -> {
+						if (applicationList.size() <= 0) {
+							return new JSONArray();
+						}
 
-				} else if (productitemapplication != null && isWithDetail == true) {
-					rtnAPIResponse = mapper.writeValueAsString(productitemapplication);
-					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+						try {
+							return new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
 
-				} else if (productitemapplications != null && isWithDetail == true) {
-					rtnAPIResponse = mapper.writeValueAsString(productitemapplications);
-					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+					CompletableFuture<JSONArray> productitemFuture = CompletableFuture.supplyAsync(() -> {
+						if (productitemList.size() <= 0) {
+							return new JSONArray();
+						}
 
-				} else if (jsonProductItemApplications != null) {
-					rtnAPIResponse = jsonProductItemApplications.toString();
-					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+						try {
+							return new JSONArray(ServiceCall.POST("productitem/ids", "{productitems: "+productitemList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
 
-				} else if (jsonProductItemApplication != null) {
-					rtnAPIResponse = jsonProductItemApplication.toString();
-					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(applicationFuture, productitemFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray applicationObject = new JSONArray(applicationFuture.toString());
+					JSONArray productitemObject = new JSONArray(productitemFuture.toString());
+					
+					for (int i=0; i<productitemapplications.size(); i++) {
+						for (int j=0; j<applicationObject.length(); j++) {
+							JSONObject application = applicationObject.getJSONObject(j);
+							if (productitemapplications.get(i).getAPPLICATION_ID() != null && productitemapplications.get(i).getAPPLICATION_ID() == application.getLong("APPLICATION_ID")) {
+								productitemapplications.get(i).setAPPLICATION_DETAIL(application.toString());
+							}
+						}
+						for (int j=0; j<productitemObject.length(); j++) {
+							JSONObject productitem = productitemObject.getJSONObject(j);
+							if (productitemapplications.get(i).getPRODUCTITEM_ID() != null && productitemapplications.get(i).getPRODUCTITEM_ID() == productitem.getLong("PRODUCTITEM_ID")) {
+								productitemapplications.get(i).setPRODUCTITEM_DETAIL(productitem.toString());
+							}
+						}
+					}
 				}
+
+				if (productitemapplication != null)
+					rtnAPIResponse = mapper.writeValueAsString(productitemapplications.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(productitemapplications);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+			} else if (productitemapplication != null && isWithDetail == true) {
+				rtnAPIResponse = mapper.writeValueAsString(productitemapplication);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+			} else if (productitemapplications != null && isWithDetail == true) {
+				rtnAPIResponse = mapper.writeValueAsString(productitemapplications);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+			} else if (jsonProductItemApplications != null) {
+				rtnAPIResponse = jsonProductItemApplications.toString();
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+			} else if (jsonProductItemApplication != null) {
+				rtnAPIResponse = jsonProductItemApplication.toString();
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
 		}
+
 		return rtnAPIResponse;
 	}
-
 }
+
+

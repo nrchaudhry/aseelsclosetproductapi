@@ -1,5 +1,7 @@
 package com.cwiztech.product.model;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,7 +34,7 @@ public class ProductItemInventory {
 	private String PRODUCTLOCATION_DETAIL;
 	
 	@Column(name = "QUANTITY_ONHAND")
-	private Double QUANTITY_ONHAND ;
+	private BigDecimal QUANTITY_ONHAND ;
 	
 	
 	@Column(name = "QUANTITY_ONORDER")
@@ -43,7 +45,7 @@ public class ProductItemInventory {
 	
 
 	@Column(name = "QUANTITY_AVAILABLE")
-	private Double QUANTITY_AVAILABLE ;
+	private  BigDecimal QUANTITY_AVAILABLE ;
 	
 	@Column(name = "QUANTITY_BACKORDERED")
 	private Long QUANTITY_BACKORDERED ;
@@ -56,21 +58,21 @@ public class ProductItemInventory {
 	private Long QUANTITYEXTERNAL_INTRANSIT ;
 	
 	@JoinColumn(name = "QUANTITYBASEUNIT_ONHAND")
-	private Double QUANTITYBASEUNIT_ONHAND ;
+	private  BigDecimal QUANTITYBASEUNIT_ONHAND ;
 	
 	@Column(name = "QUANTITYBASEUNIT_AVAILABLE")
-	private Double QUANTITYBASEUNIT_AVAILABLE ;
+	private  BigDecimal QUANTITYBASEUNIT_AVAILABLE ;
 	
 	
 	@Column(name = "VALUE")
-	private Double VALUE ;
+	private  BigDecimal VALUE ;
 	
 	@Column(name = "AVERAGE_COST")
-	private Double AVERAGE_COST ;
+	private  BigDecimal AVERAGE_COST ;
 	
 
 	@Column(name = "LASTPURCHASE_PRICE")
-	private Double LASTPURCHASE_PRICE ;
+	private  BigDecimal LASTPURCHASE_PRICE ;
 	
 	@Column(name = "REORDER_POINT")
 	private Long REORDER_POINT ;
@@ -95,7 +97,7 @@ public class ProductItemInventory {
 	private Long ATPLEAD_TIME ;
 	
 	@Column(name = "DEFAULTRETURN_COST")
-	private Double DEFAULTRETURN_COST ;
+	private  BigDecimal DEFAULTRETURN_COST ;
 	
 	@Column(name = "LASTCOUNT_DATE")
 	private String LASTCOUNT_DATE ;
@@ -127,12 +129,29 @@ public class ProductItemInventory {
 	@Column(name = "MODIFIED_WORKSTATION")
 	private String MODIFIED_WORKSTATION;
 
+	
 	public long getPRODUCTITEMINVENTORY_ID() {
 		return PRODUCTITEMINVENTORY_ID;
 	}
 
 	public void setPRODUCTITEMINVENTORY_ID(long pRODUCTITEMINVENTORY_ID) {
 		PRODUCTITEMINVENTORY_ID = pRODUCTITEMINVENTORY_ID;
+	}
+
+	public Long getPRODUCTITEM_ID() {
+		return PRODUCTITEM_ID;
+	}
+
+	public void setPRODUCTITEM_ID(Long pRODUCTITEM_ID) {
+		PRODUCTITEM_ID = pRODUCTITEM_ID;
+	}
+
+	public String getPRODUCTITEM_DETAIL() {
+		return PRODUCTITEM_DETAIL;
+	}
+
+	public void setPRODUCTITEM_DETAIL(String pRODUCTITEM_DETAIL) {
+		PRODUCTITEM_DETAIL = pRODUCTITEM_DETAIL;
 	}
 
 	public Long getPRODUCTLOCATION_ID() {
@@ -151,11 +170,11 @@ public class ProductItemInventory {
 		PRODUCTLOCATION_DETAIL = pRODUCTLOCATION_DETAIL;
 	}
 
-	public Double getQUANTITY_ONHAND() {
+	public BigDecimal getQUANTITY_ONHAND() {
 		return QUANTITY_ONHAND;
 	}
 
-	public void setQUANTITY_ONHAND(Double qUANTITY_ONHAND) {
+	public void setQUANTITY_ONHAND(BigDecimal qUANTITY_ONHAND) {
 		QUANTITY_ONHAND = qUANTITY_ONHAND;
 	}
 
@@ -175,27 +194,11 @@ public class ProductItemInventory {
 		QUANTITY_COMMITTED = qUANTITY_COMMITTED;
 	}
 
-	public Long getPRODUCTITEM_ID() {
-		return PRODUCTITEM_ID;
-	}
-
-	public void setPRODUCTITEM_ID(Long pRODUCTITEM_ID) {
-		PRODUCTITEM_ID = pRODUCTITEM_ID;
-	}
-
-	public String getPRODUCTITEM_DETAIL() {
-		return PRODUCTITEM_DETAIL;
-	}
-
-	public void setPRODUCTITEM_DETAIL(String pRODUCTITEM_DETAIL) {
-		PRODUCTITEM_DETAIL = pRODUCTITEM_DETAIL;
-	}
-
-	public Double getQUANTITY_AVAILABLE() {
+	public BigDecimal getQUANTITY_AVAILABLE() {
 		return QUANTITY_AVAILABLE;
 	}
 
-	public void setQUANTITY_AVAILABLE(Double qUANTITY_AVAILABLE) {
+	public void setQUANTITY_AVAILABLE(BigDecimal qUANTITY_AVAILABLE) {
 		QUANTITY_AVAILABLE = qUANTITY_AVAILABLE;
 	}
 
@@ -223,43 +226,43 @@ public class ProductItemInventory {
 		QUANTITYEXTERNAL_INTRANSIT = qUANTITYEXTERNAL_INTRANSIT;
 	}
 
-	public Double getQUANTITYBASEUNIT_ONHAND() {
+	public BigDecimal getQUANTITYBASEUNIT_ONHAND() {
 		return QUANTITYBASEUNIT_ONHAND;
 	}
 
-	public void setQUANTITYBASEUNIT_ONHAND(Double qUANTITYBASEUNIT_ONHAND) {
+	public void setQUANTITYBASEUNIT_ONHAND(BigDecimal qUANTITYBASEUNIT_ONHAND) {
 		QUANTITYBASEUNIT_ONHAND = qUANTITYBASEUNIT_ONHAND;
 	}
 
-	public Double getQUANTITYBASEUNIT_AVAILABLE() {
+	public BigDecimal getQUANTITYBASEUNIT_AVAILABLE() {
 		return QUANTITYBASEUNIT_AVAILABLE;
 	}
 
-	public void setQUANTITYBASEUNIT_AVAILABLE(Double qUANTITYBASEUNIT_AVAILABLE) {
+	public void setQUANTITYBASEUNIT_AVAILABLE(BigDecimal qUANTITYBASEUNIT_AVAILABLE) {
 		QUANTITYBASEUNIT_AVAILABLE = qUANTITYBASEUNIT_AVAILABLE;
 	}
 
-	public Double getVALUE() {
+	public BigDecimal getVALUE() {
 		return VALUE;
 	}
 
-	public void setVALUE(Double vALUE) {
+	public void setVALUE(BigDecimal vALUE) {
 		VALUE = vALUE;
 	}
 
-	public Double getAVERAGE_COST() {
+	public BigDecimal getAVERAGE_COST() {
 		return AVERAGE_COST;
 	}
 
-	public void setAVERAGE_COST(Double aVERAGE_COST) {
+	public void setAVERAGE_COST(BigDecimal aVERAGE_COST) {
 		AVERAGE_COST = aVERAGE_COST;
 	}
 
-	public Double getLASTPURCHASE_PRICE() {
+	public BigDecimal getLASTPURCHASE_PRICE() {
 		return LASTPURCHASE_PRICE;
 	}
 
-	public void setLASTPURCHASE_PRICE(Double lASTPURCHASE_PRICE) {
+	public void setLASTPURCHASE_PRICE(BigDecimal lASTPURCHASE_PRICE) {
 		LASTPURCHASE_PRICE = lASTPURCHASE_PRICE;
 	}
 
@@ -319,11 +322,11 @@ public class ProductItemInventory {
 		ATPLEAD_TIME = aTPLEAD_TIME;
 	}
 
-	public Double getDEFAULTRETURN_COST() {
+	public BigDecimal getDEFAULTRETURN_COST() {
 		return DEFAULTRETURN_COST;
 	}
 
-	public void setDEFAULTRETURN_COST(Double dEFAULTRETURN_COST) {
+	public void setDEFAULTRETURN_COST(BigDecimal dEFAULTRETURN_COST) {
 		DEFAULTRETURN_COST = dEFAULTRETURN_COST;
 	}
 

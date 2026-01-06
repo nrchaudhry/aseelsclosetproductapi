@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cwiztech.product.model.Product;
 import com.cwiztech.product.model.ProductItemImage;
 import com.cwiztech.product.model.ProductItemPriceLevel;
 import com.cwiztech.product.repository.productItemImageRepository;
@@ -303,43 +305,67 @@ public class productItemImageController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductItemImage", message).toString();
 		} else {
-			if (productitemimage != null && isWithDetail == true) {
-				JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productitemimage.getPRODUCTITEM_ID(), apiRequest.getString("access_TOKEN"), false));
-				productitemimage.setPRODUCTITEM_DETAIL(productitem.toString());
-
-				rtnAPIResponse = mapper.writeValueAsString(productitemimage);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (productitemimages != null && isWithDetail == true) {
+			if ((productitemimages != null || productitemimage != null) && isWithDetail == true) {
+				if (productitemimage != null) {
+					productitemimages = new ArrayList<ProductItemImage>();
+					productitemimages.add(productitemimage);
+				}
 				if (productitemimages.size()>0) {
 					List<Integer> productitemList = new ArrayList<Integer>();
+
 					for (int i=0; i<productitemimages.size(); i++) {
-						productitemList.add(Integer.parseInt(productitemimages.get(i).getPRODUCTITEM_ID().toString()));
+						if (productitemimages.get(i).getPRODUCTITEM_ID() != null) {
+							productitemList.add(Integer.parseInt(productitemimages.get(i).getPRODUCTITEM_ID().toString()));
+						}
 					}
-					JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getString("access_TOKEN"), false));
-					
+
+					CompletableFuture<JSONArray> productitemFuture = CompletableFuture.supplyAsync(() -> {
+						if (productitemList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("productitem/ids", "{productitems: "+productitemList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(productitemFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray productitemObject = new JSONArray(productitemFuture.toString());
+		
 					for (int i=0; i<productitemimages.size(); i++) {
 						for (int j=0; j<productitemObject.length(); j++) {
 							JSONObject productitem = productitemObject.getJSONObject(j);
-							if (productitemimages.get(i).getPRODUCTITEM_ID() == productitem.getLong("productitem_ID") ) {
+							if (productitemimages.get(i).getPRODUCTITEM_ID() != null && productitemimages.get(i).getPRODUCTITEM_ID() == productitem.getLong("PRODUCTITEM_ID")) {
 								productitemimages.get(i).setPRODUCTITEM_DETAIL(productitem.toString());
 							}
 						}
 					}
 				}
 
-				rtnAPIResponse = mapper.writeValueAsString(productitemimages);
+				if (productitemimage != null)
+					rtnAPIResponse = mapper.writeValueAsString(productitemimages.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(productitemimages);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (productitemimage != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(productitemimage);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-			
+
 			} else if (productitemimages != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(productitemimages);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-			}
-			else if (jsonProductItemImages != null) {
+
+			} else if (jsonProductItemImages != null) {
 				rtnAPIResponse = jsonProductItemImages.toString();
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
@@ -348,7 +374,9 @@ public class productItemImageController {
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
 		}
-		
+
 		return rtnAPIResponse;
 	}
 }
+
+		

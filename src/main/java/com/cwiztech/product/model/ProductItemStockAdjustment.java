@@ -1,5 +1,7 @@
 package com.cwiztech.product.model;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,10 +27,10 @@ public class ProductItemStockAdjustment {
 	private String PRODUCTITEM_DETAIL;
 
 	@Column(name ="QUANTITY_ADJUST")
-	private Double QUANTITY_ADJUST;
+	private  BigDecimal QUANTITY_ADJUST;
 
 	@Column(name ="PURCHASE_PRICE")
-	private Double PURCHASE_PRICE;
+	private  BigDecimal PURCHASE_PRICE;
 
 	@Column(name ="ISACTIVE")
 	private String ISACTIVE;
@@ -69,19 +71,19 @@ public class ProductItemStockAdjustment {
 		PRODUCTITEM_DETAIL = pRODUCTITEM_DETAIL;
 	}
 
-	public Double getQUANTITY_ADJUST() {
+	public BigDecimal getQUANTITY_ADJUST() {
 		return QUANTITY_ADJUST;
 	}
 
-	public void setQUANTITY_ADJUST(Double qUANTITY_ADJUST) {
+	public void setQUANTITY_ADJUST(BigDecimal qUANTITY_ADJUST) {
 		QUANTITY_ADJUST = qUANTITY_ADJUST;
 	}
 
-	public Double getPURCHASE_PRICE() {
+	public BigDecimal getPURCHASE_PRICE() {
 		return PURCHASE_PRICE;
 	}
 
-	public void setPURCHASE_PRICE(Double pURCHASE_PRICE) {
+	public void setPURCHASE_PRICE(BigDecimal pURCHASE_PRICE) {
 		PURCHASE_PRICE = pURCHASE_PRICE;
 	}
 

@@ -1,5 +1,7 @@
 package com.cwiztech.product.model;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -66,10 +68,10 @@ public class Product {
 	private String PURCHASELEDGERACCOUNT_DETAIL;
 	
     @Column(name = "PURCHASE_PRICE")
-    private Double PURCHASE_PRICE;
+    private  BigDecimal PURCHASE_PRICE;
     
 	@Column(name = "PRODUCT_WEIGHT")
-	private Double PRODUCT_WEIGHT;
+	private  BigDecimal PRODUCT_WEIGHT;
 	
 	@Column(name = "ISACTIVE")
 	private String ISACTIVE;
@@ -118,14 +120,6 @@ public class Product {
 		SAGE_ID = sAGE_ID;
 	}
 
-	public String getPRODUCT_CODE() {
-		return PRODUCT_CODE;
-	}
-
-	public void setPRODUCT_CODE(String pRODUCT_CODE) {
-		PRODUCT_CODE = pRODUCT_CODE;
-	}
-
 	public Long getPRODUCTCATEGORY_ID() {
 		return PRODUCTCATEGORY_ID;
 	}
@@ -140,6 +134,14 @@ public class Product {
 
 	public void setPRODUCTCATEGORY_DETAIL(String pRODUCTCATEGORY_DETAIL) {
 		PRODUCTCATEGORY_DETAIL = pRODUCTCATEGORY_DETAIL;
+	}
+
+	public String getPRODUCT_CODE() {
+		return PRODUCT_CODE;
+	}
+
+	public void setPRODUCT_CODE(String pRODUCT_CODE) {
+		PRODUCT_CODE = pRODUCT_CODE;
 	}
 
 	public String getPRODUCT_NAME() {
@@ -167,14 +169,14 @@ public class Product {
 	}
 
 	public String getPRODUCTICON_URL() {
-        return PRODUCTICON_URL;
-    }
+		return PRODUCTICON_URL;
+	}
 
-    public void setPRODUCTICON_URL(String pRODUCTICON_URL) {
-        PRODUCTICON_URL = pRODUCTICON_URL;
-    }
+	public void setPRODUCTICON_URL(String pRODUCTICON_URL) {
+		PRODUCTICON_URL = pRODUCTICON_URL;
+	}
 
-    public Long getTAXCODE_ID() {
+	public Long getTAXCODE_ID() {
 		return TAXCODE_ID;
 	}
 
@@ -222,23 +224,23 @@ public class Product {
 		PURCHASELEDGERACCOUNT_DETAIL = pURCHASELEDGERACCOUNT_DETAIL;
 	}
 
-	public Double getPURCHASE_PRICE() {
+	public BigDecimal getPURCHASE_PRICE() {
 		return PURCHASE_PRICE;
 	}
 
-	public void setPURCHASE_PRICE(Double pURCHASE_PRICE) {
+	public void setPURCHASE_PRICE(BigDecimal pURCHASE_PRICE) {
 		PURCHASE_PRICE = pURCHASE_PRICE;
 	}
 
-	public Double getPRODUCT_WEIGHT() {
+	public BigDecimal getPRODUCT_WEIGHT() {
 		return PRODUCT_WEIGHT;
 	}
 
-	public void setPRODUCT_WEIGHT(Double pRODUCT_WEIGHT) {
+	public void setPRODUCT_WEIGHT(BigDecimal pRODUCT_WEIGHT) {
 		PRODUCT_WEIGHT = pRODUCT_WEIGHT;
 	}
 
-    public String getISACTIVE() {
+	public String getISACTIVE() {
 		return ISACTIVE;
 	}
 

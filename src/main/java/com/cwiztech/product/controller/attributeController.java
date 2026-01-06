@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -330,50 +331,80 @@ public class attributeController {
 
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "Attribute", message).toString();
-		} else {
-			if (attribute != null && isWithDetail == true) {
-				if (attribute.getDATATYPE_ID() != null) {
-				JSONObject datatype = new JSONObject(ServiceCall.GET("lookup/"+attribute.getDATATYPE_ID(), apiRequest.getString("access_TOKEN"), true));
-				attribute.setDATATYPE_DETAIL(datatype.toString());
-			   }
-				rtnAPIResponse = mapper.writeValueAsString(attribute);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+			} else {
+				if ((attributes != null || attribute != null) && isWithDetail == true) {
+					if (attribute != null) {
+						attributes = new ArrayList<Attribute>();
+						attributes.add(attribute);
+					}
+					if (attributes.size()>0) {
+						List<Integer> datatypeList = new ArrayList<Integer>();
 
-			} else if (attributes != null && isWithDetail == true) {
-				if (attributes.size()>0) {
-				List<Integer> datatypeList = new ArrayList<Integer>();
-				for (int i=0; i<attributes.size(); i++) {
-					datatypeList.add(Integer.parseInt(attributes.get(i).getDATATYPE_ID().toString()));
-				}
-				JSONArray datatypeObject = new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+datatypeList+"}", apiRequest.getString("access_TOKEN"), true));
-
-				for (int i=0; i<attributes.size(); i++) {
-					for (int j=0; j<datatypeObject.length(); j++) {
-						JSONObject datatype = datatypeObject.getJSONObject(j);
-						if (attributes.get(i).getDATATYPE_ID() != null && attributes.get(i).getDATATYPE_ID() == datatype.getLong("id") ) {
-							attributes.get(i).setDATATYPE_DETAIL(datatype.toString());
+						for (int i=0; i<attributes.size(); i++) {
+							if (attributes.get(i).getDATATYPE_ID() != null) {
+								datatypeList.add(Integer.parseInt(attributes.get(i).getDATATYPE_ID().toString()));
+							}
 						}
-					}		
-			    }
-		    }
-			rtnAPIResponse = mapper.writeValueAsString(attributes);
-			apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
-			} else if (jsonAttributes != null) {
-				rtnAPIResponse = jsonAttributes.toString();
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-		
-			} else if (jsonAttribute != null) {
-				rtnAPIResponse = jsonAttribute.toString();
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-			}		
+						CompletableFuture<JSONArray> datatypeFuture = CompletableFuture.supplyAsync(() -> {
+							if (datatypeList.size() <= 0) {
+								return new JSONArray();
+							}
+
+							try {
+								return new JSONArray(ServiceCall.POST("datatype/ids", "{datatypes: "+datatypeList+"}", apiRequest.getString("access_TOKEN"), true));
+							} catch (JSONException | JsonProcessingException | ParseException e) {
+								e.printStackTrace();
+								return new JSONArray();
+							}
+						});
+					
+						// Wait until all futures complete
+						CompletableFuture<Void> allDone =
+								CompletableFuture.allOf(datatypeFuture);
+
+						// Block until all are done
+						allDone.join();
+
+						JSONArray datatypeObject = new JSONArray(datatypeFuture.toString());
+						
+						for (int i=0; i<attributes.size(); i++) {
+							for (int j=0; j<datatypeObject.length(); j++) {
+								JSONObject datatype = datatypeObject.getJSONObject(j);
+								if (attributes.get(i).getDATATYPE_ID() != null && attributes.get(i).getDATATYPE_ID() == datatype.getLong("DATATYPE_ID")) {
+									attributes.get(i).setDATATYPE_DETAIL(datatype.toString());
+								}
+							}
+						}
+
+					if (attribute != null)
+						rtnAPIResponse = mapper.writeValueAsString(attributes.get(0));
+					else	
+						rtnAPIResponse = mapper.writeValueAsString(attributes);
+					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+				} else if (attribute != null && isWithDetail == false) {
+					rtnAPIResponse = mapper.writeValueAsString(attribute);
+					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+				} else if (attributes != null && isWithDetail == false) {
+					rtnAPIResponse = mapper.writeValueAsString(attribute);
+					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+				} else if (jsonAttributes != null) {
+					rtnAPIResponse = jsonAttributes.toString();
+					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+				} else if (jsonAttribute != null) {
+					rtnAPIResponse = jsonAttribute.toString();
+					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+				}
+			}
 		}
-		
 		return rtnAPIResponse;
 	}
 }
+			
 
-	
-	
 
 

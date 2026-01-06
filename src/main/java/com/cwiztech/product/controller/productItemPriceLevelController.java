@@ -1,5 +1,37 @@
 package com.cwiztech.product.controller;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cwiztech.product.model.Product;
+import com.cwiztech.product.repository.productRepository;
+import com.cwiztech.log.apiRequestLog;
+import com.cwiztech.services.ServiceCall;
+import com.cwiztech.token.AccessToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,6 +55,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cwiztech.product.model.ProductItemInventory;
+import com.cwiztech.product.model.ProductItemPriceChange;
 import com.cwiztech.product.model.ProductItemPriceLevel;
 import com.cwiztech.product.repository.productItemInventoryRepository;
 import com.cwiztech.product.repository.productItemPriceLevelRepository;
@@ -218,7 +251,7 @@ public class productItemPriceLevelController {
 				productitempricelevel.setPRODUCTITEM_QUANTITY(jsonObj.getLong("productitem_QUANTITY"));
 
 			if (jsonObj.has("productitem_UNITPRICE") && !jsonObj.isNull("productitem_UNITPRICE"))
-				productitempricelevel.setPRODUCTITEM_UNITPRICE(jsonObj.getDouble("productitem_UNITPRICE"));
+				productitempricelevel.setPRODUCTITEM_UNITPRICE(BigDecimal.valueOf(jsonObj.getDouble("productitem_UNITPRICE")));
 
 			if (jsonObj.has("isincludevat"))
 				productitempricelevel.setISINCLUDEVAT(jsonObj.getString("isactive"));
@@ -379,56 +412,106 @@ public class productItemPriceLevelController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductItemPriceLevel", message).toString();
 		} else {
-			if (productitempricelevel != null && isWithDetail == true) {
-				JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productitempricelevel.getPRODUCTITEM_ID(), apiRequest.getString("access_TOKEN"), false));
-				productitempricelevel.setPRODUCTITEM_DETAIL(productitem.toString());
-
-				if (productitempricelevel.getCURRENCY_ID() != null) {
-					JSONObject currency = new JSONObject(ServiceCall.GET("lookup/"+productitempricelevel.getCURRENCY_ID(), apiRequest.getString("access_TOKEN"), true));
-					productitempricelevel.setCURRENCY_DETAIL(currency.toString());
+			if ((productitempricelevels != null || productitempricelevel != null) && isWithDetail == true) {
+				if (productitempricelevel != null) {
+					productitempricelevels = new ArrayList<ProductItemPriceLevel>();
+					productitempricelevels.add(productitempricelevel);
 				}
-				if (productitempricelevel.getPRICELEVEL_ID() != null) {
-					JSONObject priceLevel = new JSONObject(ServiceCall.GET("lookup/"+productitempricelevel.getPRICELEVEL_ID(), apiRequest.getString("access_TOKEN"), true));
-					productitempricelevel.setPRICELEVEL_DETAIL(priceLevel.toString());
-				}
-
-				rtnAPIResponse = mapper.writeValueAsString(productitempricelevel);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (productitempricelevels != null && isWithDetail == true) {
 				if (productitempricelevels.size()>0) {
 					List<Integer> productitemList = new ArrayList<Integer>();
-					List<Integer> lookupList = new ArrayList<Integer>();
+					List<Integer> pricelevelList = new ArrayList<Integer>();
+					List<Integer> currencyList = new ArrayList<Integer>();
+
 					for (int i=0; i<productitempricelevels.size(); i++) {
-						productitemList.add(Integer.parseInt(productitempricelevels.get(i).getPRODUCTITEM_ID().toString()));
-						if (productitempricelevels.get(i).getCURRENCY_ID() != null)
-							lookupList.add(Integer.parseInt(productitempricelevels.get(i).getCURRENCY_ID().toString()));
-						if (productitempricelevels.get(i).getPRICELEVEL_ID() != null)
-							lookupList.add(Integer.parseInt(productitempricelevels.get(i).getPRICELEVEL_ID().toString()));
+						if (productitempricelevels.get(i).getPRODUCTITEM_ID() != null) {
+							productitemList.add(Integer.parseInt(productitempricelevels.get(i).getPRODUCTITEM_ID().toString()));
+						}
+
+						if (productitempricelevels.get(i).getPRICELEVEL_ID() != null) {
+							pricelevelList.add(Integer.parseInt(productitempricelevels.get(i).getPRICELEVEL_ID().toString()));
+						}
+						
+						if (productitempricelevels.get(i).getCURRENCY_ID() != null) {
+							currencyList.add(Integer.parseInt(productitempricelevels.get(i).getCURRENCY_ID().toString()));
+						}
 					}
-					JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getString("access_TOKEN"), false));
-					JSONArray lookupObject = new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+ lookupList+"}", apiRequest.getString("access_TOKEN"), true));
+
+					CompletableFuture<JSONArray> productitemFuture = CompletableFuture.supplyAsync(() -> {
+						if (productitemList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("productitem/ids", "{productitems: "+productitemList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					CompletableFuture<JSONArray> pricelevelFuture = CompletableFuture.supplyAsync(() -> {
+						if (pricelevelList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("pricelevel/ids", "{pricelevels: "+pricelevelList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+					
+					CompletableFuture<JSONArray> currencyFuture = CompletableFuture.supplyAsync(() -> {
+						if (currencyList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("currency/ids", "{currencies: "+currencyList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(productitemFuture,pricelevelFuture, currencyFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray productitemObject = new JSONArray(productitemFuture.toString());
+					JSONArray pricelevelObject = new JSONArray(pricelevelFuture.toString());
+					JSONArray currencyObject = new JSONArray(currencyFuture.toString());
 
 					for (int i=0; i<productitempricelevels.size(); i++) {
 						for (int j=0; j<productitemObject.length(); j++) {
 							JSONObject productitem = productitemObject.getJSONObject(j);
-							if (productitempricelevels.get(i).getPRODUCTITEM_ID() == productitem.getLong("productitem_ID") ) {
+							if (productitempricelevels.get(i).getPRODUCTITEM_ID() != null && productitempricelevels.get(i).getPRODUCTITEM_ID() == productitem.getLong("productitem_ID")) {
 								productitempricelevels.get(i).setPRODUCTITEM_DETAIL(productitem.toString());
 							}
 						}
-
-						for (int j=0; j<lookupObject.length(); j++) {
-							JSONObject lookup = lookupObject.getJSONObject(j);
-							if (productitempricelevels.get(i).getCURRENCY_ID() != null && productitempricelevels.get(i).getCURRENCY_ID() == lookup.getLong("id") ) {
-								productitempricelevels.get(i).setCURRENCY_DETAIL(lookup.toString());
-							}
-							if (productitempricelevels.get(i).getPRICELEVEL_ID() != null && productitempricelevels.get(i).getPRICELEVEL_ID() == lookup.getLong("id") ) {
-								productitempricelevels.get(i).setPRICELEVEL_DETAIL(lookup.toString());
+						for (int j=0; j<pricelevelObject.length(); j++) {
+							JSONObject pricelevel = pricelevelObject.getJSONObject(j);
+							if (productitempricelevels.get(i).getPRICELEVEL_ID() != null && productitempricelevels.get(i).getPRICELEVEL_ID() == pricelevel.getLong("PRICELEVEL_ID")) {
+								productitempricelevels.get(i).setPRICELEVEL_DETAIL(pricelevel.toString());
 							}
 						}
-					}
+						for (int j=0; j<currencyObject.length(); j++) {
+							JSONObject currency = currencyObject.getJSONObject(j);
+							if (productitempricelevels.get(i).getCURRENCY_ID() != null && productitempricelevels.get(i).getCURRENCY_ID() == currency.getLong("CURRENCY_ID")) {
+								productitempricelevels.get(i).setCURRENCY_DETAIL(currency.toString());
+							}
+						}
+                    }
 				}
-				rtnAPIResponse = mapper.writeValueAsString(productitempricelevels);
+
+				if (productitempricelevel != null)
+					rtnAPIResponse = mapper.writeValueAsString(productitempricelevels.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(productitempricelevels);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (productitempricelevel != null && isWithDetail == false) {
@@ -610,7 +693,7 @@ public class productItemPriceLevelController {
 					ProductItemPriceLevel newproductprice = new ProductItemPriceLevel();
 					newproductprice.setPRODUCTITEM_ID(productitem_ID);
 					newproductprice.setPRODUCTITEM_QUANTITY((long) 1);
-					newproductprice.setPRODUCTITEM_UNITPRICE(productitem_unitprice);
+					newproductprice.setPRODUCTITEM_UNITPRICE(BigDecimal.valueOf(productitem_unitprice));
 					newproductprice.setCURRENCY_ID((long) 91);
 					newproductprice.setPRICELEVEL_ID((long) 148);
 					newproductprice.setISACTIVE("Y");
@@ -625,7 +708,7 @@ public class productItemPriceLevelController {
 				ProductItemPriceLevel newproductprice = new ProductItemPriceLevel();
 				newproductprice.setPRODUCTITEM_ID(productitem_ID);
 				newproductprice.setPRODUCTITEM_QUANTITY((long) 1);
-				newproductprice.setPRODUCTITEM_UNITPRICE(productitem_unitprice);
+				newproductprice.setPRODUCTITEM_UNITPRICE(BigDecimal.valueOf(productitem_unitprice));
 				newproductprice.setCURRENCY_ID((long) 91);
 				newproductprice.setPRICELEVEL_ID((long) 148);
 				newproductprice.setISACTIVE("Y");

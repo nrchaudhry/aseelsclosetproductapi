@@ -1,5 +1,6 @@
 package com.cwiztech.product.controller;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RestController
 @CrossOrigin
 @RequestMapping("/product")
-public class productController {
+public class productController { 
 	private static final Logger log = LoggerFactory.getLogger(productController.class);
 
 	@Autowired
@@ -50,7 +51,7 @@ public class productController {
 
 		return new ResponseEntity(getAPIResponse(products, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
-
+   
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public ResponseEntity getAll(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
@@ -336,14 +337,14 @@ public class productController {
 				product.setPURCHASELEDGERACCOUNT_ID(jsonObj.getLong("purchaseledgeraccount_ID"));
 
 			if (jsonObj.has("purchase_PRICE") && !jsonObj.isNull("purchase_PRICE"))
-				product.setPURCHASE_PRICE(jsonObj.getDouble("purchase_PRICE"));
+				product.setPURCHASE_PRICE(BigDecimal.valueOf(jsonObj.getDouble("purchase_PRICE")));
 			else if (productid == 0)
-				product.setPURCHASE_PRICE(0.0);
+				product.setPURCHASE_PRICE(BigDecimal.valueOf(0.0));
 
 			if (jsonObj.has("product_WEIGHT")  && !jsonObj.isNull("product_WEIGHT"))
-				product.setPRODUCT_WEIGHT(jsonObj.getDouble("product_WEIGHT"));
+				product.setPRODUCT_WEIGHT(BigDecimal.valueOf(jsonObj.getDouble("product_WEIGHT")));
 			else if (productid == 0)
-				product.setPRODUCT_WEIGHT(0.0);
+				product.setPRODUCT_WEIGHT(BigDecimal.valueOf(0.0));
 
 			if (productid == 0)
 				product.setISACTIVE("Y");
@@ -543,10 +544,11 @@ public class productController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "Product", message).toString();
 		} else {
-			if (isWithDetail == true) {
-				if (product != null)
+			if ((products != null || product != null) && isWithDetail == true) {
+				if (product != null) {
+					products = new ArrayList<Product>();
 					products.add(product);
-
+				}
 				if (products.size()>0) {
 					List<Integer> productcategoryList = new ArrayList<Integer>();
 					List<Integer> taxcodeList = new ArrayList<Integer>();
@@ -673,4 +675,4 @@ public class productController {
 
 		return rtnAPIResponse;
 	}
-};
+}

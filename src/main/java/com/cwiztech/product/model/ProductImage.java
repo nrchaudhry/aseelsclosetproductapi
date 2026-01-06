@@ -114,9 +114,5 @@ public class ProductImage {
 		MODIFIED_WORKSTATION = mODIFIED_WORKSTATION;
 	}
 
-	public static long getDatabaseTableID() {
-		return (long) 9;
-	}
-
 	
 }

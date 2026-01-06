@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cwiztech.log.apiRequestLog;
+import com.cwiztech.product.model.Product;
 import com.cwiztech.product.model.ProductItem;
 import com.cwiztech.product.repository.productItemInventoryRepository;
 import com.cwiztech.product.repository.productItemPriceLevelRepository;
@@ -515,46 +517,80 @@ public class productItemController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductItem", message).toString();
 		} else {
-			if (productitem != null && isWithDetail == true) {
-				JSONObject application = new JSONObject(ServiceCall.GET("application/"+productitem.getAPPLICATION_ID(), apiRequest.getString("access_TOKEN"), true));
-				productitem.setAPPLICATION_DETAIL(application.toString());
-
-				JSONObject product = new JSONObject(ServiceCall.GET("product/"+productitem.getPRODUCT_ID(), apiRequest.getString("access_TOKEN"), false));
-				productitem.setPRODUCT_DETAIL(product.toString());
-				
-				rtnAPIResponse = mapper.writeValueAsString(productitem);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (productitems != null && isWithDetail == true) {
+			if ((productitems != null || productitem != null) && isWithDetail == true) {
+				if (productitem != null) {
+					productitems = new ArrayList<ProductItem>();
+					productitems.add(productitem);
+				}
 				if (productitems.size()>0) {
-					List<Integer> applicationList = new ArrayList<Integer>();
 					List<Integer> productList = new ArrayList<Integer>();
-					for (int i=0; i<productitems.size(); i++) {
-						if (productitems.get(i).getAPPLICATION_ID() != null)
-							applicationList.add(Integer.parseInt(productitems.get(i).getAPPLICATION_ID().toString()));
-						if (productitems.get(i).getPRODUCT_ID() != null)
-							productList.add(Integer.parseInt(productitems.get(i).getPRODUCT_ID().toString()));
-					}
-					JSONArray logisticsObject = new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getString("access_TOKEN"), true));
-					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), false));
+					List<Integer> applicationList = new ArrayList<Integer>();
 
 					for (int i=0; i<productitems.size(); i++) {
-						for (int j=0; j<logisticsObject.length(); j++) {
-							JSONObject application = logisticsObject.getJSONObject(j);
-							if (productitems.get(i).getAPPLICATION_ID() == application.getLong("application_ID") ) {
-								productitems.get(i).setAPPLICATION_DETAIL(application.toString());
-							}
-						}	
+						if (productitems.get(i).getPRODUCT_ID() != null) {
+							productList.add(Integer.parseInt(productitems.get(i).getPRODUCT_ID().toString()));
+						}
+
+						if (productitems.get(i).getAPPLICATION_ID() != null) {
+							applicationList.add(Integer.parseInt(productitems.get(i).getAPPLICATION_ID().toString()));
+						}
+					}
+					CompletableFuture<JSONArray> productFuture = CompletableFuture.supplyAsync(() -> {
+						if (productList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					CompletableFuture<JSONArray> applicationFuture = CompletableFuture.supplyAsync(() -> {
+						if (applicationList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("application/ids", "{applications: "+applicationList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(productFuture, applicationFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray productObject = new JSONArray(productFuture.toString());
+					JSONArray applicationObject = new JSONArray(applicationFuture.toString());
+
+					for (int i=0; i<productitems.size(); i++) {
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
-							if (productitems.get(i).getPRODUCT_ID() == product.getLong("product_ID") ) {
+							if (productitems.get(i).getPRODUCT_ID() != null && productitems.get(i).getPRODUCT_ID() == product.getLong("getPRODUCT_ID")) {
 								productitems.get(i).setPRODUCT_DETAIL(product.toString());
+							}
+						}
+						for (int j=0; j<applicationObject.length(); j++) {
+							JSONObject application = applicationObject.getJSONObject(j);
+							if (productitems.get(i).getAPPLICATION_ID() != null && productitems.get(i).getAPPLICATION_ID() == application.getLong("taxcode_ID")) {
+								productitems.get(i).setAPPLICATION_DETAIL(application.toString());
 							}
 						}
 					}
 				}
-				
-				rtnAPIResponse = mapper.writeValueAsString(productitems);
+
+				if (productitem != null)
+					rtnAPIResponse = mapper.writeValueAsString(productitems.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(productitems);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (productitem != null && isWithDetail == false) {
@@ -577,6 +613,8 @@ public class productItemController {
 
 		return rtnAPIResponse;
 	}
+}
+
 
 
 	//	@RequestMapping(value = "/getfromnetsuite/{id}", method = RequestMethod.GET)
@@ -1577,4 +1615,4 @@ public class productItemController {
 	//		return new ResponseEntity(rtn, HttpStatus.OK);
 	//	}
 	//
-};
+

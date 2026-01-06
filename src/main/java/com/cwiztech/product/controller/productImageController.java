@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -300,39 +301,62 @@ public class productImageController {
 		
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductImage", message).toString();
-		} else {
-			if (productimage != null && isWithDetail == true) {
-				JSONObject product = new JSONObject(ServiceCall.GET("product/"+productimage.getPRODUCT_ID(), apiRequest.getString("access_TOKEN"), false));
-				productimage.setPRODUCT_DETAIL(product.toString());
-				rtnAPIResponse = mapper.writeValueAsString(productimage);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-				
-			} else if (productimages != null && isWithDetail == true) {
+		} else  {
+			if ((productimages != null || productimage != null) && isWithDetail == true) {
+				if (productimage != null) {
+					productimages = new ArrayList<ProductImage>();
+					productimages.add(productimage);
+				}
 				if (productimages.size()>0) {
 					List<Integer> productList = new ArrayList<Integer>();
+
 					for (int i=0; i<productimages.size(); i++) {
-						productList.add(Integer.parseInt(productimages.get(i).getPRODUCT_ID().toString()));
-					}
-					JSONArray productObject = new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), false));
-					
+						if (productimages.get(i).getPRODUCT_ID() != null) {
+							productList.add(Integer.parseInt(productimages.get(i).getPRODUCT_ID().toString()));
+						}
+
+					CompletableFuture<JSONArray> productFuture = CompletableFuture.supplyAsync(() -> {
+						if (productList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(productFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray productObject = productFuture.get();
+
 					for (int i=0; i<productimages.size(); i++) {
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
-							if (productimages.get(i).getPRODUCT_ID() == product.getLong("product_ID") ) {
+							if (productimages.get(i).getPRODUCT_ID() != null && productimages.get(i).getPRODUCT_ID() == product.getLong("getPRODUCT_ID") ) {
 								productimages.get(i).setPRODUCT_DETAIL(product.toString());
 							}
 						}
 					}
 				}
-				
-				rtnAPIResponse = mapper.writeValueAsString(productimages);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+				if (productimage != null)
+					rtnAPIResponse = mapper.writeValueAsString(productimages.get(0));
+				else {
+					rtnAPIResponse = mapper.writeValueAsString(productimages);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");}
 
-			} else if (productimage != null  && isWithDetail == true) {
+				} else if (productimage != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(productimage);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-			
-			} else if (productimages != null  && isWithDetail == true) {
+
+			} else if (productimages != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(productimages);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
@@ -341,12 +365,16 @@ public class productImageController {
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (jsonProductImage != null) {
-				rtnAPIResponse = jsonProductImage.toString();
+				rtnAPIResponse = mapper.writeValueAsString(jsonProductImage.toString());
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
 		}
-		
+	}	
 		return rtnAPIResponse;
 	}
-
 }
+
+
+		
+		
+		

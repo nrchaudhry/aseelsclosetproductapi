@@ -1,5 +1,38 @@
 package com.cwiztech.product.controller;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cwiztech.product.model.Product;
+import com.cwiztech.product.model.ProductItem;
+import com.cwiztech.product.repository.productRepository;
+import com.cwiztech.log.apiRequestLog;
+import com.cwiztech.services.ServiceCall;
+import com.cwiztech.token.AccessToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -197,9 +230,9 @@ public class productItemInventoryController {
 			}
 
 			if (jsonObj.has("quantity_ONHAND") && !jsonObj.isNull("quantity_ONHAND"))
-				productiteminventory.setQUANTITY_ONHAND(jsonObj.getDouble("quantity_ONHAND"));
+				productiteminventory.setQUANTITY_ONHAND(BigDecimal.valueOf(jsonObj.getDouble("quantity_ONHAND")));
 			else if (productiteminventoryid == 0)
-				productiteminventory.setQUANTITY_ONHAND(0.0);
+				productiteminventory.setQUANTITY_ONHAND(BigDecimal.valueOf(0.0));
 
 			if (jsonObj.has("quantity_ONORDER") && !jsonObj.isNull("quantity_ONORDER"))
 				productiteminventory.setQUANTITY_ONORDER(jsonObj.getLong("quantity_ONORDER"));
@@ -212,7 +245,7 @@ public class productItemInventoryController {
 				productiteminventory.setQUANTITY_COMMITTED((long) 0);
 
 			if (jsonObj.has("quantity_AVAILABLE") && !jsonObj.isNull("quantity_AVAILABLE"))
-				productiteminventory.setQUANTITY_AVAILABLE(jsonObj.getDouble("quantity_AVAILABLE"));
+				productiteminventory.setQUANTITY_AVAILABLE(BigDecimal.valueOf(jsonObj.getDouble("quantity_AVAILABLE")));
 			else if (productiteminventoryid == 0)
 				productiteminventory.setQUANTITY_AVAILABLE(productiteminventory.getQUANTITY_ONHAND());
 
@@ -232,27 +265,27 @@ public class productItemInventoryController {
 				productiteminventory.setQUANTITYEXTERNAL_INTRANSIT((long) 0);
 
 			if (jsonObj.has("quantitybaseunit_ONHAND") && !jsonObj.isNull("quantitybaseunit_ONHAND"))
-				productiteminventory.setQUANTITYBASEUNIT_ONHAND(jsonObj.getDouble("quantitybaseunit_ONHAND"));
+				productiteminventory.setQUANTITYBASEUNIT_ONHAND(BigDecimal.valueOf(jsonObj.getDouble("quantitybaseunit_ONHAND")));
 			else if (productiteminventoryid == 0)
-				productiteminventory.setQUANTITYBASEUNIT_ONHAND(0.0);
+				productiteminventory.setQUANTITYBASEUNIT_ONHAND(BigDecimal.valueOf(0.0));
 
 			if (jsonObj.has("quantitybaseunit_AVAILABLE") && !jsonObj.isNull("quantitybaseunit_AVAILABLE"))
-				productiteminventory.setQUANTITYBASEUNIT_AVAILABLE(jsonObj.getDouble("quantitybaseunit_AVAILABLE"));
+				productiteminventory.setQUANTITYBASEUNIT_AVAILABLE(BigDecimal.valueOf(jsonObj.getDouble("quantitybaseunit_AVAILABLE")));
 			else if (productiteminventoryid == 0)
-				productiteminventory.setQUANTITYBASEUNIT_AVAILABLE(0.0);
+				productiteminventory.setQUANTITYBASEUNIT_AVAILABLE(BigDecimal.valueOf(0.0));
 
 			if (jsonObj.has("value") && !jsonObj.isNull("value"))
-				productiteminventory.setVALUE(jsonObj.getDouble("value"));
+				productiteminventory.setVALUE(BigDecimal.valueOf(jsonObj.getDouble("value")));
 
 			if (jsonObj.has("average_COST") && !jsonObj.isNull("average_COST"))
-				productiteminventory.setAVERAGE_COST(jsonObj.getDouble("average_COST"));
+				productiteminventory.setAVERAGE_COST(BigDecimal.valueOf(jsonObj.getDouble("average_COST")));
 			else if (productiteminventoryid == 0)
-				productiteminventory.setAVERAGE_COST(0.0);
+				productiteminventory.setAVERAGE_COST(BigDecimal.valueOf(0.0));
 
 			if (jsonObj.has("lastpurchase_PRICE") && !jsonObj.isNull("lastpurchase_PRICE"))
-				productiteminventory.setLASTPURCHASE_PRICE(jsonObj.getDouble("lastpurchase_PRICE"));
+				productiteminventory.setLASTPURCHASE_PRICE(BigDecimal.valueOf(jsonObj.getDouble("lastpurchase_PRICE")));
 			else if (productiteminventoryid == 0)
-				productiteminventory.setLASTPURCHASE_PRICE(0.0);
+				productiteminventory.setLASTPURCHASE_PRICE(BigDecimal.valueOf(0.0));
 
 			if (jsonObj.has("reorder_POINT") && !jsonObj.isNull("reorder_POINT"))
 				productiteminventory.setREORDER_POINT(jsonObj.getLong("reorder_POINT"));
@@ -276,7 +309,7 @@ public class productItemInventoryController {
 				productiteminventory.setATPLEAD_TIME(jsonObj.getLong("atplead_TIME"));
 
 			if (jsonObj.has("defaultreturn_COST") && !jsonObj.isNull("defaultreturn_COST"))
-				productiteminventory.setDEFAULTRETURN_COST(jsonObj.getDouble("defaultreturn_COST"));
+				productiteminventory.setDEFAULTRETURN_COST(BigDecimal.valueOf(jsonObj.getDouble("defaultreturn_COST")));
 
 			if (jsonObj.has("lastcount_DATE") && !jsonObj.isNull("lastcount_DATE"))
 				productiteminventory.setLASTCOUNT_DATE(jsonObj.getString("lastcount_DATE"));
@@ -444,65 +477,87 @@ public class productItemInventoryController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductItemInventory", message).toString();
 		} else {
-			if (productiteminventory != null && isWithDetail == true) {
-
-				JSONObject productitem = new JSONObject(ServiceCall.GET("productitem/"+productiteminventory.getPRODUCTITEM_ID(), apiRequest.getString("access_TOKEN"), false));
-				productiteminventory.setPRODUCTITEM_DETAIL(productitem.toString());
-
-				if (productiteminventory.getPRODUCTLOCATION_ID() != null) {
-					JSONObject productlocation = new JSONObject(ServiceCall.GET("lookup/"+productiteminventory.getPRODUCTLOCATION_ID(), apiRequest.getString("access_TOKEN"), true));
-					productiteminventory.setPRODUCTLOCATION_DETAIL(productlocation.toString());
+			if ((productiteminventories != null || productiteminventory != null) && isWithDetail == true) {
+				if (productiteminventory != null) {
+					productiteminventories = new ArrayList<ProductItemInventory>();
+					productiteminventories.add(productiteminventory);
 				}
-				if (productiteminventory.getINVENTORYCLASSIFICTION_ID() != null) {
-					JSONObject inventoryclassification = new JSONObject(ServiceCall.GET("lookup/"+productiteminventory.getINVENTORYCLASSIFICTION_ID(), apiRequest.getString("access_TOKEN"), true));
-					productiteminventory.setINVENTORYCLASSIFICTION_DETAIL(inventoryclassification.toString());
-				}
-				rtnAPIResponse = mapper.writeValueAsString(productiteminventory);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (productiteminventories != null && isWithDetail == true) {	
 				if (productiteminventories.size()>0) {
 					List<Integer> productitemList = new ArrayList<Integer>();
-					List<Integer> lookupList = new ArrayList<Integer>();
+					List<Integer> productlocationList = new ArrayList<Integer>();
+
 					for (int i=0; i<productiteminventories.size(); i++) {
-						if (productiteminventories.get(i).getPRODUCTITEM_ID() != null)
+						if (productiteminventories.get(i).getPRODUCTITEM_ID() != null) {
 							productitemList.add(Integer.parseInt(productiteminventories.get(i).getPRODUCTITEM_ID().toString()));
-						if (productiteminventories.get(i).getPRODUCTLOCATION_ID() != null)
-							lookupList.add(Integer.parseInt(productiteminventories.get(i).getPRODUCTLOCATION_ID().toString()));
-						if (productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() != null)
-							lookupList.add(Integer.parseInt(productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID().toString()));
+						}
+
+						if (productiteminventories.get(i).getPRODUCTLOCATION_ID() != null) {
+							productlocationList.add(Integer.parseInt(productiteminventories.get(i).getPRODUCTLOCATION_ID().toString()));
+						}
 					}
-					JSONArray productitemObject = new JSONArray(ServiceCall.POST("productitem/ids", "{items: "+productitemList+"}", apiRequest.getString("access_TOKEN"), false));
-					JSONArray lookupObject = new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+ lookupList+"}", apiRequest.getString("access_TOKEN"), true));
+					CompletableFuture<JSONArray> productitemFuture = CompletableFuture.supplyAsync(() -> {
+						if (productitemList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("productitem/ids", "{productitems: "+productitemList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					CompletableFuture<JSONArray> productlocationFuture = CompletableFuture.supplyAsync(() -> {
+						if (productlocationList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("productlocation/ids", "{productlocations: "+productlocationList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(productitemFuture, productlocationFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray productitemObject = new JSONArray(productitemFuture.toString());
+					JSONArray productlocationObject = new JSONArray(productlocationFuture.toString());
 
 					for (int i=0; i<productiteminventories.size(); i++) {
 						for (int j=0; j<productitemObject.length(); j++) {
 							JSONObject productitem = productitemObject.getJSONObject(j);
-							if (productiteminventories.get(i).getPRODUCTITEM_ID() == productitem.getLong("productitem_ID") ) {
+							if (productiteminventories.get(i).getPRODUCTITEM_ID() != null && productiteminventories.get(i).getPRODUCTITEM_ID() == productitem.getLong("PRODUCTITEM_ID")) {
 								productiteminventories.get(i).setPRODUCTITEM_DETAIL(productitem.toString());
 							}
 						}
-
-						for (int j=0; j<lookupObject.length(); j++) {
-							JSONObject lookup = lookupObject.getJSONObject(j);
-							if (productiteminventories.get(i).getPRODUCTLOCATION_ID() != null && productiteminventories.get(i).getPRODUCTLOCATION_ID() == lookup.getLong("id") ) {
-								productiteminventories.get(i).setPRODUCTLOCATION_DETAIL(lookup.toString());
-							}
-							if (productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() != null && productiteminventories.get(i).getINVENTORYCLASSIFICTION_ID() == lookup.getLong("id") ) {
-								productiteminventories.get(i).setINVENTORYCLASSIFICTION_DETAIL(lookup.toString());
+						for (int j=0; j<productlocationObject.length(); j++) {
+							JSONObject productlocation = productlocationObject.getJSONObject(j);
+							if (productiteminventories.get(i).getPRODUCTLOCATION_ID() != null && productiteminventories.get(i).getPRODUCTLOCATION_ID() == productlocation.getLong("PRODUCTLOCATION_ID")) {
+								productiteminventories.get(i).setPRODUCTLOCATION_DETAIL(productlocation.toString());
 							}
 						}
-					}	
+					}
 				}
 
-				rtnAPIResponse = mapper.writeValueAsString(productiteminventories);
+				if (productiteminventory != null)
+					rtnAPIResponse = mapper.writeValueAsString(productiteminventories.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(productiteminventories);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-			
-			} else if (productiteminventory != null && isWithDetail == false) {	
+
+			} else if (productiteminventory != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(productiteminventory);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
-			} else if (productiteminventories != null && isWithDetail == false) {	
+			} else if (productiteminventories != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(productiteminventories);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
@@ -548,13 +603,13 @@ public class productItemInventoryController {
 
 			ProductItemInventory productiteminventory = productiteminventoryrepository.findByProductItemId(orderdetail.getLong("productitem_ID"));
 
-			if (quantity > 0 && productiteminventory.getQUANTITY_AVAILABLE() > 0 && productiteminventory.getQUANTITY_AVAILABLE() < (double) quantity) {
-				quantity = (long) (productiteminventory.getQUANTITY_AVAILABLE() - 0);
-			} else if (quantity > 0 && productiteminventory.getQUANTITY_AVAILABLE() <= 0) {
+			if (quantity > 0 && productiteminventory.getQUANTITY_AVAILABLE() .doubleValue() > 0 && productiteminventory.getQUANTITY_AVAILABLE().doubleValue() < (double) quantity) {
+				quantity = (long) (productiteminventory.getQUANTITY_AVAILABLE().doubleValue() - 0);
+			} else if (quantity > 0 && productiteminventory.getQUANTITY_AVAILABLE().doubleValue() <= 0) {
 				quantity = 0;
 			}
 
-			productiteminventory.setQUANTITY_AVAILABLE(productiteminventory.getQUANTITY_AVAILABLE() -  quantity);
+			productiteminventory.setQUANTITY_AVAILABLE(BigDecimal.valueOf(productiteminventory.getQUANTITY_AVAILABLE().doubleValue() -  quantity));
 			productiteminventory.setQUANTITY_COMMITTED(productiteminventory.getQUANTITY_COMMITTED() +  quantity);
 			productiteminventory.setMODIFIED_BY(apiRequest.getLong("request_ID"));
 			productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getString("log_WORKSTATION"));
@@ -596,8 +651,8 @@ public class productItemInventoryController {
 			long backordered = orderdetail.getLong("back_ORDERED");
 
 			ProductItemInventory productiteminventory = productiteminventoryrepository.findByProductItemId(orderdetail.getLong("productitem_ID"));
-			productiteminventory.setQUANTITY_ONHAND(productiteminventory.getQUANTITY_ONHAND() - commitment + backordered);
-			productiteminventory.setQUANTITY_AVAILABLE(productiteminventory.getQUANTITY_AVAILABLE() +  backordered);
+			productiteminventory.setQUANTITY_ONHAND(BigDecimal.valueOf(productiteminventory.getQUANTITY_ONHAND().doubleValue() - commitment + backordered));
+			productiteminventory.setQUANTITY_AVAILABLE(BigDecimal.valueOf(productiteminventory.getQUANTITY_AVAILABLE().doubleValue() +  backordered));
 			productiteminventory.setQUANTITY_COMMITTED(productiteminventory.getQUANTITY_COMMITTED() - commitment - backordered);
 			productiteminventory.setMODIFIED_BY(apiRequest.getLong("request_ID"));
 			productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getString("log_WORKSTATION"));
@@ -644,10 +699,10 @@ public class productItemInventoryController {
 				ProductItemInventory productiteminventory = productiteminventoryrepository.findByProductItemId(productitem_id);
 				if (productiteminventory != null)
 				{
-					double quantity_onhand = productiteminventory.getQUANTITY_ONHAND() + (double) quantity_received;
-					productiteminventory.setQUANTITY_ONHAND(quantity_onhand);
-					double quantity_available = productiteminventory.getQUANTITY_AVAILABLE() + (double) quantity_received;
-					productiteminventory.setQUANTITY_AVAILABLE(quantity_available);
+					double quantity_onhand = productiteminventory.getQUANTITY_ONHAND().doubleValue() + (double) quantity_received;
+					productiteminventory.setQUANTITY_ONHAND(BigDecimal.valueOf(quantity_onhand));
+					double quantity_available = productiteminventory.getQUANTITY_AVAILABLE().doubleValue() + (double) quantity_received;
+					productiteminventory.setQUANTITY_AVAILABLE(BigDecimal.valueOf(quantity_available));
 					productiteminventory.setMODIFIED_BY(apiRequest.getLong("request_ID"));
 					productiteminventory.setMODIFIED_WORKSTATION(apiRequest.getString("log_WORKSTATION"));
 					productiteminventory.setMODIFIED_WHEN(dateFormat1.format(date));

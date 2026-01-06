@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -346,44 +347,76 @@ public class attributeValueController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "AttributeValue", message).toString();
 		} else {
-			if (attributevalue != null && isWithDetail == true) {
-				JSONObject attribute = new JSONObject(ServiceCall.GET("attribute/"+attributevalue.getATTRIBUTE_ID(), apiRequest.getString("access_TOKEN"), false));
-				attributevalue.setATTRIBUTE_DETAIL(attribute.toString());
-				rtnAPIResponse = mapper.writeValueAsString(attributevalue);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (attributevalues != null && isWithDetail == true) {
+			if ((attributevalues != null || attributevalue != null) && isWithDetail == true) {
+				if (attributevalue != null) {
+					attributevalues = new ArrayList<AttributeValue>();
+					attributevalues.add(attributevalue);
+				}
 				if (attributevalues.size()>0) {
-					List<Integer> attributeList = new ArrayList<Integer>();
-					for (int i=0; i<attributevalues.size(); i++) {
-						attributeList.add(Integer.parseInt(attributevalues.get(i).getATTRIBUTE_ID().toString()));
-					}
-					JSONArray attributeObject = new JSONArray(ServiceCall.POST("attribute/ids", "{attributes: "+attributeList+"}", apiRequest.getString("access_TOKEN"), false));
+					List<Integer>  attributeList = new ArrayList<Integer>();
 					
+					for (int i=0; i<attributevalues.size(); i++) {
+						if (attributevalues.get(i).getATTRIBUTE_ID() != null) {
+							attributeList.add(Integer.parseInt(attributevalues.get(i).getATTRIBUTE_ID().toString()));
+						}
+					}
+
+					CompletableFuture<JSONArray> attributeFuture = CompletableFuture.supplyAsync(() -> {
+						if (attributeList.size() <= 0) {
+							return new JSONArray();
+						}
+
+						try {
+							return new JSONArray(ServiceCall.POST("attribute/ids", "{attributes: "+attributeList+"}", apiRequest.getString("access_TOKEN"), true));
+						} catch (JSONException | JsonProcessingException | ParseException e) {
+							e.printStackTrace();
+							return new JSONArray();
+						}
+					});
+
+					// Wait until all futures complete
+					CompletableFuture<Void> allDone =
+							CompletableFuture.allOf(attributeFuture);
+
+					// Block until all are done
+					allDone.join();
+
+					JSONArray attributeObject = new JSONArray(attributeFuture.toString());
+			
 					for (int i=0; i<attributevalues.size(); i++) {
 						for (int j=0; j<attributeObject.length(); j++) {
 							JSONObject attribute = attributeObject.getJSONObject(j);
-							if (attributevalues.get(i).getATTRIBUTE_ID() == attribute.getLong("attribute_ID") ) {
+							if (attributevalues.get(i).getATTRIBUTE_ID() != null && attributevalues.get(i).getATTRIBUTE_ID() == attribute.getLong("getATTRIBUTE_ID")) {
 								attributevalues.get(i).setATTRIBUTE_DETAIL(attribute.toString());
 							}
 						}
 					}
 				}
 
+				if (attributevalue != null)
+					rtnAPIResponse = mapper.writeValueAsString(attributevalues.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(attributevalues);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+			} else if (attributevalue != null && isWithDetail == false) {
+				rtnAPIResponse = mapper.writeValueAsString(attributevalue);
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+
+			} else if (attributevalues != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(attributevalues);
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (jsonAttributeValues != null) {
 				rtnAPIResponse = jsonAttributeValues.toString();
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-			
+
 			} else if (jsonAttributeValue != null) {
 				rtnAPIResponse = jsonAttributeValue.toString();
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
 		}
-				
+
 		return rtnAPIResponse;
 	}
-
 }

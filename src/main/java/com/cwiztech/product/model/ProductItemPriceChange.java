@@ -1,5 +1,7 @@
 package com.cwiztech.product.model;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,10 +33,10 @@ public class ProductItemPriceChange {
 	private String CURRENCY_DETAIL;
 	
 	@Column(name = "PRODUCTITEM_PURCHASEPRICE")
-	private Double PRODUCTITEM_PURCHASEPRICE;
+	private  BigDecimal PRODUCTITEM_PURCHASEPRICE;
 	
 	@Column(name = "PRODUCTITEM_LASTPURCHASEPRICE")
-	private Double PRODUCTITEM_LASTPURCHASEPRICE;
+	private  BigDecimal PRODUCTITEM_LASTPURCHASEPRICE;
 	
 	@Column(name = "ISACTIVE")
 	private String ISACTIVE;
@@ -93,23 +95,23 @@ public class ProductItemPriceChange {
 		CURRENCY_DETAIL = cURRENCY_DETAIL;
 	}
 
-	public Double getPRODUCTITEM_PURCHASEPRICE() {
+		public BigDecimal getPRODUCTITEM_PURCHASEPRICE() {
 		return PRODUCTITEM_PURCHASEPRICE;
 	}
 
-	public void setPRODUCTITEM_PURCHASEPRICE(Double pRODUCTITEM_PURCHASEPRICE) {
+	public void setPRODUCTITEM_PURCHASEPRICE(BigDecimal pRODUCTITEM_PURCHASEPRICE) {
 		PRODUCTITEM_PURCHASEPRICE = pRODUCTITEM_PURCHASEPRICE;
 	}
 
-	public Double getPRODUCTITEM_LASTPURCHASEPRICE() {
+	public BigDecimal getPRODUCTITEM_LASTPURCHASEPRICE() {
 		return PRODUCTITEM_LASTPURCHASEPRICE;
 	}
 
-	public void setPRODUCTITEM_LASTPURCHASEPRICE(Double pRODUCTITEM_LASTPURCHASEPRICE) {
+	public void setPRODUCTITEM_LASTPURCHASEPRICE(BigDecimal pRODUCTITEM_LASTPURCHASEPRICE) {
 		PRODUCTITEM_LASTPURCHASEPRICE = pRODUCTITEM_LASTPURCHASEPRICE;
 	}
 
-	public String getISACTIVE() {
+		public String getISACTIVE() {
 		return ISACTIVE;
 	}
 
