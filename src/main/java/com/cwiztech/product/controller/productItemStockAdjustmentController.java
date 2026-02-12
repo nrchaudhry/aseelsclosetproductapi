@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cwiztech.product.model.Product;
-import com.cwiztech.product.repository.productRepository;
 import com.cwiztech.log.apiRequestLog;
 import com.cwiztech.services.ServiceCall;
 import com.cwiztech.token.AccessToken;
@@ -33,43 +31,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.cwiztech.log.apiRequestLog;
 import com.cwiztech.product.model.ProductItemStockAdjustment;
 import com.cwiztech.product.repository.productItemStockAdjustmentRepository;
-import com.cwiztech.services.ServiceCall;
-import com.cwiztech.token.AccessToken;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.errors.ApiException;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/ProductItemStockAdjustment")
+@RequestMapping("/productitemstockadjustment")
 public class productItemStockAdjustmentController {                                                                        
 	private static final Logger log = LoggerFactory.getLogger(productItemStockAdjustmentController.class);
 
@@ -79,7 +49,7 @@ public class productItemStockAdjustmentController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException, InterruptedException, ExecutionException {
-		JSONObject apiRequest = AccessToken.checkToken("GET", "/ProductItemStockAdjustment", null, null, headToken);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemstockadjustment", null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<ProductItemStockAdjustment> productitemstockadjustments = productitemstockadjustmentrepository .findActive();
@@ -90,7 +60,7 @@ public class productItemStockAdjustmentController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public ResponseEntity getAll(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException, InterruptedException, ExecutionException {
-		JSONObject apiRequest = AccessToken.checkToken("GET", "/ProductItemStockAdjustment/all", null, null, headToken);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemstockadjustment/all", null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<ProductItemStockAdjustment> productitemstockadjustments = productitemstockadjustmentrepository.findAll();
@@ -101,7 +71,7 @@ public class productItemStockAdjustmentController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity getOne(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException, InterruptedException, ExecutionException {
-		JSONObject apiRequest = AccessToken.checkToken("GET", "/ProductItemStockAdjustment/" + id, null, null, headToken);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemstockadjustment/" + id, null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		ProductItemStockAdjustment productitemstockadjustment = productitemstockadjustmentrepository.findOne(id);
@@ -109,34 +79,33 @@ public class productItemStockAdjustmentController {
 		return new ResponseEntity(getAPIResponse(null, productitemstockadjustment, null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
-	// will give id's in body in form of array and it'll show data of that id's
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/ids", method = RequestMethod.POST)
 	public ResponseEntity getByIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 
-		JSONObject apiRequest = AccessToken.checkToken("POST", "/ProductItemStockAdjustment/ids", data, null, headToken);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemstockadjustment/ids", data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
-		List<Integer> ProductItemStockAdjustment_IDS = new ArrayList<Integer>(); 
+		List<Integer> productitemstockadjustment_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
-		JSONArray jsonProductItemStockAdjustments = jsonObj.getJSONArray("ProductItemStockAdjustments");
+		JSONArray jsonProductItemStockAdjustments = jsonObj.getJSONArray("productitemstockadjustments");
 		for (int i=0; i<jsonProductItemStockAdjustments.length(); i++) {
-			ProductItemStockAdjustment_IDS.add((Integer) jsonProductItemStockAdjustments.get(i));
+			productitemstockadjustment_IDS.add((Integer) jsonProductItemStockAdjustments.get(i));
 		}
 
-		List<ProductItemStockAdjustment> ProductItemStockAdjustments = new ArrayList<ProductItemStockAdjustment>();   
+		List<ProductItemStockAdjustment> productitemstockadjustments = new ArrayList<ProductItemStockAdjustment>();   
 		if (jsonProductItemStockAdjustments.length()>0)
-			ProductItemStockAdjustments = productitemstockadjustmentrepository.findByIDs(ProductItemStockAdjustment_IDS);
+			productitemstockadjustments = productitemstockadjustmentrepository.findByIDs(productitemstockadjustment_IDS);
 
-		return new ResponseEntity(getAPIResponse(ProductItemStockAdjustments, null, null, null, null, apiRequest, true).toString(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemstockadjustments, null, null, null, null, apiRequest, true).toString(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity insert(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JSONException, ParseException, InterruptedException, ExecutionException, ApiException, InterruptedException, IOException, ExecutionException {
-		JSONObject apiRequest = AccessToken.checkToken("POST", "/ProductItemStockAdjustment", data, null, headToken);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemstockadjustment", data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		return insertupdateAll(null, new JSONObject(data), apiRequest);
@@ -146,7 +115,7 @@ public class productItemStockAdjustmentController {
 	@RequestMapping( method = RequestMethod.PUT)
 	public ResponseEntity updateAll(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JSONException, ParseException, InterruptedException, ExecutionException, ApiException, InterruptedException, IOException, ExecutionException {
-		JSONObject apiRequest = AccessToken.checkToken("PUT", "/ProductItemStockAdjustment", data, null, headToken);
+		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productitemstockadjustment", data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		return insertupdateAll(new JSONArray(data), null, apiRequest);
@@ -157,11 +126,11 @@ public class productItemStockAdjustmentController {
 	public ResponseEntity update(@PathVariable Long id, @RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JSONException, ParseException, InterruptedException, ExecutionException, ApiException, InterruptedException, IOException, ExecutionException {
 
-		JSONObject apiRequest = AccessToken.checkToken("PUT", "/ProductItemStockAdjustment/"+id, data, null, headToken);
+		JSONObject apiRequest = AccessToken.checkToken("PUT", "/productitemstockadjustment/"+id, data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		JSONObject jsonObj = new JSONObject(data);
-		jsonObj.put("ProductItemStockAdjustment_ID", id);
+		jsonObj.put("productitemstockadjustment_ID", id);
 
 		return insertupdateAll(null, jsonObj, apiRequest);
 	}
@@ -171,7 +140,7 @@ public class productItemStockAdjustmentController {
 		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 
-		List<ProductItemStockAdjustment> ProductItemStockAdjustments = new ArrayList<ProductItemStockAdjustment>();
+		List<ProductItemStockAdjustment> productitemstockadjustments = new ArrayList<ProductItemStockAdjustment>();
 		if (jsonProductItemStockAdjustment!= null) {
 			jsonProductItemStockAdjustments = new JSONArray();
 			jsonProductItemStockAdjustments.put(jsonProductItemStockAdjustment);
@@ -179,13 +148,13 @@ public class productItemStockAdjustmentController {
 
 		for (int i=0; i<jsonProductItemStockAdjustment.length(); i++) {
 			JSONObject jsonObj = jsonProductItemStockAdjustments.getJSONObject(i);
-			ProductItemStockAdjustment ProductItemStockAdjustment = new  ProductItemStockAdjustment();
+			ProductItemStockAdjustment productitemstockadjustment = new  ProductItemStockAdjustment();
 			long id=0; 
 
 			if (jsonObj.has("productitemstockadjustment_ID")) {
 				id = jsonObj.getLong("productitemstockadjustment_ID");
 				if (id!=0) {
-					ProductItemStockAdjustment = productitemstockadjustmentrepository.findOne(id);
+					productitemstockadjustment = productitemstockadjustmentrepository.findOne(id);
 				}
 			}
 
@@ -196,33 +165,33 @@ public class productItemStockAdjustmentController {
 			}
 
 			if (jsonObj.has("productitem_ID") && !jsonObj.isNull("productitem_ID"))
-				ProductItemStockAdjustment.setPRODUCTITEM_ID(jsonObj.getLong("productitem_ID"));
+				productitemstockadjustment.setPRODUCTITEM_ID(jsonObj.getLong("productitem_ID"));
 
 			if (jsonObj.has("quantity_ADJUST") && !jsonObj.isNull("quantity_ADJUST"))
-				ProductItemStockAdjustment.setQUANTITY_ADJUST(BigDecimal.valueOf(jsonObj.getDouble("quantity_ADJUST")));
+				productitemstockadjustment.setQUANTITY_ADJUST(BigDecimal.valueOf(jsonObj.getDouble("quantity_ADJUST")));
 
 			if (jsonObj.has("purchase_PRICE") && !jsonObj.isNull("purchase_PRICE"))
-				ProductItemStockAdjustment.setPURCHASE_PRICE(BigDecimal.valueOf(jsonObj.getDouble("purchase_PRICE")));
+				productitemstockadjustment.setPURCHASE_PRICE(BigDecimal.valueOf(jsonObj.getDouble("purchase_PRICE")));
 
 			if (id == 0)
-				ProductItemStockAdjustment.setISACTIVE("Y");
+				productitemstockadjustment.setISACTIVE("Y");
 			else if (jsonObj.has("isactive"))
-				ProductItemStockAdjustment.setISACTIVE(jsonObj.getString("isactive"));
+				productitemstockadjustment.setISACTIVE(jsonObj.getString("isactive"));
 
-			ProductItemStockAdjustment.setMODIFIED_BY(apiRequest.getString("request_ID"));
-			ProductItemStockAdjustment.setMODIFIED_WORKSTATION(apiRequest.getString("log_WORKSTATION"));
-			ProductItemStockAdjustment.setMODIFIED_WHEN(dateFormat1.format(date));
+			productitemstockadjustment.setMODIFIED_BY(apiRequest.getString("request_ID"));
+			productitemstockadjustment.setMODIFIED_WORKSTATION(apiRequest.getString("log_WORKSTATION"));
+			productitemstockadjustment.setMODIFIED_WHEN(dateFormat1.format(date));
 
-			ProductItemStockAdjustment = productitemstockadjustmentrepository.saveAndFlush(ProductItemStockAdjustment);
-			ProductItemStockAdjustments.add(ProductItemStockAdjustment);
+			productitemstockadjustment = productitemstockadjustmentrepository.saveAndFlush(productitemstockadjustment);
+			productitemstockadjustments.add(productitemstockadjustment);
 
 		}
 
 		ResponseEntity responseentity;
 		if (jsonProductItemStockAdjustment != null)
-			responseentity = new ResponseEntity(getAPIResponse(null, ProductItemStockAdjustments.get(0), null, null, null, apiRequest, true), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(null, productitemstockadjustments.get(0), null, null, null, apiRequest, true), HttpStatus.OK);
 		else
-			responseentity = new ResponseEntity(getAPIResponse(ProductItemStockAdjustments, null, null, null, null, apiRequest, true), HttpStatus.OK);
+			responseentity = new ResponseEntity(getAPIResponse(productitemstockadjustments, null, null, null, null, apiRequest, true), HttpStatus.OK);
 		return responseentity;
 	}
 
@@ -231,27 +200,27 @@ public class productItemStockAdjustmentController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity delete(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
-		JSONObject apiRequest = AccessToken.checkToken("GET", "/ProductItemStockAdjustment/"+id, null, null, headToken);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemstockadjustment/"+id, null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
-		ProductItemStockAdjustment ProductItemStockAdjustment = productitemstockadjustmentrepository.findOne(id);
-		productitemstockadjustmentrepository.delete(ProductItemStockAdjustment);
+		ProductItemStockAdjustment productitemstockadjustment = productitemstockadjustmentrepository.findOne(id);
+		productitemstockadjustmentrepository.delete(productitemstockadjustment);
 
-		return new ResponseEntity(getAPIResponse(null, ProductItemStockAdjustment, null, null, null, apiRequest, true).toString(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(null, productitemstockadjustment, null, null, null, apiRequest, true).toString(), HttpStatus.OK);
 	}
 
 	//update the list  to remove the given id and make it non-active
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
 	public ResponseEntity remove(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JSONException, ParseException, InterruptedException, ExecutionException, ApiException, InterruptedException, IOException, ExecutionException {
-		JSONObject apiRequest = AccessToken.checkToken("GET", "/ProductItemStockAdjustment/remove/"+id, null, null, headToken);
+		JSONObject apiRequest = AccessToken.checkToken("GET", "/productitemstockadjustment/remove/"+id, null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
-		JSONObject ProductItemStockAdjustment = new JSONObject();
-		ProductItemStockAdjustment.put("ProductItemStockAdjustment_ID", id);
-		ProductItemStockAdjustment.put("isactive", "N");
+		JSONObject productitemstockadjustment = new JSONObject();
+		productitemstockadjustment.put("productitemstockadjustment_ID", id);
+		productitemstockadjustment.put("isactive", "N");
 
-		return insertupdateAll(null, ProductItemStockAdjustment, apiRequest);
+		return insertupdateAll(null, productitemstockadjustment, apiRequest);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -270,16 +239,16 @@ public class productItemStockAdjustmentController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity BySearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException, InterruptedException, ExecutionException {
-		JSONObject apiRequest = AccessToken.checkToken("POST", "/ProductItemStockAdjustment/search" + ((active == true) ? "" : "/all"), data, null, headToken);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemstockadjustment/search" + ((active == true) ? "" : "/all"), data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.BAD_REQUEST);
 
 		JSONObject jsonObj = new JSONObject(data);
 
-		List<ProductItemStockAdjustment> ProductItemStockAdjustments = ((active == true)
+		List<ProductItemStockAdjustment> productitemstockadjustments = ((active == true)
 				? productitemstockadjustmentrepository.findBySearch("%" + jsonObj.getString("search") + "%")
 						: productitemstockadjustmentrepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
 
-		return new ResponseEntity(getAPIResponse(ProductItemStockAdjustments, null, null, null, null, apiRequest, true).toString(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemstockadjustments, null, null, null, null, apiRequest, true).toString(), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -296,10 +265,10 @@ public class productItemStockAdjustmentController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
-		JSONObject apiRequest = AccessToken.checkToken("POST", "/ProductItemStockAdjustment/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
+		JSONObject apiRequest = AccessToken.checkToken("POST", "/productitemstockadjustment/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
-		List<ProductItemStockAdjustment> ProductItemStockAdjustments = new ArrayList<ProductItemStockAdjustment>();
+		List<ProductItemStockAdjustment> productitemstockadjustments = new ArrayList<ProductItemStockAdjustment>();
 		JSONObject jsonObj = new JSONObject(data);
 		JSONArray searchObject = new JSONArray();
 
@@ -332,12 +301,12 @@ public class productItemStockAdjustmentController {
 		}
 
 		if (productitem_ID != 0) {
-			ProductItemStockAdjustments = ((active == true)
+			productitemstockadjustments = ((active == true)
 					? productitemstockadjustmentrepository.findByAdvancedSearch(productitem_ID, productitem_IDS)
 							: productitemstockadjustmentrepository.findAllByAdvancedSearch(productitem_ID, productitem_IDS));
 		}
 
-		return new ResponseEntity(getAPIResponse(ProductItemStockAdjustments, null, null, null, null, apiRequest, isWithDetail).toString(), HttpStatus.OK);
+		return new ResponseEntity(getAPIResponse(productitemstockadjustments, null, null, null, null, apiRequest, isWithDetail).toString(), HttpStatus.OK);
 	}
 
 	//getAPI response Function
@@ -349,9 +318,11 @@ public class productItemStockAdjustmentController {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductItemStockAdjustment", message).toString();
 		} else  {
 			if (isWithDetail == true) {
-				if (productitemstockadjustment != null)
+				if (productitemstockadjustment != null) {
+					productitemstockadjustments = new ArrayList<ProductItemStockAdjustment>();
 					productitemstockadjustments.add(productitemstockadjustment);
-
+				}
+				
 				if (productitemstockadjustments.size()>0) {
 					List<Integer> productitemList = new ArrayList<Integer>();
 
@@ -391,7 +362,6 @@ public class productItemStockAdjustmentController {
 							}
 						}
 					}
-
 
 					if (productitemstockadjustment != null)
 						rtnAPIResponse = mapper.writeValueAsString(productitemstockadjustments.get(0));

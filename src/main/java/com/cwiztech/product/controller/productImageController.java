@@ -314,7 +314,7 @@ public class productImageController {
 						if (productimages.get(i).getPRODUCT_ID() != null) {
 							productList.add(Integer.parseInt(productimages.get(i).getPRODUCT_ID().toString()));
 						}
-
+					} 
 					CompletableFuture<JSONArray> productFuture = CompletableFuture.supplyAsync(() -> {
 						if (productList.size() <= 0) {
 							return new JSONArray();
@@ -334,8 +334,8 @@ public class productImageController {
 
 					// Block until all are done
 					allDone.join();
-
-					JSONArray productObject = productFuture.get();
+  
+					JSONArray productObject =  new JSONArray(productFuture.toString());
 
 					for (int i=0; i<productimages.size(); i++) {
 						for (int j=0; j<productObject.length(); j++) {
@@ -369,7 +369,7 @@ public class productImageController {
 				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
 		}
-	}	
+		
 		return rtnAPIResponse;
 	}
 }
