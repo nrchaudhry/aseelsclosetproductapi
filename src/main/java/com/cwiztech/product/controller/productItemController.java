@@ -575,13 +575,13 @@ public class productItemController {
 					for (int i=0; i<productitems.size(); i++) {
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
-							if (productitems.get(i).getPRODUCT_ID() != null && productitems.get(i).getPRODUCT_ID() == product.getLong("getPRODUCT_ID")) {
+							if (productitems.get(i).getPRODUCT_ID() != null && productitems.get(i).getPRODUCT_ID() == product.getLong("product_ID")) {
 								productitems.get(i).setPRODUCT_DETAIL(product.toString());
 							}
 						}
 						for (int j=0; j<applicationObject.length(); j++) {
 							JSONObject application = applicationObject.getJSONObject(j);
-							if (productitems.get(i).getAPPLICATION_ID() != null && productitems.get(i).getAPPLICATION_ID() == application.getLong("taxcode_ID")) {
+							if (productitems.get(i).getAPPLICATION_ID() != null && productitems.get(i).getAPPLICATION_ID() == application.getLong("application_ID")) {
 								productitems.get(i).setAPPLICATION_DETAIL(application.toString());
 							}
 						}
