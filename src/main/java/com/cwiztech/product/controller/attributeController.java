@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,7 +45,7 @@ public class attributeController {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.GET)
-	public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/attribute", null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
@@ -54,7 +55,7 @@ public class attributeController {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
-	public ResponseEntity getAll(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity getAll(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/attribute/all", null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
@@ -65,7 +66,7 @@ public class attributeController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public ResponseEntity getOne(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity getOne(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/attribute/"+id, null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
@@ -77,7 +78,7 @@ public class attributeController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/ids", method = RequestMethod.POST)
 	public ResponseEntity getByIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
-			throws JsonProcessingException, JSONException, ParseException {
+			throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/attribute/ids", data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
@@ -97,7 +98,7 @@ public class attributeController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity insert(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
-			throws JsonProcessingException, JSONException, ParseException {
+			throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/attribute", data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		
@@ -107,7 +108,7 @@ public class attributeController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public ResponseEntity update(@PathVariable Long id, @RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
-			throws JsonProcessingException, JSONException, ParseException {
+			throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		
 		JSONObject apiRequest = AccessToken.checkToken("PUT", "/attribute/"+id, data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
@@ -120,7 +121,7 @@ public class attributeController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.PUT)
 	public ResponseEntity insertupdate(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
-			throws JsonProcessingException, JSONException, ParseException {
+			throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("PUT", "/attribute", data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		
@@ -128,7 +129,7 @@ public class attributeController {
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity insertupdateAll(JSONArray jsonAttributes, JSONObject jsonAttribute, JSONObject apiRequest) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity insertupdateAll(JSONArray jsonAttributes, JSONObject jsonAttribute, JSONObject apiRequest) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 	    SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 
@@ -212,7 +213,7 @@ public class attributeController {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity delete(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity delete(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/attribute/"+id, null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
@@ -224,7 +225,7 @@ public class attributeController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
-	public ResponseEntity remove(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity remove(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/attribute/"+id, null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		
@@ -237,18 +238,18 @@ public class attributeController {
 
 	@SuppressWarnings({ "rawtypes" })
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
-	public ResponseEntity getBySearch(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity getBySearch(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		return BySearch(data, true, headToken, LimitGrant);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
 	@RequestMapping(value = "/search/all", method = RequestMethod.POST)
-	public ResponseEntity getAllBySearch(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity getAllBySearch(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		return BySearch(data, false, headToken, LimitGrant);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity BySearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity BySearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/attribute/search" + ((active == true) ? "" : "/all"), data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
@@ -263,18 +264,18 @@ public class attributeController {
 
 	@SuppressWarnings({ "rawtypes" })
 	@RequestMapping(value = "/advancedsearch", method = RequestMethod.POST)
-	public ResponseEntity getByAdvancedSearch(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity getByAdvancedSearch(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		return ByAdvancedSearch(data, true, headToken, LimitGrant);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
 	@RequestMapping(value = "/advancedsearch/all", method = RequestMethod.POST)
-	public ResponseEntity getAllByAdvancedSearch(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity getAllByAdvancedSearch(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		return ByAdvancedSearch(data, false, headToken, LimitGrant);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException {
+	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/attribute/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		
@@ -325,7 +326,7 @@ public class attributeController {
 		return new ResponseEntity(rtn, HttpStatus.OK);
 	}
 
-	String getAPIResponse(List<Attribute> attributes, Attribute attribute , JSONArray jsonAttributes, JSONObject jsonAttribute, String message, JSONObject apiRequest, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException {
+	String getAPIResponse(List<Attribute> attributes, Attribute attribute , JSONArray jsonAttributes, JSONObject jsonAttribute, String message, JSONObject apiRequest, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException, InterruptedException, ExecutionException {
 		ObjectMapper mapper = new ObjectMapper();
 		String rtnAPIResponse="Invalid Resonse";
 

@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,7 +48,7 @@ public class productSageController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/sendtosage", method = RequestMethod.GET)
-	public ResponseEntity SendToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
+	public ResponseEntity SendToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException, InterruptedException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/product/sendtosage", null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
@@ -157,7 +158,7 @@ public class productSageController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/getfromsage/{page}", method = RequestMethod.GET)
-	public ResponseEntity GetFromSage(@PathVariable Long page, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
+	public ResponseEntity GetFromSage(@PathVariable Long page, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException, InterruptedException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/product/getfromsage", null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
@@ -305,7 +306,7 @@ public class productSageController {
 		return new ResponseEntity(getAPIResponse(null, null , null, null, "Product Updated", apiRequest, false), HttpStatus.OK);
 	}
 
-	String getAPIResponse(List<Product> products, Product product , JSONArray jsonProducts, JSONObject jsonProduct, String message, JSONObject apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	String getAPIResponse(List<Product> products, Product product , JSONArray jsonProducts, JSONObject jsonProduct, String message, JSONObject apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException, InterruptedException, ExecutionException {
 		ObjectMapper mapper = new ObjectMapper();
 		String rtnAPIResponse="Invalid Resonse";
 
@@ -354,7 +355,7 @@ public class productSageController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/updatetosage", method = RequestMethod.GET)
-	public ResponseEntity updateToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
+	public ResponseEntity updateToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException, InterruptedException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/product/sendtosage", null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 

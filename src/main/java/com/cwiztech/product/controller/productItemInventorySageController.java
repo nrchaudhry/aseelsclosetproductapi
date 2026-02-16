@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,7 +41,7 @@ public class productItemInventorySageController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/sendtosage", method = RequestMethod.GET)
-	public ResponseEntity SendToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
+	public ResponseEntity SendToSage(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException, InterruptedException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/productiteminventory/sendtosage", null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
@@ -120,7 +121,7 @@ public class productItemInventorySageController {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(value = "/updatestock", method = RequestMethod.GET)
-    public ResponseEntity UpdateStock(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException {
+    public ResponseEntity UpdateStock(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException, InterruptedException {
         JSONObject apiRequest = AccessToken.checkToken("GET", "/productiteminventory/updatestock", null, null, headToken);
         if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
@@ -198,7 +199,7 @@ public class productItemInventorySageController {
         return new ResponseEntity(getAPIResponse(null, null , objProductItemInventorys, null, null, apiRequest, false), HttpStatus.OK);
     }
 
-	String getAPIResponse(List<ProductItemInventory> productiteminventories, ProductItemInventory productiteminventory , JSONArray jsonProductItemInventorys, JSONObject jsonProductItemInventory, String message, JSONObject apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException {
+	String getAPIResponse(List<ProductItemInventory> productiteminventories, ProductItemInventory productiteminventory , JSONArray jsonProductItemInventorys, JSONObject jsonProductItemInventory, String message, JSONObject apiRequest, boolean isTableLog) throws JSONException, JsonProcessingException, ParseException, InterruptedException, ExecutionException {
 		ObjectMapper mapper = new ObjectMapper();
 		String rtnAPIResponse="Invalid Resonse";
 
