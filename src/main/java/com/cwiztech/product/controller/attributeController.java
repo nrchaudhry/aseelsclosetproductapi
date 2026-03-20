@@ -339,21 +339,21 @@ public class attributeController {
 						attributes.add(attribute);
 					}
 					if (attributes.size()>0) {
-						List<Integer> datatypeList = new ArrayList<Integer>();
+						List<Integer> lookupList = new ArrayList<Integer>();
 
 						for (int i=0; i<attributes.size(); i++) {
 							if (attributes.get(i).getDATATYPE_ID() != null) {
-								datatypeList.add(Integer.parseInt(attributes.get(i).getDATATYPE_ID().toString()));
+								lookupList.add(Integer.parseInt(attributes.get(i).getDATATYPE_ID().toString()));
 							}
 						}
 
 						CompletableFuture<JSONArray> datatypeFuture = CompletableFuture.supplyAsync(() -> {
-							if (datatypeList.size() <= 0) {
+							if (lookupList.size() <= 0) {
 								return new JSONArray();
 							}
 
 							try {
-								return new JSONArray(ServiceCall.POST("datatype/ids", "{datatypes: "+datatypeList+"}", apiRequest.getString("access_TOKEN"), true));
+								return new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+lookupList+"}", apiRequest.getString("access_TOKEN"), true));
 							} catch (JSONException | JsonProcessingException | ParseException e) {
 								e.printStackTrace();
 								return new JSONArray();
