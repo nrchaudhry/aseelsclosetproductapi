@@ -347,7 +347,7 @@ public class attributeController {
 							}
 						}
 
-						CompletableFuture<JSONArray> datatypeFuture = CompletableFuture.supplyAsync(() -> {
+						CompletableFuture<JSONArray> lookupFuture = CompletableFuture.supplyAsync(() -> {
 							if (lookupList.size() <= 0) {
 								return new JSONArray();
 							}
@@ -362,18 +362,17 @@ public class attributeController {
 					
 						// Wait until all futures complete
 						CompletableFuture<Void> allDone =
-								CompletableFuture.allOf(datatypeFuture);
+								CompletableFuture.allOf(lookupFuture);
 
 						// Block until all are done
 						allDone.join();
 
-						JSONArray datatypeObject = new JSONArray(datatypeFuture.toString());
+				        JSONArray lookups = lookupFuture.get();
 						
 						for (int i=0; i<attributes.size(); i++) {
-							for (int j=0; j<datatypeObject.length(); j++) {
-								JSONObject datatype = datatypeObject.getJSONObject(j);
-								if (attributes.get(i).getDATATYPE_ID() != null && attributes.get(i).getDATATYPE_ID() == datatype.getLong("DATATYPE_ID")) {
-									attributes.get(i).setDATATYPE_DETAIL(datatype.toString());
+							for (int j=0; j<lookups.length(); j++) {
+								if (attributes.get(i).getDATATYPE_ID() != null && attributes.get(i).getDATATYPE_ID() == lookups.getJSONObject(j).getLong("id") ) {
+									attributes.get(i).setDATATYPE_DETAIL(lookups.getJSONObject(j).toString());
 								}
 							}
 						}
