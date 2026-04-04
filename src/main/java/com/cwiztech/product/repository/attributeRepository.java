@@ -28,14 +28,14 @@ public interface attributeRepository extends JpaRepository<Attribute, Long>{
 	public List<Attribute> findAllBySearch(String search);
 
     @Query(value = "select * from TBLATTRIBUTE "
-	        + "where (DATATYPE_ID = CASE WHEN :DATATYPE_ID = 0 THEN DATATYPE_ID ELSE :PRMOTIONTYPE_ID END OR DATATYPE_ID IS NULL) "
+	        + "where (DATATYPE_ID = CASE WHEN :DATATYPE_ID = 0 THEN DATATYPE_ID ELSE :DATATYPE_ID END OR DATATYPE_ID IS NULL) "
 			+ "and ISACTIVE='Y' order by ATTRIBUTEORDER_NO ", nativeQuery = true)
 	List<Attribute> findByAdvancedSearch(
     @Param("DATATYPE_ID") Long DATATYPE_ID); 
 
 	@Query(value = "select * from TBLATTRIBUTE "
-			+ "where CASE WHEN :DATATYPE_ID = 0 THEN DATATYPE_ID=DATATYPE_ID ELSE DATATYPE_ID IN (:DATATYPE_IDS) END "
-			, nativeQuery = true)
+	        + "where (DATATYPE_ID = CASE WHEN :DATATYPE_ID = 0 THEN DATATYPE_ID ELSE :DATATYPE_ID END OR DATATYPE_ID IS NULL) "
+			+ "order by ATTRIBUTEORDER_NO ", nativeQuery = true)
 	List<Attribute> findAllByAdvancedSearch(
 		    @Param("DATATYPE_ID") Long DATATYPE_ID); 
 
