@@ -37,12 +37,12 @@ import com.cwiztech.token.AccessToken;
 @RequestMapping("/attributevalue")
 
 public class attributeValueController {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(attributeValueController.class);
 
 	@Autowired
 	private attributeValueRepository attributevaluerepository;
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity get(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
@@ -52,7 +52,7 @@ public class attributeValueController {
 		List<AttributeValue> attributevalues = attributevaluerepository.findActive();
 		return new ResponseEntity(getAPIResponse(attributevalues, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public ResponseEntity getAll(@RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
@@ -60,7 +60,7 @@ public class attributeValueController {
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<AttributeValue> attributevalues = attributevaluerepository.findAll();
-		
+
 		return new ResponseEntity(getAPIResponse(attributevalues, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
@@ -71,7 +71,7 @@ public class attributeValueController {
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		AttributeValue attributevalue = attributevaluerepository.findOne(id);
-		
+
 		return new ResponseEntity(getAPIResponse(null, attributevalue, null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
@@ -91,10 +91,10 @@ public class attributeValueController {
 		List<AttributeValue> attributevalues = new ArrayList<AttributeValue>();
 		if (jsonattributevalues.length()>0)
 			attributevalues = attributevaluerepository.findByIDs(attributevalue_IDS);
-		
+
 		return new ResponseEntity(getAPIResponse(attributevalues, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/notin/ids", method = RequestMethod.POST)
 	public ResponseEntity getByNotInIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
@@ -111,17 +111,17 @@ public class attributeValueController {
 		List<AttributeValue> attributevalues = new ArrayList<AttributeValue>();
 		if (jsonattributevalues.length()>0)
 			attributevalues = attributevaluerepository.findByNotInIDs(attributevalue_IDS);
-		
+
 		return new ResponseEntity(getAPIResponse(attributevalues, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity insert(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/attributevalue", data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
-		
+
 		return insertupdateAll(null, new JSONObject(data), apiRequest);
 	}
 
@@ -129,12 +129,12 @@ public class attributeValueController {
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public ResponseEntity update(@PathVariable Long id, @RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
 			throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
-		
+
 		JSONObject apiRequest = AccessToken.checkToken("PUT", "/attributevalue/"+id, data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 		JSONObject jsonObj = new JSONObject(data);
 		jsonObj.put("id", id);
-		
+
 		return insertupdateAll(null, jsonObj, apiRequest);
 	}
 
@@ -144,13 +144,13 @@ public class attributeValueController {
 			throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("PUT", "/attributevalue", data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
-		
+
 		return insertupdateAll(new JSONArray(data), null, apiRequest);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity insertupdateAll(JSONArray jsonAttributeValues, JSONObject jsonAttributeValue, JSONObject apiRequest) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
-	    SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 
 		List<AttributeValue> attributevalues = new ArrayList<AttributeValue>();
@@ -159,7 +159,7 @@ public class attributeValueController {
 			jsonAttributeValues.put(jsonAttributeValue);
 		}
 		log.info(jsonAttributeValues.toString());
-		
+
 		for (int a=0; a<jsonAttributeValues.length(); a++) {
 			JSONObject jsonObj = jsonAttributeValues.getJSONObject(a);
 			AttributeValue attributevalue = new AttributeValue();
@@ -169,28 +169,32 @@ public class attributeValueController {
 				attributevalueid = jsonObj.getLong("attributevalue_ID");
 				if (attributevalueid != 0) {
 					attributevalue = attributevaluerepository.findOne(attributevalueid);
-					
+
 					if (attributevalue == null)
 						return new ResponseEntity(getAPIResponse(null, null , null, null, "Invalid AttributeValue Data!", apiRequest, true), HttpStatus.OK);
 				}
 			}
-			
+
 			if (attributevalueid == 0) {
 				if (!jsonObj.has("attribute_ID") || jsonObj.isNull("attribute_ID"))
 					return new ResponseEntity(getAPIResponse(null, null , null, null, "attribute_ID is missing", apiRequest, true), HttpStatus.OK);
+
+				if (!jsonObj.has("attribute_VALUE") || jsonObj.isNull("attribute_VALUE"))
+					return new ResponseEntity(getAPIResponse(null, null , null, null, "attribute_VALUE is missing", apiRequest, true), HttpStatus.OK);
 			}
+
 			if (jsonObj.has("attribute_ID") && !jsonObj.isNull("attribute_ID"))
-			    attributevalue.setATTRIBUTE_ID(jsonObj.getLong("attribute_ID"));
-		
-		    if (jsonObj.has("attribute_VALUE") && !jsonObj.isNull("attribute_VALUE"))
-			    attributevalue.setATTRIBUTE_VALUE(jsonObj.getString("attribute_VALUE"));
-		
-		    if (jsonObj.has("attributevalueparent_ID") && !jsonObj.isNull("attributevalueparent_ID"))
-			    attributevalue.setATTRIBUTEVALUEPARENT_ID(jsonObj.getLong("attributevalueparent_ID"));
-			
-		    if (attributevalueid == 0)
+				attributevalue.setATTRIBUTE_ID(jsonObj.getLong("attribute_ID"));
+
+			if (jsonObj.has("attribute_VALUE") && !jsonObj.isNull("attribute_VALUE"))
+				attributevalue.setATTRIBUTE_VALUE(jsonObj.getString("attribute_VALUE"));
+
+			if (jsonObj.has("attributevalueparent_ID") && !jsonObj.isNull("attributevalueparent_ID"))
+				attributevalue.setATTRIBUTEVALUEPARENT_ID(attributevaluerepository.findOne(jsonObj.getLong("attributevalueparent_ID")));
+
+			if (attributevalueid == 0)
 				attributevalue.setISACTIVE("Y");
-		    else if (jsonObj.has("isactive"))
+			else if (jsonObj.has("isactive"))
 				attributevalue.setISACTIVE(jsonObj.getString("isactive"));
 
 			attributevalue.setMODIFIED_BY(apiRequest.getLong("request_ID"));
@@ -198,13 +202,13 @@ public class attributeValueController {
 			attributevalue.setMODIFIED_WHEN(dateFormat1.format(date));
 			attributevalues.add(attributevalue);
 		}
-		
+
 		for (int a=0; a<attributevalues.size(); a++) {
 			AttributeValue attributevalue = attributevalues.get(a);
 			attributevalue = attributevaluerepository.saveAndFlush(attributevalue);
 			attributevalues.get(a).setATTRIBUTEVALUE_ID(attributevalue.getATTRIBUTEVALUE_ID());
 		}
-		
+
 		ResponseEntity responseentity;
 		if (jsonAttributeValue != null)
 			responseentity = new ResponseEntity(getAPIResponse(null, attributevalues.get(0) , null, null, null, apiRequest, true), HttpStatus.OK);
@@ -212,7 +216,7 @@ public class attributeValueController {
 			responseentity = new ResponseEntity(getAPIResponse(attributevalues, null , null, null, null, apiRequest, true), HttpStatus.OK);
 		return responseentity;
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity delete(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
@@ -221,7 +225,7 @@ public class attributeValueController {
 
 		AttributeValue attributevalue = attributevaluerepository.findOne(id);
 		attributevaluerepository.delete(attributevalue);
-		
+
 		return new ResponseEntity(getAPIResponse(null, attributevalue , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
@@ -230,11 +234,11 @@ public class attributeValueController {
 	public ResponseEntity remove(@PathVariable Long id, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("GET", "/attributevalue/"+id, null, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
-		
+
 		JSONObject attributevalue = new JSONObject();
 		attributevalue.put("id", id);
 		attributevalue.put("isactive", "N");
-		
+
 		return insertupdateAll(null, attributevalue, apiRequest);
 	}
 
@@ -259,8 +263,8 @@ public class attributeValueController {
 
 		List<AttributeValue> attributevalues = ((active == true)
 				? attributevaluerepository.findBySearch("%" + jsonObj.getString("search") + "%")
-				: attributevaluerepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
-		
+						: attributevaluerepository.findAllBySearch("%" + jsonObj.getString("search") + "%"));
+
 		return new ResponseEntity(getAPIResponse(attributevalues, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
@@ -280,71 +284,70 @@ public class attributeValueController {
 	public ResponseEntity ByAdvancedSearch(String data, boolean active, String headToken, String LimitGrant) throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
 		JSONObject apiRequest = AccessToken.checkToken("POST", "/attributevalue/advancedsearch" + ((active == true) ? "" : "/all"), data, null, headToken);
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
-		
+
 		List<AttributeValue> attributevalues= new ArrayList<AttributeValue>();
 		JSONObject jsonObj = new JSONObject(data);
 		long attribute_ID = 0, attributevalueparent_ID = 0;
-		
-		   JSONArray searchObject = new JSONArray();
-	        List<Integer> attribute_IDS = new ArrayList<Integer>(); 
-	        List<Integer> attributevalueparent_IDS = new ArrayList<Integer>(); 
 
-	        attribute_IDS.add((int) 0);
-	        attributevalueparent_IDS.add((int) 0);
+		JSONArray searchObject = new JSONArray();
+		List<Integer> attribute_IDS = new ArrayList<Integer>(); 
+		List<Integer> attributevalueparent_IDS = new ArrayList<Integer>(); 
 
-	        		
-       boolean isWithDetail = true;
-       if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
-           isWithDetail = jsonObj.getBoolean("iswithdetail");
-       }
-       jsonObj.put("iswithdetail", false);
-		
-       if (jsonObj.has("attribute_ID") && !jsonObj.isNull("attribute_ID") && jsonObj.getLong("attribute_ID") != 0) {
-           attribute_ID = jsonObj.getLong("attribute_ID");
-           attribute_IDS.add((int) attribute_ID);
-       } else if (jsonObj.has("attribute") && !jsonObj.isNull("attribute") && jsonObj.getLong("attribute") != 0) {
-           if (active == true) {
-               searchObject = new JSONArray(ServiceCall.POST("attribute/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
-           } else {
-               searchObject = new JSONArray(ServiceCall.POST("attribute/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
-           }
+		attribute_IDS.add((int) 0);
+		attributevalueparent_IDS.add((int) 0);
 
-           attribute_ID = searchObject.length();
-           for (int i=0; i<searchObject.length(); i++) {
-               attribute_IDS.add((int) searchObject.getJSONObject(i).getLong("attribute_ID"));
-           }
-       }
-		
-		if (jsonObj.has("attributevalueparent_ID") && !jsonObj.isNull("attributevalueparent_ID"))
-			attributevalueparent_ID = jsonObj.getLong("attributevalueparent_ID");
-		
-		if (attribute_ID != 0 || attributevalueparent_ID != 0) {
-			List<AttributeValue> attributevalue = ((active == true)
-				? attributevaluerepository.findByAdvancedSearch(attribute_ID,attribute_IDS, attributevalueparent_ID, attributevalueparent_IDS)
-				: attributevaluerepository.findAllByAdvancedSearch(attribute_ID,attribute_IDS, attributevalueparent_ID, attributevalueparent_IDS));
-		
-		 for (int i=0; i<attributevalue.size(); i++) {
-	            boolean found = false;
-	            
-	            for (int j=0; j<attributevalues.size(); j++) {
-	                if (attributevalue.get(i).getATTRIBUTEVALUE_ID() == attributevalues.get(j).getATTRIBUTEVALUE_ID()) {
-	                    found = true;
-	                    break;
-	                }
-	            }
-	            
-	            if (found == false) {
-	            	attributevalues.add(attributevalue.get(i));
-	            }
-	        }
+
+		boolean isWithDetail = true;
+		if (jsonObj.has("iswithdetail") && !jsonObj.isNull("iswithdetail")) {
+			isWithDetail = jsonObj.getBoolean("iswithdetail");
 		}
+		jsonObj.put("iswithdetail", false);
+
+		if (jsonObj.has("attribute_ID") && !jsonObj.isNull("attribute_ID") && jsonObj.getLong("attribute_ID") != 0) {
+			attribute_ID = jsonObj.getLong("attribute_ID");
+			attribute_IDS.add((int) attribute_ID);
+		} else if (jsonObj.has("attribute") && !jsonObj.isNull("attribute") && jsonObj.getLong("attribute") != 0) {
+			if (active == true) {
+				searchObject = new JSONArray(ServiceCall.POST("attribute/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
+			} else {
+				searchObject = new JSONArray(ServiceCall.POST("attribute/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
+			}
+
+			attribute_ID = searchObject.length();
+			for (int i=0; i<searchObject.length(); i++) {
+				attribute_IDS.add((int) searchObject.getJSONObject(i).getLong("attribute_ID"));
+			}
+		}
+
+		if (jsonObj.has("attributevalueparent_ID") && !jsonObj.isNull("attributevalueparent_ID") && jsonObj.getLong("attributevalueparent_ID") != 0) {
+			attributevalueparent_ID = jsonObj.getLong("attributevalueparent_ID");
+			attributevalueparent_IDS.add((int) attributevalueparent_ID);
+		} else if (jsonObj.has("attributevalueparent") && !jsonObj.isNull("attributevalueparent") && jsonObj.getLong("attributevalueparent") != 0) {
+			if (active == true) {
+				searchObject = new JSONArray(ServiceCall.POST("attributevalue/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
+			} else {
+				searchObject = new JSONArray(ServiceCall.POST("attributevalue/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
+			}
+
+			attributevalueparent_ID = searchObject.length();
+			for (int i=0; i<searchObject.length(); i++) {
+				attributevalueparent_IDS.add((int) searchObject.getJSONObject(i).getLong("attributevalue_ID"));
+			}
+		}
+
+		if (attribute_ID != 0 || attributevalueparent_ID != 0) {
+			attributevalues = ((active == true)
+					? attributevaluerepository.findByAdvancedSearch(attribute_ID,attribute_IDS, attributevalueparent_ID, attributevalueparent_IDS)
+							: attributevaluerepository.findAllByAdvancedSearch(attribute_ID,attribute_IDS, attributevalueparent_ID, attributevalueparent_IDS));
+		}
+
 		return new ResponseEntity(getAPIResponse(attributevalues, null , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 	}
 
 	String getAPIResponse(List<AttributeValue> attributevalues, AttributeValue attributevalue , JSONArray jsonAttributeValues, JSONObject jsonAttributeValue, String message, JSONObject apiRequest, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException, InterruptedException, ExecutionException {
 		ObjectMapper mapper = new ObjectMapper();
 		String rtnAPIResponse="Invalid Resonse";
-		
+
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "AttributeValue", message).toString();
 		} else {
@@ -355,7 +358,7 @@ public class attributeValueController {
 				}
 				if (attributevalues.size()>0) {
 					List<Integer>  attributeList = new ArrayList<Integer>();
-					
+
 					for (int i=0; i<attributevalues.size(); i++) {
 						if (attributevalues.get(i).getATTRIBUTE_ID() != null) {
 							attributeList.add(Integer.parseInt(attributevalues.get(i).getATTRIBUTE_ID().toString()));
@@ -383,7 +386,7 @@ public class attributeValueController {
 					allDone.join();
 
 					JSONArray attributeObject = new JSONArray(attributeFuture.toString());
-			
+
 					for (int i=0; i<attributevalues.size(); i++) {
 						for (int j=0; j<attributeObject.length(); j++) {
 							JSONObject attribute = attributeObject.getJSONObject(j);
@@ -398,24 +401,21 @@ public class attributeValueController {
 					rtnAPIResponse = mapper.writeValueAsString(attributevalues.get(0));
 				else	
 					rtnAPIResponse = mapper.writeValueAsString(attributevalues);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (attributevalue != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(attributevalue);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (attributevalues != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(attributevalues);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (jsonAttributeValues != null) {
 				rtnAPIResponse = jsonAttributeValues.toString();
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (jsonAttributeValue != null) {
 				rtnAPIResponse = jsonAttributeValue.toString();
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
+
+			apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 		}
 
 		return rtnAPIResponse;

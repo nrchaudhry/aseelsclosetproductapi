@@ -36,9 +36,7 @@ import com.cwiztech.token.AccessToken;
 @RestController
 @CrossOrigin
 @RequestMapping("/productattribute")
-
 public class productAttributeController {
-
 	private static final Logger log = LoggerFactory.getLogger(productAttributeController.class);
 
 	@Autowired
@@ -51,6 +49,7 @@ public class productAttributeController {
 		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
 
 		List<ProductAttribute> productattributes = productattributerepository.findActive();
+
 		return new ResponseEntity(getAPIResponse(productattributes, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
 
@@ -92,26 +91,6 @@ public class productAttributeController {
 		List<ProductAttribute> productattributes = new ArrayList<ProductAttribute>();
 		if (jsonproductattributes.length()>0)
 			productattributes = productattributerepository.findByIDs(productattribute_IDS);
-
-		return new ResponseEntity(getAPIResponse(productattributes, null , null, null, null, apiRequest, true), HttpStatus.OK);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/notin/ids", method = RequestMethod.POST)
-	public ResponseEntity getByNotInIDs(@RequestBody String data, @RequestHeader(value = "Authorization") String headToken, @RequestHeader(value = "LimitGrant") String LimitGrant)
-			throws JsonProcessingException, JSONException, ParseException, InterruptedException, ExecutionException {
-		JSONObject apiRequest = AccessToken.checkToken("POST", "/productattribute/notin/ids", data, null, headToken);
-		if (apiRequest.has("error")) return new ResponseEntity(apiRequest.toString(), HttpStatus.OK);
-
-		List<Integer> productattribute_IDS = new ArrayList<Integer>(); 
-		JSONObject jsonObj = new JSONObject(data);
-		JSONArray jsonproductattributes = jsonObj.getJSONArray("productattributes");
-		for (int i=0; i<jsonproductattributes.length(); i++) {
-			productattribute_IDS.add((Integer) jsonproductattributes.get(i));
-		}
-		List<ProductAttribute> productattributes = new ArrayList<ProductAttribute>();
-		if (jsonproductattributes.length()>0)
-			productattributes = productattributerepository.findByNotInIDs(productattribute_IDS);
 
 		return new ResponseEntity(getAPIResponse(productattributes, null , null, null, null, apiRequest, true), HttpStatus.OK);
 	}
@@ -394,9 +373,11 @@ public class productAttributeController {
 			}
 		}
 
-		productattributes = ((active == true)
-				? productattributerepository.findByAdvancedSearch(productcategory_ID,productcategory_IDS, product_ID,product_IDS, attributecategory_ID,attributecategory_IDS, attribute_ID, attribute_IDS)
-						: productattributerepository.findAllByAdvancedSearch(productcategory_ID,productcategory_IDS, product_ID,product_IDS, attributecategory_ID,attributecategory_IDS, attribute_ID, attribute_IDS));		
+		if (productcategory_ID != 0 || product_ID != 0 || attributecategory_ID != 0 || attribute_ID != 0) {
+			productattributes = ((active == true)
+					? productattributerepository.findByAdvancedSearch(productcategory_ID, productcategory_IDS, product_ID, product_IDS, attributecategory_ID, attributecategory_IDS, attribute_ID, attribute_IDS)
+							: productattributerepository.findAllByAdvancedSearch(productcategory_ID, productcategory_IDS, product_ID , product_IDS, attributecategory_ID, attributecategory_IDS, attribute_ID, attribute_IDS));		
+		}
 
 
 		//		if (jsonObj.has("withattributevalue")) {
@@ -535,10 +516,10 @@ public class productAttributeController {
 					// Block until all are done
 					allDone.join();
 
-					JSONArray attributeObject = new JSONArray(attributeFuture.toString());
-					JSONArray attributecategoryObject = new JSONArray(attributecategoryFuture.toString());
-					JSONArray productObject = new JSONArray(productFuture.toString());
-					JSONArray productcategoryObject = new JSONArray(productcategoryFuture.toString());
+					JSONArray attributeObject = attributeFuture.get();
+					JSONArray attributecategoryObject = attributecategoryFuture.get();
+					JSONArray productObject = productFuture.get();
+					JSONArray productcategoryObject = productcategoryFuture.get();
 
 					for (int i=0; i<productattributes.size(); i++) {
 						for (int j=0; j<attributeObject.length(); j++) {
@@ -547,18 +528,21 @@ public class productAttributeController {
 								productattributes.get(i).setATTRIBUTE_DETAIL(attribute.toString());
 							}
 						}
+						
 						for (int j=0; j<attributecategoryObject.length(); j++) {
 							JSONObject attributecategory = attributecategoryObject.getJSONObject(j);
 							if (productattributes.get(i).getATTRIBUTECATEGORY_ID() != null && productattributes.get(i).getATTRIBUTECATEGORY_ID() == attributecategory.getLong("ATTRIBUTECATEGORY_ID")) {
 								productattributes.get(i).setATTRIBUTECATEGORY_DETAIL(attributecategory.toString());
 							}
 						}
+						
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
 							if (productattributes.get(i).getPRODUCT_ID() != null && productattributes.get(i).getPRODUCT_ID() == product.getLong("PRODUCT_ID")) {
 								productattributes.get(i).setPRODUCT_DETAIL(product.toString());
 							}
 						}
+						
 						for (int j=0; j<productcategoryObject.length(); j++) {
 							JSONObject productcategory = productcategoryObject.getJSONObject(j);
 							if (productattributes.get(i).getPRODUCTCATEGORY_ID() != null && productattributes.get(i).getPRODUCTCATEGORY_ID() == productcategory.getLong("PRODUCTCATEGORY_ID")) {
@@ -566,30 +550,29 @@ public class productAttributeController {
 							}
 						}
 					}
+					
 					if (productattribute != null)
 						rtnAPIResponse = mapper.writeValueAsString(productattributes.get(0));
 					else	
 						rtnAPIResponse = mapper.writeValueAsString(productattributes);
-					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 				} else if (productattribute != null && isWithDetail == false) {
 					rtnAPIResponse = mapper.writeValueAsString(productattribute);
-					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 				} else if (productattributes != null && isWithDetail == false) {
 					rtnAPIResponse = mapper.writeValueAsString(productattributes);
-					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 				} else if (jsonProductAttributes != null) {
 					rtnAPIResponse = jsonProductAttributes.toString();
-					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 				} else if (jsonProductAttribute != null) {
 					rtnAPIResponse = jsonProductAttribute.toString();
-					apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 				}
+
+				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
 		}
+
 		return rtnAPIResponse;
 	}
 }	

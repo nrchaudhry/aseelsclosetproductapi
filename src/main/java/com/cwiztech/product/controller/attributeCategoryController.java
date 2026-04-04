@@ -319,14 +319,13 @@ public class attributeCategoryController {
 			}
 		}
 
-		if (attributecategoryparent_ID != 0 ) {
+		if (attributecategoryparent_ID != 0) {
 			attributecategories = ((active == true)
 					? attributecategoryrepository.findByAdvancedSearch(attributecategoryparent_ID, attributecategoryparent_IDS)
 							: attributecategoryrepository.findAllByAdvancedSearch(attributecategoryparent_ID, attributecategoryparent_IDS));
-
 		}
-		return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 
+		return new ResponseEntity(getAPIResponse(attributecategories, null , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 	}
 
 	String getAPIResponse(List<AttributeCategory> attributecategories, AttributeCategory attributecategory , JSONArray jsonAttributecategories, JSONObject jsonAttributeCategory, String message, JSONObject apiRequest, boolean isWithDetail) throws JSONException, JsonProcessingException, ParseException, InterruptedException, ExecutionException {

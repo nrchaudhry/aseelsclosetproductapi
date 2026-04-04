@@ -303,9 +303,11 @@ public class attributeController {
 				datatype_ID = datatype.getLong("id");
 		}
 
-		attributes = ((active == true)
-				? attributerepository.findByAdvancedSearch(datatype_ID)
-						: attributerepository.findAllByAdvancedSearch(datatype_ID));
+		if (datatype_ID != 0) {
+			attributes = ((active == true)
+					? attributerepository.findByAdvancedSearch(datatype_ID)
+							: attributerepository.findAllByAdvancedSearch(datatype_ID));
+		}
 
 		return new ResponseEntity(getAPIResponse(attributes, null , null, null, null, apiRequest, isWithDetail), HttpStatus.OK);
 	}

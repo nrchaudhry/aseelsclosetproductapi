@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -14,13 +16,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "TBLATTRIBUTEVALUE")
 
 public class AttributeValue {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long ATTRIBUTEVALUE_ID;
 	
-	@Column(name = "ATTRIBUTEVALUEPARENT_ID")
-	private Long ATTRIBUTEVALUEPARENT_ID ;
+	@OneToOne
+	@JoinColumn(name = "ATTRIBUTEVALUEPARENT_ID")
+	private AttributeValue ATTRIBUTEVALUEPARENT_ID ;
 	
 	@Column(name = "ATTRIBUTE_ID")
 	private Long ATTRIBUTE_ID ;
@@ -50,11 +52,11 @@ public class AttributeValue {
 		return ATTRIBUTEVALUE_ID;
 	}
 	
-	public Long getATTRIBUTEVALUEPARENT_ID() {
+	public AttributeValue getATTRIBUTEVALUEPARENT_ID() {
 		return ATTRIBUTEVALUEPARENT_ID;
 	}
 
-	public void setATTRIBUTEVALUEPARENT_ID(Long pRODUCTATTRIBUTEVALUEPARENT_ID) {
+	public void setATTRIBUTEVALUEPARENT_ID(AttributeValue pRODUCTATTRIBUTEVALUEPARENT_ID) {
 		ATTRIBUTEVALUEPARENT_ID = pRODUCTATTRIBUTEVALUEPARENT_ID;
 	}
 
