@@ -308,14 +308,14 @@ public class attributeCategoryController {
 			attributecategoryparent_IDS.add((int) attributecategoryparent_ID);
 		} else if (jsonObj.has("attributecategoryparent") && !jsonObj.isNull("attributecategoryparent") && jsonObj.getLong("attributecategoryparent") != 0) {
 			if (active == true) {
-				searchObject = new JSONArray(ServiceCall.POST("attributecategoryparent/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
+				searchObject = new JSONArray(ServiceCall.POST("attributecategory/advancedsearch", jsonObj.toString().replace("\"", "'"), headToken, false));
 			} else {
-				searchObject = new JSONArray(ServiceCall.POST("attributecategoryparent/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
+				searchObject = new JSONArray(ServiceCall.POST("attributecategory/advancedsearch/all", jsonObj.toString().replace("\"", "'"), headToken, false));
 			}
 
 			attributecategoryparent_ID = searchObject.length();
 			for (int i=0; i<searchObject.length(); i++) {
-				attributecategoryparent_IDS.add((int) searchObject.getJSONObject(i).getLong("attributecategoryparent_ID"));
+				attributecategoryparent_IDS.add((int) searchObject.getJSONObject(i).getLong("attributecategory_ID"));
 			}
 		}
 
@@ -336,30 +336,31 @@ public class attributeCategoryController {
 		if (message != null) {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "AttributeCategory", message).toString();
 		} else {
-			if (attributecategory != null && isWithDetail == true) {
-				rtnAPIResponse = mapper.writeValueAsString(attributecategory);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
-
-			} else if (attributecategories != null && isWithDetail == true) {
-				rtnAPIResponse = mapper.writeValueAsString(attributecategories);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+			if ((attributecategory != null || attributecategories != null) && isWithDetail == true) {
+				if (attributecategory != null) {
+					attributecategories = new ArrayList<AttributeCategory>();
+					attributecategories.add(attributecategory);
+				}
+				
+				if (attributecategory != null) 
+					rtnAPIResponse = mapper.writeValueAsString(attributecategories.get(0));
+				else
+					rtnAPIResponse = mapper.writeValueAsString(attributecategories);
 
 			} else if (attributecategory != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(attributecategory);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (attributecategories != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(attributecategories);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (jsonAttributecategories != null) {
 				rtnAPIResponse = jsonAttributecategories.toString();
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (jsonAttributeCategory != null) {
 				rtnAPIResponse = jsonAttributeCategory.toString();
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
+
+			apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 		}
 
 		return rtnAPIResponse;
