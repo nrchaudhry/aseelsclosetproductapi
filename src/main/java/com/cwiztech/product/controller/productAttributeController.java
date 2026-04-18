@@ -431,10 +431,11 @@ public class productAttributeController {
 			rtnAPIResponse = apiRequestLog.apiRequestErrorLog(apiRequest, "ProductAttribute", message).toString();
 		} else {
 			if ((productattributes != null || productattribute != null) && isWithDetail == true) {
-				if (productattribute != null)
+				if (productattribute != null) {
 					productattributes = new ArrayList<ProductAttribute>();
 					productattributes.add(productattribute);
-
+				}
+				
 				if (productattributes.size()>0) {
 					List<Integer> attributeList = new ArrayList<Integer>();
 					List<Integer> attributecategoryList = new ArrayList<Integer>();
