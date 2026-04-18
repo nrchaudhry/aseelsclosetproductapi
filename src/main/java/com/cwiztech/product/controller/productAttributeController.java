@@ -527,28 +527,28 @@ public class productAttributeController {
 					for (int i=0; i<productattributes.size(); i++) {
 						for (int j=0; j<attributeObject.length(); j++) {
 							JSONObject attribute = attributeObject.getJSONObject(j);
-							if (productattributes.get(i).getATTRIBUTE_ID() != null && productattributes.get(i).getATTRIBUTE_ID() == attribute.getLong("ATTRIBUTE_ID")) {
+							if (productattributes.get(i).getATTRIBUTE_ID() != null && productattributes.get(i).getATTRIBUTE_ID() == attribute.getLong("attribute_ID")) {
 								productattributes.get(i).setATTRIBUTE_DETAIL(attribute.toString());
 							}
 						}
 						
 						for (int j=0; j<attributecategoryObject.length(); j++) {
 							JSONObject attributecategory = attributecategoryObject.getJSONObject(j);
-							if (productattributes.get(i).getATTRIBUTECATEGORY_ID() != null && productattributes.get(i).getATTRIBUTECATEGORY_ID() == attributecategory.getLong("ATTRIBUTECATEGORY_ID")) {
+							if (productattributes.get(i).getATTRIBUTECATEGORY_ID() != null && productattributes.get(i).getATTRIBUTECATEGORY_ID() == attributecategory.getLong("attributecategory_ID")) {
 								productattributes.get(i).setATTRIBUTECATEGORY_DETAIL(attributecategory.toString());
 							}
 						}
 						
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
-							if (productattributes.get(i).getPRODUCT_ID() != null && productattributes.get(i).getPRODUCT_ID() == product.getLong("PRODUCT_ID")) {
+							if (productattributes.get(i).getPRODUCT_ID() != null && productattributes.get(i).getPRODUCT_ID() == product.getLong("product_ID")) {
 								productattributes.get(i).setPRODUCT_DETAIL(product.toString());
 							}
 						}
 						
 						for (int j=0; j<productcategoryObject.length(); j++) {
 							JSONObject productcategory = productcategoryObject.getJSONObject(j);
-							if (productattributes.get(i).getPRODUCTCATEGORY_ID() != null && productattributes.get(i).getPRODUCTCATEGORY_ID() == productcategory.getLong("PRODUCTCATEGORY_ID")) {
+							if (productattributes.get(i).getPRODUCTCATEGORY_ID() != null && productattributes.get(i).getPRODUCTCATEGORY_ID() == productcategory.getLong("productcategory_ID")) {
 								productattributes.get(i).setPRODUCTCATEGORY_DETAIL(productcategory.toString());
 							}
 						}
