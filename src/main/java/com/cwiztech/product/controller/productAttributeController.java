@@ -165,7 +165,7 @@ public class productAttributeController {
 				if (!jsonObj.has("attributecategory_ID") || jsonObj.isNull("attributecategory_ID"))
 					return new ResponseEntity(getAPIResponse(null, null , null, null, "attributecategory_ID is missing", apiRequest, true), HttpStatus.OK);
 
-				if (!jsonObj.has("productcategory_ID") || jsonObj.isNull("productcategory_ID") || !jsonObj.has("product_ID") || jsonObj.isNull("product_ID"))
+				if ((!jsonObj.has("productcategory_ID") || jsonObj.isNull("productcategory_ID")) && (!jsonObj.has("product_ID") || jsonObj.isNull("product_ID")))
 					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategory_ID/product_ID is missing", apiRequest, true), HttpStatus.OK);
 
 				if (!jsonObj.has("isrequired") || jsonObj.isNull("isrequired"))
@@ -192,6 +192,8 @@ public class productAttributeController {
 
 			if (jsonObj.has("showinlist") && !jsonObj.isNull("showinlist"))
 				productattribute.setSHOWINLIST(jsonObj.getString("showinlist"));
+			else if (productattributeid == 0)
+				productattribute.setSHOWINLIST("Y");
 
 			if (productattributeid == 0)
 				productattribute.setISACTIVE("Y");
