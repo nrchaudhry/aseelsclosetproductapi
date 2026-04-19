@@ -281,21 +281,23 @@ public class productController {
 				if (!jsonObj.has("productcategory_ID") || jsonObj.isNull("productcategory_ID"))
 					return new ResponseEntity(getAPIResponse(null, null , null, null, "productcategory_ID is missing", apiRequest, true), HttpStatus.OK);
 
-				String new_code = null;
-				String productcategory_CODE = productrepository.GenerateNewCode(jsonObj.getLong("productcategory_ID"));
-				if (productcategory_CODE == null) {
-					JSONObject productcategory = new JSONObject(ServiceCall.GET("productcategory/"+jsonObj.getLong("productcategory_ID"), apiRequest.getString("access_TOKEN"), false));
-					new_code = productcategory.getString("productcategory_CODE") + "001";
-				} else {
-					String codeDigits = productcategory_CODE.substring(productcategory_CODE.length() - 3);
-					int z=Integer.parseInt(codeDigits) + 1;
-					String codeProductCategory = productcategory_CODE.substring(0,productcategory_CODE.length() - 3);
-
-					codeDigits = "000" + String.valueOf(z);
-					new_code = codeProductCategory + codeDigits.substring(codeDigits.length() - 3);
+				if (!jsonObj.has("product_NAME") || jsonObj.isNull("product_NAME")) {
+					String new_code = null;
+					String productcategory_CODE = productrepository.GenerateNewCode(jsonObj.getLong("productcategory_ID"));
+					if (productcategory_CODE == null) {
+						JSONObject productcategory = new JSONObject(ServiceCall.GET("productcategory/"+jsonObj.getLong("productcategory_ID"), apiRequest.getString("access_TOKEN"), false));
+						new_code = productcategory.getString("productcategory_CODE") + "001";
+					} else {
+						String codeDigits = productcategory_CODE.substring(productcategory_CODE.length() - 3);
+						int z=Integer.parseInt(codeDigits) + 1;
+						String codeProductCategory = productcategory_CODE.substring(0,productcategory_CODE.length() - 3);
+	
+						codeDigits = "000" + String.valueOf(z);
+						new_code = codeProductCategory + codeDigits.substring(codeDigits.length() - 3);
+					}
+	
+					product.setPRODUCT_CODE(new_code);
 				}
-
-				product.setPRODUCT_CODE(new_code);
 			}
 
 			if (jsonObj.has("productcategory_ID") && !jsonObj.isNull("productcategory_ID")) {
