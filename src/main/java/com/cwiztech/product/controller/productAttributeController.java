@@ -435,7 +435,7 @@ public class productAttributeController {
 					productattributes = new ArrayList<ProductAttribute>();
 					productattributes.add(productattribute);
 				}
-				
+
 				if (productattributes.size()>0) {
 					List<Integer> attributeList = new ArrayList<Integer>();
 					List<Integer> attributecategoryList = new ArrayList<Integer>();
@@ -531,21 +531,21 @@ public class productAttributeController {
 								productattributes.get(i).setATTRIBUTE_DETAIL(attribute.toString());
 							}
 						}
-						
+
 						for (int j=0; j<attributecategoryObject.length(); j++) {
 							JSONObject attributecategory = attributecategoryObject.getJSONObject(j);
 							if (productattributes.get(i).getATTRIBUTECATEGORY_ID() != null && productattributes.get(i).getATTRIBUTECATEGORY_ID() == attributecategory.getLong("attributecategory_ID")) {
 								productattributes.get(i).setATTRIBUTECATEGORY_DETAIL(attributecategory.toString());
 							}
 						}
-						
+
 						for (int j=0; j<productObject.length(); j++) {
 							JSONObject product = productObject.getJSONObject(j);
 							if (productattributes.get(i).getPRODUCT_ID() != null && productattributes.get(i).getPRODUCT_ID() == product.getLong("product_ID")) {
 								productattributes.get(i).setPRODUCT_DETAIL(product.toString());
 							}
 						}
-						
+
 						for (int j=0; j<productcategoryObject.length(); j++) {
 							JSONObject productcategory = productcategoryObject.getJSONObject(j);
 							if (productattributes.get(i).getPRODUCTCATEGORY_ID() != null && productattributes.get(i).getPRODUCTCATEGORY_ID() == productcategory.getLong("productcategory_ID")) {
@@ -553,27 +553,27 @@ public class productAttributeController {
 							}
 						}
 					}
-					
-					if (productattribute != null)
-						rtnAPIResponse = mapper.writeValueAsString(productattributes.get(0));
-					else	
-						rtnAPIResponse = mapper.writeValueAsString(productattributes);
-
-				} else if (productattribute != null && isWithDetail == false) {
-					rtnAPIResponse = mapper.writeValueAsString(productattribute);
-
-				} else if (productattributes != null && isWithDetail == false) {
-					rtnAPIResponse = mapper.writeValueAsString(productattributes);
-
-				} else if (jsonProductAttributes != null) {
-					rtnAPIResponse = jsonProductAttributes.toString();
-
-				} else if (jsonProductAttribute != null) {
-					rtnAPIResponse = jsonProductAttribute.toString();
 				}
 
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
+				if (productattribute != null)
+					rtnAPIResponse = mapper.writeValueAsString(productattributes.get(0));
+				else	
+					rtnAPIResponse = mapper.writeValueAsString(productattributes);
+
+			} else if (productattribute != null && isWithDetail == false) {
+				rtnAPIResponse = mapper.writeValueAsString(productattribute);
+
+			} else if (productattributes != null && isWithDetail == false) {
+				rtnAPIResponse = mapper.writeValueAsString(productattributes);
+
+			} else if (jsonProductAttributes != null) {
+				rtnAPIResponse = jsonProductAttributes.toString();
+
+			} else if (jsonProductAttribute != null) {
+				rtnAPIResponse = jsonProductAttribute.toString();
 			}
+
+			apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 		}
 
 		return rtnAPIResponse;
