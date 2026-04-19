@@ -485,7 +485,7 @@ public class productItemInventoryController {
 				}
 				if (productiteminventories.size()>0) {
 					List<Integer> productitemList = new ArrayList<Integer>();
-					List<Integer> productlocationList = new ArrayList<Integer>();
+					List<Integer> lookupList = new ArrayList<Integer>();
 
 					for (int i=0; i<productiteminventories.size(); i++) {
 						if (productiteminventories.get(i).getPRODUCTITEM_ID() != null) {
@@ -493,7 +493,7 @@ public class productItemInventoryController {
 						}
 
 						if (productiteminventories.get(i).getPRODUCTLOCATION_ID() != null) {
-							productlocationList.add(Integer.parseInt(productiteminventories.get(i).getPRODUCTLOCATION_ID().toString()));
+							lookupList.add(Integer.parseInt(productiteminventories.get(i).getPRODUCTLOCATION_ID().toString()));
 						}
 					}
 					CompletableFuture<JSONArray> productitemFuture = CompletableFuture.supplyAsync(() -> {
@@ -502,20 +502,20 @@ public class productItemInventoryController {
 						}
 
 						try {
-							return new JSONArray(ServiceCall.POST("productitem/ids", "{productitems: "+productitemList+"}", apiRequest.getString("access_TOKEN"), true));
+							return new JSONArray(ServiceCall.POST("productitem/ids", "{productitems: "+productitemList+"}", apiRequest.getString("access_TOKEN"), false));
 						} catch (JSONException | JsonProcessingException | ParseException e) {
 							e.printStackTrace();
 							return new JSONArray();
 						}
 					});
 
-					CompletableFuture<JSONArray> productlocationFuture = CompletableFuture.supplyAsync(() -> {
-						if (productlocationList.size() <= 0) {
+					CompletableFuture<JSONArray> lookupFuture = CompletableFuture.supplyAsync(() -> {
+						if (lookupList.size() <= 0) {
 							return new JSONArray();
 						}
 
 						try {
-							return new JSONArray(ServiceCall.POST("productlocation/ids", "{productlocations: "+productlocationList+"}", apiRequest.getString("access_TOKEN"), true));
+							return new JSONArray(ServiceCall.POST("lookup/ids", "{lookups: "+lookupList+"}", apiRequest.getString("access_TOKEN"), true));
 						} catch (JSONException | JsonProcessingException | ParseException e) {
 							e.printStackTrace();
 							return new JSONArray();
@@ -524,25 +524,24 @@ public class productItemInventoryController {
 
 					// Wait until all futures complete
 					CompletableFuture<Void> allDone =
-							CompletableFuture.allOf(productitemFuture, productlocationFuture);
+							CompletableFuture.allOf(productitemFuture, lookupFuture);
 
 					// Block until all are done
 					allDone.join();
 
-					JSONArray productitemObject = new JSONArray(productitemFuture.toString());
-					JSONArray productlocationObject = new JSONArray(productlocationFuture.toString());
+					JSONArray productitemObject = productitemFuture.get();
+					JSONArray lookups = lookupFuture.get();
 
 					for (int i=0; i<productiteminventories.size(); i++) {
 						for (int j=0; j<productitemObject.length(); j++) {
 							JSONObject productitem = productitemObject.getJSONObject(j);
-							if (productiteminventories.get(i).getPRODUCTITEM_ID() != null && productiteminventories.get(i).getPRODUCTITEM_ID() == productitem.getLong("PRODUCTITEM_ID")) {
+							if (productiteminventories.get(i).getPRODUCTITEM_ID() != null && productiteminventories.get(i).getPRODUCTITEM_ID() == productitem.getLong("productitem_ID")) {
 								productiteminventories.get(i).setPRODUCTITEM_DETAIL(productitem.toString());
 							}
 						}
-						for (int j=0; j<productlocationObject.length(); j++) {
-							JSONObject productlocation = productlocationObject.getJSONObject(j);
-							if (productiteminventories.get(i).getPRODUCTLOCATION_ID() != null && productiteminventories.get(i).getPRODUCTLOCATION_ID() == productlocation.getLong("PRODUCTLOCATION_ID")) {
-								productiteminventories.get(i).setPRODUCTLOCATION_DETAIL(productlocation.toString());
+						for (int j=0; j<lookups.length(); j++) {
+							if (productiteminventories.get(i).getPRODUCTLOCATION_ID() != null && productiteminventories.get(i).getPRODUCTLOCATION_ID() == lookups.getJSONObject(j).getLong("id") ) {
+								productiteminventories.get(i).setPRODUCTLOCATION_DETAIL(lookups.getJSONObject(j).toString());
 							}
 						}
 					}
@@ -552,24 +551,21 @@ public class productItemInventoryController {
 					rtnAPIResponse = mapper.writeValueAsString(productiteminventories.get(0));
 				else	
 					rtnAPIResponse = mapper.writeValueAsString(productiteminventories);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (productiteminventory != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(productiteminventory);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (productiteminventories != null && isWithDetail == false) {
 				rtnAPIResponse = mapper.writeValueAsString(productiteminventories);
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (jsonProductItemInventories != null) {
 				rtnAPIResponse = jsonProductItemInventories.toString();
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 
 			} else if (jsonProductItemInventory != null) {
 				rtnAPIResponse = jsonProductItemInventory.toString();
-				apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 			}
+
+			apiRequestLog.apiRequestSaveLog(apiRequest, rtnAPIResponse, "Success");
 		}
 
 		return rtnAPIResponse;
