@@ -581,7 +581,7 @@ public class productController {
 						}
 
 						try {
-							return new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getString("access_TOKEN"), true));
+							return new JSONArray(ServiceCall.POST("productcategory/ids", "{productcategories: "+productcategoryList+"}", apiRequest.getString("access_TOKEN"), false));
 						} catch (JSONException | JsonProcessingException | ParseException e) {
 							e.printStackTrace();
 							return new JSONArray();
@@ -594,7 +594,7 @@ public class productController {
 						}
 
 						try {
-							return new JSONArray(ServiceCall.POST("taxcode/ids", "{taxcodes: "+taxcodeList+"}", apiRequest.getString("access_TOKEN"), true));
+							return new JSONArray(ServiceCall.POST("taxcode/ids", "{taxcodes: "+taxcodeList+"}", apiRequest.getString("access_TOKEN"), false));
 						} catch (JSONException | JsonProcessingException | ParseException e) {
 							e.printStackTrace();
 							return new JSONArray();
@@ -607,7 +607,7 @@ public class productController {
 						}
 
 						try {
-							return new JSONArray(ServiceCall.POST("ledgeraccount/ids", "{ledgeraccounts: "+ledgeraccountList+"}", apiRequest.getString("access_TOKEN"), true));
+							return new JSONArray(ServiceCall.POST("ledgeraccount/ids", "{ledgeraccounts: "+ledgeraccountList+"}", apiRequest.getString("access_TOKEN"), false));
 						} catch (JSONException | JsonProcessingException | ParseException e) {
 							e.printStackTrace();
 							return new JSONArray();

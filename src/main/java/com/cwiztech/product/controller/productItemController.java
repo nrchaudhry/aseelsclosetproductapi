@@ -542,7 +542,7 @@ public class productItemController {
 						}
 
 						try {
-							return new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), true));
+							return new JSONArray(ServiceCall.POST("product/ids", "{products: "+productList+"}", apiRequest.getString("access_TOKEN"), false));
 						} catch (JSONException | JsonProcessingException | ParseException e) {
 							e.printStackTrace();
 							return new JSONArray();
