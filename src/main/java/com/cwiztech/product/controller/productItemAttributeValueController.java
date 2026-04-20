@@ -105,7 +105,7 @@ public class productItemAttributeValueController {
 
 		List<Integer> productitem_IDS = new ArrayList<Integer>(); 
 		JSONObject jsonObj = new JSONObject(data);
-		JSONArray jsonproductitems = jsonObj.getJSONArray("items");
+		JSONArray jsonproductitems = jsonObj.getJSONArray("productitems");
 		for (int i=0; i<jsonproductitems.length(); i++) {
 			productitem_IDS.add((Integer) jsonproductitems.get(i));
 		}
